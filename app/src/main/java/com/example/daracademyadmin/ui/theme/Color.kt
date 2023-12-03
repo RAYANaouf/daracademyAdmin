@@ -28,14 +28,17 @@ val customWhite7 = Color(0xFF909090)
 
 /***************  costume black  ******************/
 
-val customBlack0 = Color(0xFF000000)
-val customBlack1 = Color(0xFF101010)
-val customBlack2 = Color(0xFF202020)
-val customBlack3 = Color(0xFF303030)
-val customBlack4 = Color(0xFF404040)
-val customBlack5 = Color(0xFF505050)
-val customBlack6 = Color(0xFF606060)
-val customBlack7 = Color(0xFF707070)
+val customBlack0  = Color(0xFF000000)
+val customBlack1  = Color(0xFF101010)
+val customBlack2  = Color(0xFF202020)
+val customBlack3  = Color(0xFF303030)
+val customBlack4  = Color(0xFF404040)
+val customBlack5  = Color(0xFF505050)
+val customBlack6  = Color(0xFF606060)
+val customBlack7  = Color(0xFF707070)
+val customBlack8  = Color(0xFF909090)
+val customBlack9  = Color(0xFFA0A0A0)
+val customBlack10 = Color(0xFFB0B0B0)
 
 /**************************************************/
 

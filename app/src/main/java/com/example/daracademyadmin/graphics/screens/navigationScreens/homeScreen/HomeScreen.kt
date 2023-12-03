@@ -87,19 +87,18 @@ fun HomeScreen(
                             if (category.screen==Screens.HomeScreen().root){
                                 Screens.HomeScreen()
                             }
-//                            else if (category.screen==Screens.AddStudentScreen().root){
-//                                Screens.AddStudentScreen()
-//                            }else if (category.screen==Screens.AddTeacherScreen().root){
-//                                Screens.AddTeacherScreen()
-//                            }else if (category.screen==Screens.AddFormationScreen().root){
-//                                Screens.AddFormationScreen()
-//                            }
                             else if (category.screen==Screens.AddTeacherScreen().root){
                                 Screens.AddTeacherScreen()
                             }
                             else if (category.screen==Screens.AddPostScreen().root){
                                 Screens.AddPostScreen()
                             }
+                            else if (category.screen==Screens.AddFormationScreen().root){
+                                Screens.AddFormationScreen()
+                            }
+//                            else if (category.screen==Screens.AddSupportCourseScreen().root){
+//                                Screens.AddSupportCourseScreen()
+//                            }
                             else{
                                 Screens.HomeScreen()
                             }

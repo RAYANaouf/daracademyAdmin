@@ -1,13 +1,9 @@
 package com.example.daracademyadmin
 
-import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -35,12 +31,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -62,16 +54,18 @@ import androidx.navigation.compose.rememberNavController
 import com.example.bigsam.grafic.material.topBar.AlphaTopBar2
 import com.example.bigsam.model.data.`object`.NormalTextStyles
 import com.example.daracademy.model.data.sealedClasses.screens.Screens
-import com.example.daracademyadmin.graphics.material.alphaBottomBar.AlphaBottomBar
 import com.example.daracademyadmin.graphics.screens.fullScreen.SignInScreen
 import com.example.daracademyadmin.graphics.material.alphaTopBar.AlphaTopAppBar3
-import com.example.daracademyadmin.graphics.screens.navigationScreens.AddPost.AddPostScreen
-import com.example.daracademyadmin.graphics.screens.navigationScreens.AddTeacher.AddTeacherScreen
+import com.example.daracademyadmin.graphics.screens.navigationScreens.addFormation.AddFormationScreen
+import com.example.daracademyadmin.graphics.screens.navigationScreens.addPost.AddPostScreen
+import com.example.daracademyadmin.graphics.screens.navigationScreens.addSupportCourse.AddSupportCourseScreen
+import com.example.daracademyadmin.graphics.screens.navigationScreens.addTeacher.AddTeacherScreen
 import com.example.daracademyadmin.graphics.screens.navigationScreens.homeScreen.HomeScreen
 import com.example.daracademyadmin.model.data.variables.firaSansFamily
 import com.example.daracademyadmin.model.viewModel.DaracademyAdminViewModel
 import com.example.daracademyadmin.ui.theme.DaracademyAdminTheme
 import com.example.daracademyadmin.ui.theme.color1
+import com.example.daracademyadmin.ui.theme.color3
 import com.example.daracademyadmin.ui.theme.customWhite7
 import kotlinx.coroutines.launch
 
@@ -520,18 +514,16 @@ fun MainScreen(
 
                         },
                         trailingActions = {
-                            if (navBackStackEntry?.destination?.route == Screens.AddPostScreen().root){
-                                Icon(
-                                    painter = painterResource(id = R.drawable.translation_inline),
-                                    contentDescription = null,
-                                    tint = color1,
-                                    modifier = Modifier
-                                        .size(26.dp)
-                                        .clickable {
+                            Icon(
+                                painter = painterResource(id = R.drawable.translation_inline),
+                                contentDescription = null,
+                                tint = color1,
+                                modifier = Modifier
+                                    .size(26.dp)
+                                    .clickable {
 
-                                        }
-                                )
-                            }
+                                    }
+                            )
                         }
                     )
                 }
@@ -539,7 +531,9 @@ fun MainScreen(
 
             },
             bottomBar = {
-
+//                if(navBackStackEntry?.destination?.route == Screens.AddPostScreen().root){
+//
+//                }
             }
         ) { paddingValues ->
 
@@ -574,16 +568,44 @@ fun MainScreen(
 
                 composable(route = Screens.AddTeacherScreen().root){
                     AddTeacherScreen(
-//                        viewModel = viewModel,
+                        viewModel = viewModel,
                         onNavigate = {
                             navController.navigate(it.root)
                             viewModel.setAppScreen(it)
                         },
-                        viewModel = viewModel,
                         modifier = Modifier
                             .padding(top = paddingValues.calculateTopPadding() , bottom = paddingValues.calculateBottomPadding() )
                     )
                 }
+
+                composable(route = Screens.AddFormationScreen().root){
+                    AddFormationScreen(
+//                        viewModel = viewModel,
+//                        onNavigate = {
+//                            navController.navigate(it.root)
+//                            viewModel.setAppScreen(it)
+//                        },
+                        modifier = Modifier
+                            .background(color3)
+                            .padding(top = paddingValues.calculateTopPadding() , bottom = paddingValues.calculateBottomPadding() )
+                    )
+                }
+
+//                composable(route = Screens.AddSupportCourseScreen().root){
+//                    AddSupportCourseScreen(
+////                        viewModel = viewModel,
+////                        onNavigate = {
+////                            navController.navigate(it.root)
+////                            viewModel.setAppScreen(it)
+////                        },
+//                        modifier = Modifier
+//                            .padding(
+//                                top = paddingValues.calculateTopPadding(),
+//                                bottom = paddingValues.calculateBottomPadding()
+//                            )
+//                    )
+//                }
+
 
             }
 

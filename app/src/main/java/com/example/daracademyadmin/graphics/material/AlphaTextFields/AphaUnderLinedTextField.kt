@@ -5,6 +5,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.checkScrollableContainerConstraints
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -43,7 +45,7 @@ fun AlphaUnderLinedTextField(
 ) {
 
     Box(
-        contentAlignment = Alignment.Center,
+        contentAlignment = Alignment.CenterStart,
         modifier = modifier
             .wrapContentWidth()
             .drawBehind {
@@ -54,6 +56,8 @@ fun AlphaUnderLinedTextField(
                     end         = Offset(size.width , size.height)
                 )
             }
+            .padding(bottom = 4.dp)
+
     ) {
 
         BasicTextField(
@@ -67,7 +71,6 @@ fun AlphaUnderLinedTextField(
             keyboardOptions = keyboardOptions,
             visualTransformation = visualTransformation,
             modifier = Modifier
-                .fillMaxWidth()
         )
 
         if (text == ""){

@@ -11,6 +11,7 @@ sealed class Screens(val root : String){
     class AddPostScreen              : Screens(root = screens.addPostScreen)
     class AddTeacherScreen           : Screens(root = screens.addTeacherScreen)
     class AddFormationScreen         : Screens(root = screens.addFormationScreen)
+//    class AddSupportCourseScreen     : Screens(root = screens.add)
     class AddStudentScreen           : Screens(root = screens.addStudentScreen)
 
 }
