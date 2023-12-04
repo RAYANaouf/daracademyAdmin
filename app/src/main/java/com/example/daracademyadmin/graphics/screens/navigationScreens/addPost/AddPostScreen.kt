@@ -88,7 +88,6 @@ fun AddPostScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Color(parseColor("#F9F9F9")))
     ) {
 
 

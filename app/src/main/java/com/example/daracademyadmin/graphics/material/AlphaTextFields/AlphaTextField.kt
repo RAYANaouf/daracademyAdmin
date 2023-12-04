@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,6 +38,7 @@ fun AlphaTextField(
     hint : String ,
     hintStyle : TextStyle,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions(),
     visualTransformation : VisualTransformation = VisualTransformation.None,
     cursorColor : Color = Color.Black
 ) {
@@ -65,7 +67,7 @@ fun AlphaTextField(
             cursorBrush = SolidColor(cursorColor),
             keyboardOptions = keyboardOptions,
             visualTransformation = visualTransformation,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
         )
 
         if (text == ""){

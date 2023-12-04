@@ -8,6 +8,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,17 +20,27 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -52,6 +63,7 @@ import com.example.daracademyadmin.R
 import com.example.daracademyadmin.graphics.material.AlphaTextFields.AlphaUnderLinedTextField
 import com.example.daracademyadmin.graphics.material.alphaBottomBar.AlphaAdjustableBottomBar
 import com.example.daracademyadmin.graphics.material.alphaBottomBar.AlphaBottomBar
+import com.example.daracademyadmin.graphics.screens.navigationScreens.addFormation.bottomSheet.BottomSheet
 import com.example.daracademyadmin.model.data.variables.josefinSansFamily
 import com.example.daracademyadmin.ui.theme.color1
 import com.example.daracademyadmin.ui.theme.color3
@@ -59,7 +71,9 @@ import com.example.daracademyadmin.ui.theme.customBlack9
 import com.example.daracademyadmin.ui.theme.customWhite0
 import com.example.daracademyadmin.ui.theme.customWhite1
 import com.example.daracademyadmin.ui.theme.customWhite2
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddFormationScreen(
     modifier : Modifier = Modifier
@@ -93,10 +107,34 @@ fun AddFormationScreen(
         }
     }
 
+
+    var show_bottomSheet by remember{
+        mutableStateOf(false)
+    }
+
+    var hashtag : List<String> by rememberSaveable {
+        mutableStateOf(emptyList())
+    }
+
+    BottomSheet(
+        show = show_bottomSheet,
+        onDismiss = {
+            show_bottomSheet = false
+        },
+        hashtagList = hashtag,
+        onAddHashtagClick = {
+            val newHashtagList = ArrayList<String>()
+            newHashtagList.addAll(hashtag)
+            newHashtagList.add(it)
+            hashtag = newHashtagList
+        }
+    )
+
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(Color(parseColor("#f9f9f9")))
+            .verticalScroll(rememberScrollState())
     ) {
 
         Box(
@@ -244,6 +282,7 @@ fun AddFormationScreen(
                 .background(customWhite0)
         ) {
 
+            //add photo
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
@@ -265,13 +304,14 @@ fun AddFormationScreen(
             }
 
 
+            //hashtag
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .fillMaxHeight()
                     .width(65.dp)
                     .clickable {
-
+                        show_bottomSheet = true
                     }
             ) {
                 Icon(
@@ -283,13 +323,14 @@ fun AddFormationScreen(
                 )
             }
 
+            //scheduler
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .fillMaxHeight()
                     .width(65.dp)
                     .clickable {
-
+                        show_bottomSheet = true
                     }
             ) {
                 Icon(
@@ -301,13 +342,14 @@ fun AddFormationScreen(
                 )
             }
 
+            //set teacher
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .fillMaxHeight()
                     .width(65.dp)
                     .clickable {
-
+                        show_bottomSheet = true
                     }
             ) {
                 Icon(
@@ -321,6 +363,7 @@ fun AddFormationScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
+            //send
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier

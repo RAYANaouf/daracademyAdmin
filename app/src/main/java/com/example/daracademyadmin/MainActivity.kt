@@ -1,5 +1,6 @@
 package com.example.daracademyadmin
 
+import android.graphics.Rect
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -9,15 +10,24 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.isImeVisible
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DrawerValue
@@ -40,10 +50,12 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -65,7 +77,9 @@ import com.example.daracademyadmin.model.data.variables.firaSansFamily
 import com.example.daracademyadmin.model.viewModel.DaracademyAdminViewModel
 import com.example.daracademyadmin.ui.theme.DaracademyAdminTheme
 import com.example.daracademyadmin.ui.theme.color1
+import com.example.daracademyadmin.ui.theme.color2
 import com.example.daracademyadmin.ui.theme.color3
+import com.example.daracademyadmin.ui.theme.customWhite0
 import com.example.daracademyadmin.ui.theme.customWhite7
 import kotlinx.coroutines.launch
 
@@ -76,6 +90,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        WindowCompat.setDecorFitsSystemWindows(window , false)
 
         setContent {
 
@@ -118,7 +134,7 @@ class MainActivity : ComponentActivity() {
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun MainScreen(
     viewModel     : DaracademyAdminViewModel,
@@ -420,176 +436,190 @@ fun MainScreen(
             }
         },
         drawerState = drawerState,
+        modifier = Modifier
+            .background(customWhite0)
+            .windowInsetsPadding(WindowInsets.navigationBars)
     ) {
 
-        Scaffold(
-            topBar = {
 
-                if ( navBackStackEntry?.destination?.route == Screens.HomeScreen().root ){
-                    AlphaTopBar2(
-                        img = painterResource(id = R.drawable.daracademy),
-                        onImgClick = {
-                            coroutineScope.launch {
-                                Toast.makeText(context , "${navBackStackEntry?.destination?.route}" , Toast.LENGTH_LONG).show()
-                                drawerState.apply {
-                                    open()
+        Box(
+            modifier = Modifier
+                .windowInsetsPadding(WindowInsets.safeDrawing)
+        ) {
+
+            Scaffold(
+                topBar = {
+
+                    if ( navBackStackEntry?.destination?.route == Screens.HomeScreen().root ){
+                        AlphaTopBar2(
+                            img = painterResource(id = R.drawable.daracademy),
+                            onImgClick = {
+                                coroutineScope.launch {
+                                    Toast.makeText(context , "${navBackStackEntry?.destination?.route}" , Toast.LENGTH_LONG).show()
+                                    drawerState.apply {
+                                        open()
+                                    }
                                 }
-                            }
-                        },
-                        txt = "Daracademy"
-                    )
-                }
-                else {
+                            },
+                            txt = "Daracademy",
+                            modifier = Modifier
+                        )
+                    }
+                    else {
 
-                    val img = remember {
-                        if(navBackStackEntry?.destination?.route == Screens.AddPostScreen().root){
-                            R.drawable.post
+                        val img = remember {
+                            if(navBackStackEntry?.destination?.route == Screens.AddPostScreen().root){
+                                R.drawable.post
+                            }
+                            else if(navBackStackEntry?.destination?.route == Screens.AddTeacherScreen().root){
+                                R.drawable.teacher
+                            }
+                            else if(navBackStackEntry?.destination?.route == Screens.AddStudentScreen().root){
+                                R.drawable.teacher
+                            }
+                            else if(navBackStackEntry?.destination?.route == Screens.AddFormationScreen().root){
+                                R.drawable.formation
+                            }
+                            else{
+                                R.drawable.about_us
+                            }
                         }
-                        else if(navBackStackEntry?.destination?.route == Screens.AddTeacherScreen().root){
-                            R.drawable.teacher
+
+                        val title = remember {
+                            if(navBackStackEntry?.destination?.route == Screens.AddPostScreen().root){
+                                "Add post"
+                            }
+                            else if(navBackStackEntry?.destination?.route == Screens.AddTeacherScreen().root){
+                                "Add teacher"
+                            }
+                            else if(navBackStackEntry?.destination?.route == Screens.AddStudentScreen().root){
+                                "Add student"
+                            }
+                            else if(navBackStackEntry?.destination?.route == Screens.AddFormationScreen().root){
+                                "Add formation"
+                            }
+                            else{
+                                "I dont know"
+                            }
                         }
-                        else if(navBackStackEntry?.destination?.route == Screens.AddStudentScreen().root){
-                            R.drawable.teacher
-                        }
-                        else if(navBackStackEntry?.destination?.route == Screens.AddFormationScreen().root){
-                            R.drawable.formation
-                        }
-                        else{
-                            R.drawable.about_us
-                        }
+
+
+                        AlphaTopAppBar3(
+                            onCloseClicked = {
+                                viewModel.setAppScreen(Screens.HomeScreen())
+                                navController.navigate(Screens.HomeScreen().root)
+                            },
+                            centralTitle = {
+                                if(navBackStackEntry?.destination?.route != Screens.AddPostScreen().root){
+
+                                }
+
+                                Image(
+                                    painter = painterResource(id = img),
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Inside,
+                                    modifier = Modifier
+                                        .size(26.dp)
+                                        .clickable {
+                                            Toast
+                                                .makeText(
+                                                    context,
+                                                    "${navBackStackEntry?.destination?.route == Screens.AddPostScreen().root} ${Screens.AddPostScreen().root} ",
+                                                    Toast.LENGTH_LONG
+                                                )
+                                                .show()
+                                        }
+                                )
+
+                                Spacer(modifier = Modifier.width(10.dp))
+
+                                Text(
+                                    text = title ,
+                                    style = NormalTextStyles.TextStyleSZ5.copy(fontFamily = firaSansFamily , fontWeight = FontWeight.SemiBold , color = color1),
+                                )
+
+                            },
+                            trailingActions = {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.translation_inline),
+                                    contentDescription = null,
+                                    tint = color1,
+                                    modifier = Modifier
+                                        .size(26.dp)
+                                        .clickable {
+
+                                        }
+                                )
+                            },
+                        )
                     }
 
-                    val title = remember {
-                        if(navBackStackEntry?.destination?.route == Screens.AddPostScreen().root){
-                            "Add post"
-                        }
-                        else if(navBackStackEntry?.destination?.route == Screens.AddTeacherScreen().root){
-                            "Add teacher"
-                        }
-                        else if(navBackStackEntry?.destination?.route == Screens.AddStudentScreen().root){
-                            "Add student"
-                        }
-                        else if(navBackStackEntry?.destination?.route == Screens.AddFormationScreen().root){
-                            "Add formation"
-                        }
-                        else{
-                            "I dont know"
-                        }
+
+                },
+                modifier = Modifier
+                    .background(customWhite0)
+            ) { paddingValues ->
+
+                NavHost(
+                    navController = navController,
+                    startDestination = Screens.HomeScreen().root,
+                    modifier = Modifier
+                        .background(Color(android.graphics.Color.parseColor("#000000")))
+                ) {
+
+                    composable(route = Screens.HomeScreen().root) {
+                        HomeScreen(
+                            viewModel = viewModel,
+                            onNavigate = {
+                                viewModel.setAppScreen(it)
+                                navController.navigate(it.root)
+                            },
+                            modifier = Modifier
+                                .background(Color(android.graphics.Color.parseColor("#F9F9F9")))
+                                .padding(
+                                    top = paddingValues.calculateTopPadding(),
+                                )
+                        )
                     }
 
+                    composable(route = Screens.AddPostScreen().root){
+                        AddPostScreen(
+                            viewModel = viewModel,
+                            onNavigate = {
+                                navController.navigate(Screens.HomeScreen().root)
+                                viewModel.setAppScreen(Screens.HomeScreen())
+                            },
+                            modifier = Modifier
+                                .background(Color(android.graphics.Color.parseColor("#Fa5751")))
+                                .padding(
+                                    top = paddingValues.calculateTopPadding(),
+                                )
+                        )
+                    }
 
-                    AlphaTopAppBar3(
-                        onCloseClicked = {
-                            viewModel.setAppScreen(Screens.HomeScreen())
-                            navController.navigate(Screens.HomeScreen().root)
-                        },
-                        centralTitle = {
-                            if(navBackStackEntry?.destination?.route != Screens.AddPostScreen().root){
+                    composable(route = Screens.AddTeacherScreen().root){
+                        AddTeacherScreen(
+                            viewModel = viewModel,
+                            onNavigate = {
+                                navController.navigate(it.root)
+                                viewModel.setAppScreen(it)
+                            },
+                            modifier = Modifier
+                                .padding(top = paddingValues.calculateTopPadding()  )
+                        )
+                    }
 
-                            }
-
-                            Image(
-                                painter = painterResource(id = img),
-                                contentDescription = null,
-                                contentScale = ContentScale.Inside,
-                                modifier = Modifier
-                                    .size(26.dp)
-                                    .clickable {
-                                        Toast
-                                            .makeText(
-                                                context,
-                                                "${navBackStackEntry?.destination?.route == Screens.AddPostScreen().root} ${Screens.AddPostScreen().root} ",
-                                                Toast.LENGTH_LONG
-                                            )
-                                            .show()
-                                    }
-                            )
-
-                            Spacer(modifier = Modifier.width(10.dp))
-
-                            Text(
-                                text = title ,
-                                style = NormalTextStyles.TextStyleSZ5.copy(fontFamily = firaSansFamily , fontWeight = FontWeight.SemiBold , color = color1),
-                            )
-
-                        },
-                        trailingActions = {
-                            Icon(
-                                painter = painterResource(id = R.drawable.translation_inline),
-                                contentDescription = null,
-                                tint = color1,
-                                modifier = Modifier
-                                    .size(26.dp)
-                                    .clickable {
-
-                                    }
-                            )
-                        }
-                    )
-                }
-
-
-            },
-            bottomBar = {
-//                if(navBackStackEntry?.destination?.route == Screens.AddPostScreen().root){
-//
-//                }
-            }
-        ) { paddingValues ->
-
-            NavHost(
-                navController = navController,
-                startDestination = Screens.HomeScreen().root
-            ) {
-
-                composable(route = Screens.HomeScreen().root) {
-                    HomeScreen(
-                        viewModel = viewModel,
-                        onNavigate = {
-                            viewModel.setAppScreen(it)
-                            navController.navigate(it.root)
-                        },
-                        modifier = Modifier
-                            .padding(top = paddingValues.calculateTopPadding() , bottom = paddingValues.calculateBottomPadding() )
-                    )
-                }
-
-                composable(route = Screens.AddPostScreen().root){
-                    AddPostScreen(
-                        viewModel = viewModel,
-                        onNavigate = {
-                            navController.navigate(Screens.HomeScreen().root)
-                            viewModel.setAppScreen(Screens.HomeScreen())
-                        },
-                        modifier = Modifier
-                            .padding(top = paddingValues.calculateTopPadding() , bottom = paddingValues.calculateBottomPadding() )
-                    )
-                }
-
-                composable(route = Screens.AddTeacherScreen().root){
-                    AddTeacherScreen(
-                        viewModel = viewModel,
-                        onNavigate = {
-                            navController.navigate(it.root)
-                            viewModel.setAppScreen(it)
-                        },
-                        modifier = Modifier
-                            .padding(top = paddingValues.calculateTopPadding() , bottom = paddingValues.calculateBottomPadding() )
-                    )
-                }
-
-                composable(route = Screens.AddFormationScreen().root){
-                    AddFormationScreen(
+                    composable(route = Screens.AddFormationScreen().root){
+                        AddFormationScreen(
 //                        viewModel = viewModel,
 //                        onNavigate = {
 //                            navController.navigate(it.root)
 //                            viewModel.setAppScreen(it)
 //                        },
-                        modifier = Modifier
-                            .background(color3)
-                            .padding(top = paddingValues.calculateTopPadding() , bottom = paddingValues.calculateBottomPadding() )
-                    )
-                }
+                            modifier = Modifier
+                                .padding(top = paddingValues.calculateTopPadding() )
+                        )
+                    }
 
 //                composable(route = Screens.AddSupportCourseScreen().root){
 //                    AddSupportCourseScreen(
@@ -607,9 +637,14 @@ fun MainScreen(
 //                }
 
 
+                }
+
             }
 
+
         }
+
+
 
     }
 
