@@ -10,6 +10,7 @@ import androidx.compose.runtime.setValue
 import androidx.core.util.rangeTo
 import androidx.lifecycle.ViewModel
 import com.example.daracademy.model.data.sealedClasses.screens.Screens
+import com.example.daracademyadmin.model.data.dataClasses.Teacher
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
@@ -162,23 +163,67 @@ class DaracademyAdminViewModel : ViewModel{
     }
 
 
-    fun addTeacher( name : String , email: String , phone : String , formation : HashMap<String , String> , support : HashMap<String , String> ,  onSuccessCallBack: () -> Unit = {} , onFailureCallBack: (exp : Exception) -> Unit = {}){
+    fun addTeacher( name : String , email: String , number : String , type : String , photo : Uri? ,  formation : List<String> , support : List<String> ,  onSuccessCallBack: () -> Unit = {} , onFailureCallBack: (exp : Exception) -> Unit = {}){
 
-        firebaseFirestore.collection("teacher")
+
+        val teachersRef = storageRef.child("teachers")
+
+        firebaseFirestore.collection("teachers")
             .add(
                 hashMapOf(
                     "name"       to name,
                     "email"      to email,
-                    "number"     to phone,
+                    "phone"      to hashMapOf("type" to type , "number" to number),
                     "formations" to formation,
-                    "supports"   to support
+                    "supports"   to support,
+                    "photo"      to ""
                 )
             )
+            .addOnSuccessListener { documentRef->
+
+                if (photo == null) { onSuccessCallBack() }
+                else{
+                    val photoRef = teachersRef.child("${name}_${documentRef.id}/photo")
+                    photoRef.putFile(photo)
+                        .addOnSuccessListener { _->
+                            //get the uri
+                            photoRef.downloadUrl
+                                .addOnSuccessListener { downloadUri->
+                                    firebaseFirestore.collection("teachers")
+                                        .document(documentRef.id)
+                                        .update("photo" , downloadUri)
+                                        .addOnSuccessListener { onSuccessCallBack() }
+                                        .addOnFailureListener { onFailureCallBack(it) }
+                                }
+                                .addOnFailureListener { onFailureCallBack(it) }
+                        }
+                        .addOnFailureListener{ onFailureCallBack(it) }
+                }
+
+            }
+
+
+    }
+
+
+    fun getAllTeachers(onSuccessCallBack: (List<Teacher>) -> Unit = {} , onFailureCallBack: (exp : Exception) -> Unit = {}){
+
+        firebaseFirestore.collection("teachers")
+            .get()
+            .addOnCompleteListener { task->
+                if (task.isSuccessful){
+                    var teacherList = arrayListOf<Teacher>()
+                    for (doc in task.result.documents){
+                        val teacher = doc.toObject(Teacher::class.java)
+                        if (teacher != null){
+                            teacherList.add(teacher)
+                        }
+                    }
+                 onSuccessCallBack(teacherList)
+                }
+            }
             .addOnFailureListener {
                 onFailureCallBack(it)
-            }
-            .addOnSuccessListener {
-                onSuccessCallBack()
             }
 
     }

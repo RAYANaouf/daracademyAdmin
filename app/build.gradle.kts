@@ -90,6 +90,11 @@ dependencies {
     implementation("com.airbnb.android:lottie-compose:6.1.0")
 
 
+    //time picker
+    // https://mvnrepository.com/artifact/io.github.vanpra.compose-material-dialogs/datetime
+    implementation("io.github.vanpra.compose-material-dialogs:datetime:0.9.0")
+
+
 
 
     /****************************  firebase   ****************************/

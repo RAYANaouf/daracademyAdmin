@@ -1,10 +1,12 @@
 package com.example.daracademyadmin
 
 import android.graphics.Rect
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,6 +32,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.Button
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -38,11 +42,14 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -63,12 +70,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.alphaspace.screens.common.textFields.AlphaTextField
 import com.example.bigsam.grafic.material.topBar.AlphaTopBar2
 import com.example.bigsam.model.data.`object`.NormalTextStyles
 import com.example.daracademy.model.data.sealedClasses.screens.Screens
 import com.example.daracademyadmin.graphics.screens.fullScreen.SignInScreen
 import com.example.daracademyadmin.graphics.material.alphaTopBar.AlphaTopAppBar3
 import com.example.daracademyadmin.graphics.screens.navigationScreens.addFormation.AddFormationScreen
+import com.example.daracademyadmin.graphics.screens.navigationScreens.addFormation.bottomSheet.BottomSheet
 import com.example.daracademyadmin.graphics.screens.navigationScreens.addPost.AddPostScreen
 import com.example.daracademyadmin.graphics.screens.navigationScreens.addSupportCourse.AddSupportCourseScreen
 import com.example.daracademyadmin.graphics.screens.navigationScreens.addTeacher.AddTeacherScreen
@@ -88,6 +97,7 @@ class MainActivity : ComponentActivity() {
 
 
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -134,6 +144,7 @@ class MainActivity : ComponentActivity() {
 }
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun MainScreen(
@@ -147,6 +158,9 @@ fun MainScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
 
+    var show_bottomSheet by remember {
+        mutableStateOf(false)
+    }
 
 
 
@@ -447,9 +461,9 @@ fun MainScreen(
                 .windowInsetsPadding(WindowInsets.safeDrawing)
         ) {
 
+
             Scaffold(
                 topBar = {
-
                     if ( navBackStackEntry?.destination?.route == Screens.HomeScreen().root ){
                         AlphaTopBar2(
                             img = painterResource(id = R.drawable.daracademy),
@@ -553,18 +567,15 @@ fun MainScreen(
                             },
                         )
                     }
-
-
                 },
                 modifier = Modifier
                     .background(customWhite0)
-            ) { paddingValues ->
-
+                    .windowInsetsPadding(WindowInsets.statusBars)
+            ) {paddingValues ->
                 NavHost(
                     navController = navController,
                     startDestination = Screens.HomeScreen().root,
                     modifier = Modifier
-                        .background(Color(android.graphics.Color.parseColor("#000000")))
                 ) {
 
                     composable(route = Screens.HomeScreen().root) {
@@ -590,7 +601,6 @@ fun MainScreen(
                                 viewModel.setAppScreen(Screens.HomeScreen())
                             },
                             modifier = Modifier
-                                .background(Color(android.graphics.Color.parseColor("#Fa5751")))
                                 .padding(
                                     top = paddingValues.calculateTopPadding(),
                                 )
@@ -611,7 +621,7 @@ fun MainScreen(
 
                     composable(route = Screens.AddFormationScreen().root){
                         AddFormationScreen(
-//                        viewModel = viewModel,
+                        viewModel = viewModel,
 //                        onNavigate = {
 //                            navController.navigate(it.root)
 //                            viewModel.setAppScreen(it)
@@ -638,8 +648,9 @@ fun MainScreen(
 
 
                 }
-
             }
+
+
 
 
         }
@@ -651,6 +662,7 @@ fun MainScreen(
 }
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview
 @Composable
 fun MainScreen_preview() {

@@ -1,9 +1,12 @@
 package com.example.daracademyadmin.graphics.screens.navigationScreens.addFormation
 
 import android.graphics.Color.parseColor
+import android.os.Build
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -51,11 +54,15 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.bigsam.model.data.`object`.NormalTextStyles
 import com.example.daracademy.model.data.sealedClasses.screens.Screens
@@ -63,21 +70,48 @@ import com.example.daracademyadmin.R
 import com.example.daracademyadmin.graphics.material.AlphaTextFields.AlphaUnderLinedTextField
 import com.example.daracademyadmin.graphics.material.alphaBottomBar.AlphaAdjustableBottomBar
 import com.example.daracademyadmin.graphics.material.alphaBottomBar.AlphaBottomBar
+import com.example.daracademyadmin.graphics.screens.navigationScreens.addFormation.bottomSheet.AddTeacherBottomSheet
 import com.example.daracademyadmin.graphics.screens.navigationScreens.addFormation.bottomSheet.BottomSheet
+import com.example.daracademyadmin.graphics.screens.navigationScreens.addFormation.bottomSheet.SchedulerBottomSheet
+import com.example.daracademyadmin.graphics.screens.navigationScreens.addFormation.dialog.AddHashtagDialog
+import com.example.daracademyadmin.graphics.screens.navigationScreens.addFormation.dialog.PickDayDialog
+import com.example.daracademyadmin.model.data.dataClasses.Course
+import com.example.daracademyadmin.model.data.dataClasses.Teacher
 import com.example.daracademyadmin.model.data.variables.josefinSansFamily
+import com.example.daracademyadmin.model.viewModel.DaracademyAdminViewModel
 import com.example.daracademyadmin.ui.theme.color1
 import com.example.daracademyadmin.ui.theme.color3
 import com.example.daracademyadmin.ui.theme.customBlack9
 import com.example.daracademyadmin.ui.theme.customWhite0
 import com.example.daracademyadmin.ui.theme.customWhite1
 import com.example.daracademyadmin.ui.theme.customWhite2
+import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AddFormationScreen(
+    viewModel: DaracademyAdminViewModel,
     modifier : Modifier = Modifier
 ) {
+
+
+    var context = LocalContext.current
+
+
+    var teachers : List<Teacher> by rememberSaveable {
+        mutableStateOf(emptyList())
+    }
+
+    viewModel.getAllTeachers(
+        onSuccessCallBack = {
+            teachers = it
+        },
+        onFailureCallBack = {
+            Toast.makeText(context , "$it" , Toast.LENGTH_LONG).show()
+        }
+    )
 
     var name by rememberSaveable {
         mutableStateOf("")
@@ -88,6 +122,14 @@ fun AddFormationScreen(
     }
 
     var photo_uris : List<String> by rememberSaveable {
+        mutableStateOf(emptyList())
+    }
+
+    var hashtags : List<String> by rememberSaveable {
+        mutableStateOf(emptyList())
+    }
+
+    var courses : List<Course> by rememberSaveable {
         mutableStateOf(emptyList())
     }
 
@@ -108,102 +150,194 @@ fun AddFormationScreen(
     }
 
 
-    var show_bottomSheet by remember{
+//    var show_bottomSheet by remember{
+//        mutableStateOf(false)
+//    }
+
+    var show_schedulerBottomSheet by remember{
         mutableStateOf(false)
     }
 
-    var hashtag : List<String> by rememberSaveable {
-        mutableStateOf(emptyList())
+    var show_pickDateDialog by remember{
+        mutableStateOf(false)
     }
 
-    BottomSheet(
-        show = show_bottomSheet,
+    var show_pickDateDialogForIdet by remember{
+        mutableStateOf(false)
+    }
+
+    var show_addTeacherBottomSheet by remember{
+        mutableStateOf(false)
+    }
+
+    var idetIndex by remember{
+        mutableStateOf(-1)
+    }
+
+    val hashtagDialogState    = rememberMaterialDialogState()
+
+
+
+
+//    BottomSheet(
+//        show = show_bottomSheet,
+//        onDismiss = {
+//            show_bottomSheet = false
+//        },
+//        hashtagList = hashtag,
+//        onAddHashtagClick = {
+//            val newHashtagList = ArrayList<String>()
+//            newHashtagList.addAll(hashtag)
+//            newHashtagList.add(it)
+//            hashtag = newHashtagList
+//        }
+//    )
+
+    SchedulerBottomSheet(
+        show = show_schedulerBottomSheet,
         onDismiss = {
-            show_bottomSheet = false
+            show_schedulerBottomSheet = false
         },
-        hashtagList = hashtag,
-        onAddHashtagClick = {
-            val newHashtagList = ArrayList<String>()
-            newHashtagList.addAll(hashtag)
-            newHashtagList.add(it)
-            hashtag = newHashtagList
+        onAddClick = {
+            show_pickDateDialog = true
+        },
+        onIdetClick = {
+            idetIndex = it
+            show_pickDateDialogForIdet = true
+        },
+        coursesList = courses
+    )
+
+
+    PickDayDialog(
+        show = show_pickDateDialog,
+        onDismiss = {
+            show_pickDateDialog = false
+        },
+        onDoneClick = {
+            val newCourses =  ArrayList<Course>()
+            newCourses.addAll(courses)
+            newCourses.add(it)
+            courses = newCourses
         }
+    )
+
+    PickDayDialog(
+        show = show_pickDateDialogForIdet,
+        onDismiss = {
+            show_pickDateDialogForIdet = false
+        },
+        onDoneClick = {
+            val newCourses =  ArrayList<Course>()
+            newCourses.addAll(courses)
+            newCourses.removeAt(idetIndex)
+            newCourses.add(it)
+            courses = newCourses
+        }
+    )
+
+    AddHashtagDialog(
+        state = hashtagDialogState,
+        hashtags = hashtags,
+        onAddHashtag = {
+            val newHashtags = ArrayList<String>()
+            newHashtags.addAll(hashtags)
+            newHashtags.add(it)
+            hashtags = newHashtags
+        }
+    )
+
+
+
+    AddTeacherBottomSheet(
+        show = show_addTeacherBottomSheet,
+        onDismiss = {
+            show_addTeacherBottomSheet = false
+        },
+        teachers = teachers
     )
 
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(Color(parseColor("#f9f9f9")))
-            .verticalScroll(rememberScrollState())
     ) {
 
-        Box(
-            contentAlignment = Alignment.Center,
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
-                .height(160.dp)
                 .fillMaxWidth()
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
         ) {
-
             Box(
+                contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .size(135.dp)
+                    .height(160.dp)
+                    .fillMaxWidth()
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.formation) ,
-                    contentDescription = null,
-                    contentScale = ContentScale.FillBounds,
-                    modifier = Modifier
-                        .size(120.dp)
-                )
 
-                Icon(
-                    painter = painterResource(id = R.drawable.add_icon),
-                    contentDescription = null,
-                    tint = color1,
+                Box(
                     modifier = Modifier
-                        .size(30.dp)
-                        .align(Alignment.BottomEnd)
-                        .clip(CircleShape)
-                        .background(customWhite1)
-                )
+                        .size(135.dp)
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.formation) ,
+                        contentDescription = null,
+                        contentScale = ContentScale.FillBounds,
+                        modifier = Modifier
+                            .size(120.dp)
+                    )
+
+                    Icon(
+                        painter = painterResource(id = R.drawable.add_icon),
+                        contentDescription = null,
+                        tint = color1,
+                        modifier = Modifier
+                            .size(30.dp)
+                            .align(Alignment.BottomEnd)
+                            .clip(CircleShape)
+                            .background(customWhite1)
+                    )
+                }
+
             }
 
+            Spacer(modifier = Modifier.height(16.dp))
+
+
+            AlphaUnderLinedTextField(
+                text = name,
+                onValueChange = {
+                    name =it
+                },
+                underLineColor = color1,
+                underLineWidth = 1.5f,
+                textFieldStyle = NormalTextStyles.TextStyleSZ6.copy(fontFamily = josefinSansFamily ),
+                hint = "Formation name",
+                hintStyle = NormalTextStyles.TextStyleSZ6.copy(fontFamily = josefinSansFamily ),
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+            )
+
+
+            Spacer(modifier = Modifier.height(26.dp))
+
+            AlphaUnderLinedTextField(
+                text = desc,
+                onValueChange = {
+                    desc =it
+                },
+                textFieldStyle = NormalTextStyles.TextStyleSZ6.copy(fontFamily = josefinSansFamily , color = customBlack9 , lineHeight = TextUnit(25f , TextUnitType.Sp)),
+                hint = "Formation's description",
+                hintStyle = NormalTextStyles.TextStyleSZ6.copy(fontFamily = josefinSansFamily , color = customBlack9),
+                modifier = Modifier
+                    .padding(start = 25.dp, end = 25.dp)
+                    .align(Alignment.Start)
+            )
+
         }
-        
-        Spacer(modifier = Modifier.height(16.dp))
 
-
-        AlphaUnderLinedTextField(
-            text = name,
-            onValueChange = {
-                name =it
-            },
-            underLineColor = color1,
-            underLineWidth = 1.5f,
-            textFieldStyle = NormalTextStyles.TextStyleSZ6.copy(fontFamily = josefinSansFamily ),
-            hint = "Formation name",
-            hintStyle = NormalTextStyles.TextStyleSZ6.copy(fontFamily = josefinSansFamily ),
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-        )
-
-        
-        Spacer(modifier = Modifier.height(26.dp))
-
-        AlphaUnderLinedTextField(
-            text = desc,
-            onValueChange = {
-                desc =it
-            },
-            textFieldStyle = NormalTextStyles.TextStyleSZ6.copy(fontFamily = josefinSansFamily , color = customBlack9 , lineHeight = TextUnit(25f , TextUnitType.Sp)),
-            hint = "Formation's description",
-            hintStyle = NormalTextStyles.TextStyleSZ6.copy(fontFamily = josefinSansFamily , color = customBlack9),
-            modifier = Modifier
-                .padding(start = 25.dp , end = 25.dp)
-        )
-        
-        
-        Spacer(modifier = Modifier.weight(1f))
         
         
         Spacer(
@@ -311,7 +445,8 @@ fun AddFormationScreen(
                     .fillMaxHeight()
                     .width(65.dp)
                     .clickable {
-                        show_bottomSheet = true
+//                        show_bottomSheet = true
+                        hashtagDialogState.show()
                     }
             ) {
                 Icon(
@@ -330,7 +465,7 @@ fun AddFormationScreen(
                     .fillMaxHeight()
                     .width(65.dp)
                     .clickable {
-                        show_bottomSheet = true
+                        show_schedulerBottomSheet = true
                     }
             ) {
                 Icon(
@@ -349,7 +484,7 @@ fun AddFormationScreen(
                     .fillMaxHeight()
                     .width(65.dp)
                     .clickable {
-                        show_bottomSheet = true
+                        show_addTeacherBottomSheet = true
                     }
             ) {
                 Icon(
@@ -391,8 +526,21 @@ fun AddFormationScreen(
 }
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview
 @Composable
 fun AddFormationScreen_preview() {
-    AddFormationScreen()
+    val context = LocalContext.current
+    AddFormationScreen(
+        viewModel = viewModel(
+            factory = object : ViewModelProvider.Factory{
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return if (modelClass.isAssignableFrom(DaracademyAdminViewModel::class.java))
+                        DaracademyAdminViewModel( context ) as T
+                    else
+                        throw IllegalArgumentException("cant create DaracademyAdminViewModel (addFormation Screen)")
+                }
+            }
+        )
+    )
 }

@@ -50,4 +50,7 @@ val color1 = Color(0xFF3B6ABA)
 val color2 = Color(0xFF00B2EB)
 val color3 = Color(0xFFF4C01E)
 
+val color2_a44 = Color(0x4400B2EB)
+val color2___  = Color(0xFFE4F8FF)
+
 /**************************************************/

@@ -3,7 +3,11 @@ package com.example.alphaspace.screens.common.textFields
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,9 +16,12 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
@@ -24,6 +31,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.daracademyadmin.ui.theme.color1
+import com.example.daracademyadmin.ui.theme.color2
+import com.example.daracademyadmin.ui.theme.color3
 import com.example.daracademyadmin.ui.theme.customWhite0
 
 @Composable
@@ -44,6 +53,10 @@ fun AlphaTextField(
 ) {
 
 
+    var focusRequester = remember {
+        FocusRequester()
+    }
+
 
     Box(
         contentAlignment = Alignment.CenterStart,
@@ -53,9 +66,13 @@ fun AlphaTextField(
                 border = borderStroke,
                 shape = shape
             )
-            .background(background)
+            .clickable {
+                focusRequester.requestFocus()
+            }
             .padding(start = 10.dp, end = 10.dp, top = 6.dp, bottom = 6.dp)
     ) {
+
+
 
         BasicTextField(
             value = text,
@@ -66,8 +83,10 @@ fun AlphaTextField(
             maxLines = 1,
             cursorBrush = SolidColor(cursorColor),
             keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
             visualTransformation = visualTransformation,
             modifier = Modifier
+                .focusRequester(focusRequester)
         )
 
         if (text == ""){
@@ -75,9 +94,12 @@ fun AlphaTextField(
                 text = hint ,
                 style = hintStyle,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier
             )
         }
+
+
 
     }
 }
