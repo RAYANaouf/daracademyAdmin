@@ -1,6 +1,5 @@
 package com.example.daracademyadmin
 
-import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
@@ -20,9 +19,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.ime
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
@@ -32,8 +28,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.BottomSheetScaffold
-import androidx.compose.material3.Button
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -42,13 +36,13 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,7 +51,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -70,26 +63,28 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.alphaspace.screens.common.textFields.AlphaTextField
 import com.example.bigsam.grafic.material.topBar.AlphaTopBar2
 import com.example.bigsam.model.data.`object`.NormalTextStyles
+import com.example.daracademy.model.data.dataClasses.MessageBox
 import com.example.daracademy.model.data.sealedClasses.screens.Screens
-import com.example.daracademyadmin.graphics.screens.fullScreen.SignInScreen
-import com.example.daracademyadmin.graphics.material.alphaTopBar.AlphaTopAppBar3
-import com.example.daracademyadmin.graphics.screens.navigationScreens.addFormation.AddFormationScreen
-import com.example.daracademyadmin.graphics.screens.navigationScreens.addFormation.bottomSheet.BottomSheet
-import com.example.daracademyadmin.graphics.screens.navigationScreens.addPost.AddPostScreen
-import com.example.daracademyadmin.graphics.screens.navigationScreens.addSupportCourse.AddSupportCourseScreen
-import com.example.daracademyadmin.graphics.screens.navigationScreens.addTeacher.AddTeacherScreen
-import com.example.daracademyadmin.graphics.screens.navigationScreens.homeScreen.HomeScreen
-import com.example.daracademyadmin.model.data.variables.firaSansFamily
-import com.example.daracademyadmin.model.viewModel.DaracademyAdminViewModel
+import com.example.daracademy.view.screens.annees_de_etude_Screen.AnneesDesEtudesScreen
+import com.example.daracademy.view.screens.chatBox.ChatScreen
+import com.example.daracademy.view.screens.chatScreen.ChatBoxsScreen
+import com.example.daracademyadmin.model.sealedClasses.phaseDesEtudes.PhaseDesEtudes
+import com.example.daracademyadmin.view.screens.fullScreen.SignInScreen
+import com.example.daracademyadmin.view.material.alphaTopBar.AlphaTopAppBar3
+import com.example.daracademyadmin.view.screens.navigationScreens.addFormation.AddFormationScreen
+import com.example.daracademyadmin.view.screens.navigationScreens.addPost.AddPostScreen
+import com.example.daracademyadmin.view.screens.navigationScreens.addStudent.AddStudentScreen
+import com.example.daracademyadmin.view.screens.navigationScreens.addTeacher.AddTeacherScreen
+import com.example.daracademyadmin.view.screens.navigationScreens.homeScreen.HomeScreen
+import com.example.daracademyadmin.model.variables.firaSansFamily
+import com.example.daracademyadmin.viewModel.DaracademyAdminViewModel
 import com.example.daracademyadmin.ui.theme.DaracademyAdminTheme
 import com.example.daracademyadmin.ui.theme.color1
-import com.example.daracademyadmin.ui.theme.color2
-import com.example.daracademyadmin.ui.theme.color3
 import com.example.daracademyadmin.ui.theme.customWhite0
 import com.example.daracademyadmin.ui.theme.customWhite7
+import com.example.daracademyadmin.view.screens.navigationScreens.stageScreen.StageScreen
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -160,6 +155,14 @@ fun MainScreen(
 
     var show_bottomSheet by remember {
         mutableStateOf(false)
+    }
+
+
+    var chatId : String by rememberSaveable {
+        mutableStateOf("")
+    }
+    var phase : PhaseDesEtudes = rememberSaveable {
+        PhaseDesEtudes.Primaire()
     }
 
 
@@ -350,7 +353,8 @@ fun MainScreen(
                             .height(65.dp)
                             .padding(start = 16.dp, end = 16.dp)
                             .clickable {
-//                                    viewModel.setAppScreen(Screens.chatScreen())
+                                viewModel.setAppScreen(Screens.ChatBoxsScreen())
+                                navController.navigate(Screens.ChatBoxsScreen().root)
                                 coroutineScope.launch {
                                     drawerState.apply {
                                         close()
@@ -489,7 +493,7 @@ fun MainScreen(
                                 R.drawable.teacher
                             }
                             else if(navBackStackEntry?.destination?.route == Screens.AddStudentScreen().root){
-                                R.drawable.teacher
+                                R.drawable.student_icon
                             }
                             else if(navBackStackEntry?.destination?.route == Screens.AddFormationScreen().root){
                                 R.drawable.formation
@@ -622,30 +626,77 @@ fun MainScreen(
                     composable(route = Screens.AddFormationScreen().root){
                         AddFormationScreen(
                         viewModel = viewModel,
-//                        onNavigate = {
-//                            navController.navigate(it.root)
-//                            viewModel.setAppScreen(it)
-//                        },
+                        onNavigation = {
+                            navController.navigate(it.root)
+                            viewModel.setAppScreen(it)
+                        },
                             modifier = Modifier
                                 .padding(top = paddingValues.calculateTopPadding() )
                         )
                     }
 
-//                composable(route = Screens.AddSupportCourseScreen().root){
-//                    AddSupportCourseScreen(
-////                        viewModel = viewModel,
-////                        onNavigate = {
-////                            navController.navigate(it.root)
-////                            viewModel.setAppScreen(it)
-////                        },
-//                        modifier = Modifier
-//                            .padding(
-//                                top = paddingValues.calculateTopPadding(),
-//                                bottom = paddingValues.calculateBottomPadding()
-//                            )
-//                    )
-//                }
+                    composable(route = Screens.AddStudentScreen().root){
+                        AddStudentScreen(
+                            viewModel = viewModel,
+                            onNavigation = {
+                                navController.navigate(it.root)
+                                viewModel.setAppScreen(it)
+                            },
+                            modifier = Modifier
+                                .padding(top = paddingValues.calculateTopPadding())
+                        )
+                    }
 
+                    composable(route = Screens.ChatBoxsScreen().root){
+                        ChatBoxsScreen(
+                            viewModel = viewModel,
+                            onChatBoxClick = {
+                                chatId = it
+                            },
+                            onNavigate = {
+                                navController.navigate(it.root)
+                                viewModel.setAppScreen(it)
+                            },
+                            modifier = Modifier
+                                .padding(
+                                    top = paddingValues.calculateTopPadding()
+                                )
+                        )
+                    }
+
+                    composable(route = Screens.ChatScreen().root){
+                        ChatScreen(
+                            viewModel    = viewModel,
+                            messageBoxId = chatId,
+                            modifier     = Modifier
+                                .padding(
+                                    top = paddingValues.calculateTopPadding()
+                                )
+                        )
+                    }
+
+                    composable(route = Screens.StageScreen().root){
+                        StageScreen(
+                            onNavigate = {screen , stage->
+                                phase = stage
+                                navController.navigate(screen.root)
+                                viewModel.setAppScreen(screen)
+                            },
+                            modifier     = Modifier
+                                .padding(
+                                    top = paddingValues.calculateTopPadding()
+                                )
+                        )
+                    }
+
+                    composable(route = Screens.AnneesScreen().root){
+                        AnneesDesEtudesScreen(
+                            onNavigate = {
+
+                            },
+                            phase = phase
+                        )
+                    }
 
                 }
             }
