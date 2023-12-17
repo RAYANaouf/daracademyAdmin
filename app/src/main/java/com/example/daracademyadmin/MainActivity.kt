@@ -38,6 +38,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -84,6 +85,8 @@ import com.example.daracademyadmin.ui.theme.DaracademyAdminTheme
 import com.example.daracademyadmin.ui.theme.color1
 import com.example.daracademyadmin.ui.theme.customWhite0
 import com.example.daracademyadmin.ui.theme.customWhite7
+import com.example.daracademyadmin.view.screens.MatieresScreen.MatieresScreen
+import com.example.daracademyadmin.view.screens.navigationScreens.addCours.AddCoursScreen
 import com.example.daracademyadmin.view.screens.navigationScreens.stageScreen.StageScreen
 import kotlinx.coroutines.launch
 
@@ -125,7 +128,8 @@ class MainActivity : ComponentActivity() {
                             viewModel = viewModel
                         )
                     }
-                    else{
+                    else
+                    {
                         MainScreen(
                             viewModel = viewModel
                         )
@@ -153,16 +157,14 @@ fun MainScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
 
-    var show_bottomSheet by remember {
-        mutableStateOf(false)
-    }
-
-
     var chatId : String by rememberSaveable {
         mutableStateOf("")
     }
-    var phase : PhaseDesEtudes = rememberSaveable {
-        PhaseDesEtudes.Primaire()
+    var phase : String by rememberSaveable {
+        mutableStateOf("")
+    }
+    var annee : String by rememberSaveable {
+        mutableStateOf("")
     }
 
 
@@ -678,7 +680,7 @@ fun MainScreen(
                     composable(route = Screens.StageScreen().root){
                         StageScreen(
                             onNavigate = {screen , stage->
-                                phase = stage
+                                phase = stage.phase
                                 navController.navigate(screen.root)
                                 viewModel.setAppScreen(screen)
                             },
@@ -690,14 +692,50 @@ fun MainScreen(
                     }
 
                     composable(route = Screens.AnneesScreen().root){
-                        AnneesDesEtudesScreen(
-                            onNavigate = {
 
+                        AnneesDesEtudesScreen(
+                            onNavigate = {screen , selectedAnnee->
+                                viewModel.setAppScreen(screen)
+                                navController.navigate(screen.root)
+                                annee = selectedAnnee.id
                             },
-                            phase = phase
+                            phase = phase,
+                            modifier     = Modifier
+                                .padding(
+                                    top = paddingValues.calculateTopPadding()
+                                )
                         )
                     }
 
+                    composable(route = Screens.AddCoursScreen().root){
+                        AddCoursScreen(
+//                            onNavigate = {
+//
+//                            },
+//                            phase = phase,
+                            viewModel = viewModel,
+                            modifier     = Modifier
+                                .padding(
+                                    top = paddingValues.calculateTopPadding()
+                                )
+                        )
+                    }
+
+                    composable(route = Screens.MatieresScreen().root){
+                        MatieresScreen(
+                            viewModel = viewModel,
+                            onNavigate = {screen->
+                                viewModel.setAppScreen(screen)
+                                navController.navigate(screen.root)
+                            },
+                            phase     = phase,
+                            annee     = annee,
+                            modifier     = Modifier
+                                .padding(
+                                    top = paddingValues.calculateTopPadding()
+                                )
+                        )
+                    }
                 }
             }
 

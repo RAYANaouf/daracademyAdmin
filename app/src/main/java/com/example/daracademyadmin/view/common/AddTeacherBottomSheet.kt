@@ -1,4 +1,4 @@
-package com.example.daracademyadmin.view.screens.navigationScreens.addFormation.bottomSheet
+package com.example.daracademyadmin.view.common
 
 import android.net.Uri
 import androidx.compose.foundation.Image
@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -24,6 +25,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -47,6 +49,7 @@ fun AddTeacherBottomSheet(
     teachers    : List<Teacher>,
     selectedTeachers    : List<Teacher> = emptyList(),
     onTeacherSelected   : (Teacher)->Unit = {},
+    shape: Shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp ),
     modifier   : Modifier = Modifier
 ) {
 
@@ -63,6 +66,7 @@ fun AddTeacherBottomSheet(
             },
             sheetState = state,
             containerColor = customWhite0,
+            shape = shape,
             modifier = modifier
         ){
 

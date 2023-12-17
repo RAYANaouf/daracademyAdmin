@@ -1,6 +1,6 @@
 package com.example.daracademyadmin.model.dataClasses
 
-data class Course(
+data class Lesson(
     val start : String ,
     val end   : String ,
     val day   : Int

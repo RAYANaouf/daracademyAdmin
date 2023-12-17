@@ -26,10 +26,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.bigsam.model.data.`object`.NormalTextStyles
+import com.example.daracademy.model.data.sealedClasses.screens.Screens
 import com.example.daracademy.model.data.variables.les_annees_d_etude.annees_de_C_E_M
 import com.example.daracademy.model.data.variables.les_annees_d_etude.annees_de_lycee
 import com.example.daracademy.model.data.variables.les_annees_d_etude.annees_de_primaire
 import com.example.daracademyadmin.R
+import com.example.daracademyadmin.model.dataClasses.Annees
 import com.example.daracademyadmin.model.sealedClasses.phaseDesEtudes.PhaseDesEtudes
 import com.example.daracademyadmin.model.variables.firaSansFamily
 import com.example.daracademyadmin.ui.theme.color1
@@ -39,16 +41,17 @@ import com.example.daracademyadmin.ui.theme.customWhite0
 
 @Composable
 fun AnneesDesEtudesScreen(
-    phase : PhaseDesEtudes,
-    onNavigate : (String)->Unit = {}
+    phase : String,
+    onNavigate : (Screens , Annees)->Unit = {_,_->},
+    modifier: Modifier = Modifier
 ) {
 
     var color  = remember {
 
-        if (phase.phase == PhaseDesEtudes.Primaire().phase){
+        if (phase == PhaseDesEtudes.Primaire().phase){
             color1
         }
-        else if(phase.phase == PhaseDesEtudes.CEM().phase)
+        else if(phase == PhaseDesEtudes.CEM().phase)
         {
             color2
         }
@@ -58,10 +61,10 @@ fun AnneesDesEtudesScreen(
     }
     var annees = remember {
 
-        if (phase.phase == PhaseDesEtudes.Primaire().phase){
+        if (phase == PhaseDesEtudes.Primaire().phase){
             annees_de_primaire
         }
-        else if(phase.phase == PhaseDesEtudes.CEM().phase)
+        else if(phase == PhaseDesEtudes.CEM().phase)
         {
             annees_de_C_E_M
         }
@@ -74,7 +77,7 @@ fun AnneesDesEtudesScreen(
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth()
     )
     {
 
@@ -89,7 +92,7 @@ fun AnneesDesEtudesScreen(
                         .clip(RoundedCornerShape(16.dp))
                         .background(color = color)
                         .clickable {
-                            onNavigate(annee.id)
+                            onNavigate(Screens.MatieresScreen() , annee)
                         }
                         .padding(top = 4.dp, bottom = 4.dp, start = 10.dp, end = 10.dp)
                 ) {
@@ -112,7 +115,7 @@ fun AnneesDesEtudesScreen(
                         .clip(RoundedCornerShape(16.dp))
                         .background(color = color)
                         .clickable {
-                            onNavigate(annee.id)
+                            onNavigate(Screens.MatieresScreen() , annee)
                         }
                         .padding(top = 4.dp, bottom = 4.dp, start = 10.dp, end = 10.dp)
                 ) {
@@ -165,6 +168,6 @@ fun AnneesDesEtudesScreen(
 @Composable
 fun AnneesDesEtudesScreen_preview() {
     AnneesDesEtudesScreen(
-        phase = PhaseDesEtudes.Primaire()
+        phase = PhaseDesEtudes.Primaire().phase
     )
 }

@@ -56,13 +56,13 @@ import com.example.bigsam.grafic.material.loadingEffect.loadingLottieAnimation
 import com.example.bigsam.model.data.`object`.NormalTextStyles
 import com.example.daracademy.model.data.sealedClasses.screens.Screens
 import com.example.daracademyadmin.R
+import com.example.daracademyadmin.model.dataClasses.Lesson
 import com.example.daracademyadmin.view.material.AlphaTextFields.AlphaUnderLinedTextField
 import com.example.daracademyadmin.view.material.alphaBottomBar.AlphaAdjustableBottomBar
-import com.example.daracademyadmin.view.screens.navigationScreens.addFormation.bottomSheet.AddTeacherBottomSheet
-import com.example.daracademyadmin.view.screens.navigationScreens.addFormation.bottomSheet.SchedulerBottomSheet
+import com.example.daracademyadmin.view.common.AddTeacherBottomSheet
+import com.example.daracademyadmin.view.common.SchedulerBottomSheet
 import com.example.daracademyadmin.view.screens.navigationScreens.addFormation.dialog.AddHashtagDialog
 import com.example.daracademyadmin.view.screens.navigationScreens.addFormation.dialog.PickDayDialog
-import com.example.daracademyadmin.model.dataClasses.Course
 import com.example.daracademyadmin.model.dataClasses.Teacher
 import com.example.daracademyadmin.model.variables.josefinSansFamily
 import com.example.daracademyadmin.viewModel.DaracademyAdminViewModel
@@ -86,17 +86,9 @@ fun AddFormationScreen(
 
 
     var teachers : List<Teacher> by rememberSaveable {
-        mutableStateOf(emptyList())
+        mutableStateOf(viewModel.getAllTeachers())
     }
 
-    viewModel.getAllTeachers(
-        onSuccessCallBack = {
-            teachers = it
-        },
-        onFailureCallBack = {
-            Toast.makeText(context , "$it" , Toast.LENGTH_LONG).show()
-        }
-    )
 
     var name by rememberSaveable {
         mutableStateOf("")
@@ -114,7 +106,7 @@ fun AddFormationScreen(
         mutableStateOf(emptyList())
     }
 
-    var courses : List<Course> by rememberSaveable {
+    var courses : List<Lesson> by rememberSaveable {
         mutableStateOf(emptyList())
     }
 
@@ -208,7 +200,7 @@ fun AddFormationScreen(
             show_pickDateDialog = false
         },
         onDoneClick = {
-            val newCourses =  ArrayList<Course>()
+            val newCourses =  ArrayList<Lesson>()
             newCourses.addAll(courses)
             newCourses.add(it)
             courses = newCourses
@@ -221,7 +213,7 @@ fun AddFormationScreen(
             show_pickDateDialogForIdet = false
         },
         onDoneClick = {
-            val newCourses =  ArrayList<Course>()
+            val newCourses =  ArrayList<Lesson>()
             newCourses.addAll(courses)
             newCourses.removeAt(idetIndex)
             newCourses.add(it)

@@ -15,7 +15,8 @@ object screens {
     val chatScreen                 = "chatScreen"
     val stageScreen                = "stageScreen"
     val anneesScreen               = "anneesScreen"
-
+    val addCoursScreen             = "addCoursScreen"
+    val matieresScreen             = "matieresScreen"
 
 
 }

@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModel
 import com.example.daracademy.model.data.dataClasses.Message
 import com.example.daracademy.model.data.dataClasses.MessageBox
 import com.example.daracademy.model.data.sealedClasses.screens.Screens
+import com.example.daracademyadmin.model.dataClasses.Matiere
 import com.example.daracademyadmin.model.dataClasses.Teacher
 import com.example.daracademyadmin.repo.DaracademyRepository
 import com.google.firebase.auth.FirebaseAuth
@@ -29,27 +30,32 @@ class DaracademyAdminViewModel : ViewModel{
     var boxMessages by mutableStateOf<List<MessageBox>>(emptyList())
         private set
 
-    val repo : DaracademyRepository
+    private val repo : DaracademyRepository
+
 
     private val auth: FirebaseAuth by mutableStateOf(Firebase.auth)
     private val firebaseFirestore  by mutableStateOf(Firebase.firestore)
     private val storageRef         by mutableStateOf(Firebase.storage.reference)
 
+    var matieres : List<Matiere>by mutableStateOf(emptyList())
+
     var user : FirebaseUser?  by mutableStateOf(auth.currentUser)
 
+
     init {
-        auth.addAuthStateListener { firebaseAuth ->
-            val currentUser = firebaseAuth.currentUser
-            if (currentUser != null) {
+        this.repo = DaracademyRepository()
+        repo.isSignIn{signIn->
+            if(signIn){
                 setAppScreen(Screens.HomeScreen())
-            } else {
+            }
+            else{
                 setAppScreen(Screens.SignInScreen())
             }
         }
     }
 
     constructor(context : Context){
-        this.repo = DaracademyRepository()
+
     }
 
     fun setAppScreen(newScreen : Screens){
@@ -90,26 +96,8 @@ class DaracademyAdminViewModel : ViewModel{
         this.repo.addFormation(name = name , desc = desc , images = images , hashtags = hashtags , teachers = teachers , onSuccessCallBack, onFailureCallBack  )
     }
 
-    fun getAllTeachers(onSuccessCallBack: (List<Teacher>) -> Unit = {}, onFailureCallBack: (exp : Exception) -> Unit = {}){
-
-        firebaseFirestore.collection("teachers")
-            .get()
-            .addOnCompleteListener { task->
-                if (task.isSuccessful){
-                    var teacherList = arrayListOf<Teacher>()
-                    for (doc in task.result.documents){
-                        val teacher = doc.toObject(Teacher::class.java)
-                        if (teacher != null){
-                            teacherList.add(teacher)
-                        }
-                    }
-                 onSuccessCallBack(teacherList)
-                }
-            }
-            .addOnFailureListener {
-                onFailureCallBack(it)
-            }
-
+    fun getAllTeachers() : List<Teacher>{
+        return repo.getAllTeachers()
     }
 
 
@@ -133,35 +121,33 @@ class DaracademyAdminViewModel : ViewModel{
         repo.sendMsg(id, newMassage, onSuccessCallBack, onFailureCallBack)
     }
 
-    fun get_matiere( phase : String , annee : String ,  onSuccessCallBack: (List<String>) -> Unit = {} , onFailureCallBack: () -> Unit = {}){
-
-
-
-        firebaseFirestore.collection("phases_d_etudes")
-            .document(phase)
-            .collection("annees")
-            .document(annee)
-            .collection("matiere")
-            .orderBy("id")
-            .get()
-            .addOnCompleteListener {task->
-                if (task.isSuccessful){
-
-                    val matieres = ArrayList<String>()
-
-                    for (doc in  task.result){
-                        matieres.add(doc.id)
-                    }
-
-                    onSuccessCallBack(matieres)
-                }
-                else{
-                    onFailureCallBack()
-                }
-            }
-
-
+    fun getAllMatieres(phase : String , annee : String , onSuccessCallBack: (List<Matiere>) -> Unit  , onFailureCallBack: (ex: Exception) -> Unit){
+        return repo.getAllMatieres(
+            phase = phase ,
+            annee = annee ,
+            onSuccessCallBack = {
+                this.matieres = it
+                onSuccessCallBack(it)
+            } ,
+            onFailureCallBack = onFailureCallBack
+        )
     }
+
+    fun addMatieres(phase : String , annee : String , matiere : Matiere, onSuccessCallBack: (List<Matiere>) -> Unit  , onFailureCallBack: (ex: Exception) -> Unit){
+        repo.addMatiere(
+            phase = phase ,
+            annee = annee ,
+            matiere = matiere ,
+            onSuccessCallBack = {
+                onSuccessCallBack(it)
+                this.matieres = it
+            },
+            onFailureCallBack = {
+                onFailureCallBack(it)
+            }
+        )
+    }
+
 }
 
 

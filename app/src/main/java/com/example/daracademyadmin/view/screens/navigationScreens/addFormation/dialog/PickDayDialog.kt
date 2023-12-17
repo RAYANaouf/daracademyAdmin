@@ -47,7 +47,7 @@ import androidx.compose.ui.unit.dp
 import com.example.bigsam.grafic.material.indicator.AlphaIndicator
 import com.example.bigsam.model.data.`object`.NormalTextStyles
 import com.example.daracademyadmin.R
-import com.example.daracademyadmin.model.dataClasses.Course
+import com.example.daracademyadmin.model.dataClasses.Lesson
 import com.example.daracademyadmin.model.variables.days
 import com.example.daracademyadmin.model.variables.firaSansFamily
 import com.example.daracademyadmin.ui.theme.color1
@@ -71,7 +71,7 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun PickDayDialog(
     show : Boolean,
-    onDoneClick : (Course)->Unit = {},
+    onDoneClick : (Lesson)->Unit = {},
     onDismiss : ()->Unit = {}
 ) {
 
@@ -237,7 +237,7 @@ fun PickDayDialog(
                             .background(color1)
                             .clickable {
                                 if (pagerState.currentPage == 1) {
-                                    onDoneClick(Course(start = formattedStartTime , end = formattedEndTime , day = selectedDay ))
+                                    onDoneClick(Lesson(start = formattedStartTime , end = formattedEndTime , day = selectedDay ))
                                     onDismiss()
                                 }
                                 coroutineScope.launch {

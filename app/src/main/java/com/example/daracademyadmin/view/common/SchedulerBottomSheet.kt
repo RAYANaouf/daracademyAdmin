@@ -1,9 +1,11 @@
-package com.example.daracademyadmin.view.screens.navigationScreens.addFormation.bottomSheet
+package com.example.daracademyadmin.view.common
 
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,10 +24,12 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -33,7 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.bigsam.model.data.`object`.NormalTextStyles
 import com.example.daracademyadmin.R
-import com.example.daracademyadmin.model.dataClasses.Course
+import com.example.daracademyadmin.model.dataClasses.Lesson
 import com.example.daracademyadmin.model.variables.dayImg
 import com.example.daracademyadmin.model.variables.firaSansFamily
 import com.example.daracademyadmin.model.variables.josefinSansFamily
@@ -49,14 +53,15 @@ fun SchedulerBottomSheet(
     onDismiss   : ()->Unit = {},
     onAddClick  : ()->Unit = {},
     onIdetClick : (Int)->Unit = {},
-    coursesList : List<Course>,
+    coursesList : List<Lesson>,
+    shape: Shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp ),
     modifier   : Modifier = Modifier
 ) {
 
     if (show){
 
 
-        var bottomSheetState = rememberModalBottomSheetState()
+        var bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
         var coroutineScope   = rememberCoroutineScope()
 
         ModalBottomSheet(
@@ -65,7 +70,8 @@ fun SchedulerBottomSheet(
             },
             sheetState = bottomSheetState,
             containerColor = customWhite0,
-            modifier = Modifier
+            shape = shape,
+            modifier = modifier
         ){
 
             Text(
@@ -91,16 +97,20 @@ fun SchedulerBottomSheet(
 
             val scrollState = rememberScrollState()
 
-//            LaunchedEffect(key1 = scrollState ){
-//                scrollState.scrollTo(scrollState.maxValue)
-//            }
+            LaunchedEffect(key1 = coursesList ){
+                scrollState.animateScrollTo(
+                    value = scrollState.maxValue,
+                    animationSpec = tween(500)
+                )
+            }
 
             Column(
+                verticalArrangement = Arrangement.Bottom,
                 modifier = Modifier
                     .fillMaxWidth()
                     .verticalScroll(scrollState)
             ) {
-                coursesList.forEachIndexed { index, course ->
+                coursesList.forEachIndexed { index, lesson ->
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -117,12 +127,12 @@ fun SchedulerBottomSheet(
                             .padding(start = 16.dp, end = 16.dp)
                     ) {
 
-                        Image(painter = painterResource(id = dayImg[course.day]), contentDescription = null , contentScale = ContentScale.FillBounds , modifier = Modifier.size(35.dp) )
+                        Image(painter = painterResource(id = dayImg[lesson.day]), contentDescription = null , contentScale = ContentScale.FillBounds , modifier = Modifier.size(35.dp) )
 
                         Spacer(modifier = Modifier.width(20.dp))
 
                         Text(
-                            text = "${course.start} - ${course.end}",
+                            text = "${lesson.start} - ${lesson.end}",
                             style = NormalTextStyles.TextStyleSZ6.copy(fontFamily = josefinSansFamily , textAlign = TextAlign.Center),
                             modifier = Modifier
                                 .weight(1f)
@@ -172,9 +182,11 @@ fun SchedulerBottomSheet(
                     )
 
                 }
+
+                Spacer(modifier = Modifier.height(30.dp))
             }
 
-            Spacer(modifier = Modifier.height(25.dp))
+
 
 
         }

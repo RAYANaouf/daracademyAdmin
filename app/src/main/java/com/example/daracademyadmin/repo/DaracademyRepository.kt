@@ -2,12 +2,21 @@ package com.example.daracademyadmin.repo
 
 import android.content.Context
 import android.net.Uri
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.example.daracademy.model.data.dataClasses.Message
 import com.example.daracademy.model.data.dataClasses.MessageBox
 import com.example.daracademy.model.data.sealedClasses.screens.Screens
+import com.example.daracademy.model.data.variables.les_annees_d_etude.annees_de_C_E_M
+import com.example.daracademy.model.data.variables.les_annees_d_etude.annees_de_lycee
+import com.example.daracademy.model.data.variables.les_annees_d_etude.annees_de_primaire
+import com.example.daracademyadmin.model.dataClasses.Formation
+import com.example.daracademyadmin.model.dataClasses.Matiere
+import com.example.daracademyadmin.model.dataClasses.Post
+import com.example.daracademyadmin.model.dataClasses.Teacher
+import com.example.daracademyadmin.model.sealedClasses.phaseDesEtudes.PhaseDesEtudes
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
@@ -23,13 +32,62 @@ class DaracademyRepository {
     private val firebaseFirestore  by mutableStateOf(Firebase.firestore)
     private val storageRef         by mutableStateOf(Firebase.storage.reference)
 
-    var user : FirebaseUser?  by mutableStateOf(auth.currentUser)
+    var teachers           by mutableStateOf<List<Teacher>>(emptyList())
+        private set
+    private var isListen_teachers  = false
+    var posts              by mutableStateOf<List<Post>>(emptyList())
+        private set
+    private var isListen_posts  = false
+    var formations         by mutableStateOf<List<Formation>>(emptyList())
+        private set
+    private var isListen_formations  = false
+
+
+    var matieres : HashMap<String , HashMap< String , List<Matiere>? > > =
+        hashMapOf(
+            PhaseDesEtudes.Primaire().phase to hashMapOf(
+                annees_de_primaire[0].id     to MatieresCollection.primaire_pre,
+                annees_de_primaire[1].id     to MatieresCollection.primaire_premiere,
+                annees_de_primaire[2].id     to MatieresCollection.primaire_deuxieme,
+                annees_de_primaire[3].id     to MatieresCollection.primaire_troisieme,
+                annees_de_primaire[4].id     to MatieresCollection.primaire_quatrieme,
+                annees_de_primaire[5].id     to MatieresCollection.primaire_cinquieme,
+                annees_de_primaire[6].id     to MatieresCollection.primaire_sixieme,
+            ),
+            PhaseDesEtudes.CEM().phase      to hashMapOf(
+                annees_de_C_E_M[0].id        to MatieresCollection.cem_premiere,
+                annees_de_C_E_M[1].id        to MatieresCollection.cem_deuxieme,
+                annees_de_C_E_M[2].id        to MatieresCollection.cem_troisieme,
+                annees_de_C_E_M[3].id        to MatieresCollection.cem_quatrieme,
+                annees_de_C_E_M[4].id        to MatieresCollection.cem_bem,
+            ),
+            PhaseDesEtudes.Lycee().phase    to hashMapOf(
+                annees_de_lycee[0].id        to MatieresCollection.lycee_premiere,
+                annees_de_lycee[1].id        to MatieresCollection.lycee_deuxieme,
+                annees_de_lycee[2].id        to MatieresCollection.lycee_troisieme,
+                annees_de_lycee[3].id        to MatieresCollection.lycee_bac,
+            )
+
+        )
+
 
 
 
     constructor(){
+        listenToTeachers()
+        listenToPosts()
+        listenToformations()
+    }
 
-
+    fun isSignIn(result : (Boolean)-> Unit = {}){
+        auth.addAuthStateListener { firebaseAuth ->
+            val currentUser = firebaseAuth.currentUser
+            if (currentUser != null) {
+                result(true)
+            } else {
+                result(false)
+            }
+        }
     }
 
 
@@ -42,6 +100,66 @@ class DaracademyRepository {
                 onFailureCallBack(it)
             }
     }
+
+    //listeners
+    fun listenToTeachers( onFailureCallBack : (ex : Exception)->Unit = {}){
+        firebaseFirestore.collection("teachers")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null){
+                    isListen_teachers = false
+                    onFailureCallBack(error)
+                    return@addSnapshotListener
+                }
+                isListen_teachers = true
+                if (snapshot==null || snapshot.isEmpty ){
+                    return@addSnapshotListener
+                }
+
+                teachers = snapshot.documents.mapNotNull { documentSnapshot ->
+                    documentSnapshot.toObject(Teacher::class.java)
+                }
+
+            }
+    }
+    fun listenToPosts( onFailureCallBack : (ex : Exception)->Unit = {}){
+        firebaseFirestore.collection("posts")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null){
+                    isListen_posts = false
+                    onFailureCallBack(error)
+                    return@addSnapshotListener
+                }
+                isListen_posts = true
+                if (snapshot==null || snapshot.isEmpty ){
+                    return@addSnapshotListener
+                }
+
+                posts = snapshot.documents.mapNotNull { documentSnapshot ->
+                    documentSnapshot.toObject(Post::class.java)
+                }
+
+            }
+    }
+    fun listenToformations( onFailureCallBack : (ex : Exception)->Unit = {}){
+        firebaseFirestore.collection("formations")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null){
+                    isListen_formations = false
+                    onFailureCallBack(error)
+                    return@addSnapshotListener
+                }
+                isListen_formations = true
+                if (snapshot==null || snapshot.isEmpty ){
+                    return@addSnapshotListener
+                }
+
+                formations = snapshot.documents.mapNotNull { documentSnapshot ->
+                    documentSnapshot.toObject(Formation::class.java)
+                }
+
+            }
+    }
+
 
     fun addPost(name : String, desc : String, images : List<Uri>,  onSuccessCallBack: () -> Unit = {}, onFailureCallBack: (ex : Exception) -> Unit = {}){
 
@@ -325,6 +443,26 @@ class DaracademyRepository {
 
     }
 
+
+
+    //geters
+    fun getAllTeachers( ) : List<Teacher>{
+        if (!isListen_teachers)
+            listenToTeachers()
+
+        return this.teachers
+    }
+    fun getAllPosts( ) : List<Post>{
+        if (!isListen_posts)
+            listenToPosts()
+        return this.posts
+    }
+    fun getAllFormation( ) : List<Formation>{
+        if (!isListen_formations)
+            listenToformations()
+        return this.formations
+    }
+
     fun getAllMessageBoxs(onSuccessCallBack: (List<MessageBox> , Int) -> Unit = {_,_->}, onFailureCallBack: (exp : Exception) -> Unit = {}  ){
 
 
@@ -388,4 +526,71 @@ class DaracademyRepository {
 
 
     }
+
+
+
+    fun addMatiere( phase : String , annee : String , matiere : Matiere , onSuccessCallBack: (List<Matiere>) -> Unit , onFailureCallBack: (ex: Exception) -> Unit){
+
+        //add to firebase
+
+
+
+        firebaseFirestore.collection("phases")
+            .document(phase)
+            .collection("annees")
+            .document(annee)
+            .collection("matiere")
+            .document(matiere.name)
+            .set(
+                hashMapOf(
+                    "name"   to matiere.name,
+                    "img"    to matiere.img,
+                    "imgUrl" to matiere.imgUrl
+                )
+            )
+            .addOnSuccessListener {
+                var list = matieres.get(phase)?.get(annee)?.toMutableList()
+                list?.add(matiere)
+                matieres.get(phase)?.set(annee , list ?: emptyList())
+
+                onSuccessCallBack(
+                    list ?: emptyList()
+                )
+            }
+            .addOnFailureListener {
+                onFailureCallBack(it)
+            }
+
+
+
+    }
+
+    fun getAllMatieres(phase : String , annee : String , onSuccessCallBack: (List<Matiere>) -> Unit , onFailureCallBack: (ex: Exception) -> Unit) {
+
+
+        if (matieres.get(phase)?.get(annee) != null){
+            onSuccessCallBack(matieres.get(phase)?.get(annee)!!)
+        }
+        else{
+            firebaseFirestore.collection("phases")
+                .document(phase)
+                .collection("annees")
+                .document(annee)
+                .collection("matiere")
+                .get()
+                .addOnSuccessListener { docs->
+                    var new_matieres = ArrayList<Matiere>()
+                    for (doc in docs){
+                        new_matieres.add(doc.toObject(Matiere::class.java))
+                    }
+
+                    matieres.get(phase)?.set(annee , new_matieres)
+
+                    onSuccessCallBack(new_matieres)
+                }
+        }
+
+
+    }
+
 }
