@@ -26,6 +26,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.bigsam.model.data.`object`.NormalTextStyles
 import com.example.daracademy.model.data.dataClasses.MessageBox
 import com.example.daracademy.model.data.sealedClasses.screens.Screens
@@ -36,9 +38,8 @@ import com.example.daracademyadmin.viewModel.DaracademyAdminViewModel
 
 @Composable
 fun ChatBoxsScreen(
+    navController  : NavController,
     viewModel      : DaracademyAdminViewModel,
-    onChatBoxClick : (String)->Unit = {},
-    onNavigate     : (Screens)->Unit = {},
     modifier       : Modifier = Modifier
 ) {
 
@@ -46,7 +47,7 @@ fun ChatBoxsScreen(
 
     viewModel.getAllMessageBoxs(
         onSuccessCallBack = {boxs,size->
-            Toast.makeText(context , "size : ${size}" , Toast.LENGTH_SHORT).show()
+
         }
     )
 
@@ -61,9 +62,6 @@ fun ChatBoxsScreen(
             contentPadding = PaddingValues(top = 8.dp , end = 8.dp),
             modifier = Modifier
                 .weight(1f)
-                .clickable {
-                    Toast.makeText(context , "${viewModel.boxMessages}" , Toast.LENGTH_SHORT).show()
-                }
         ) {
 
             items(viewModel.boxMessages){
@@ -71,8 +69,7 @@ fun ChatBoxsScreen(
                     messageBox = it,
                     modifier = Modifier
                         .clickable {
-                            onNavigate(Screens.ChatScreen())
-                            onChatBoxClick(it.id)
+                            navController.navigate("${Screens.ChatScreen().root}/${it.id}")
                         }
                         .padding(top = 8.dp, bottom = 8.dp)
 
@@ -144,6 +141,7 @@ fun Item(
 @Composable
 fun ChatBoxsScreen_preview() {
     ChatBoxsScreen(
+        navController = rememberNavController(),
         viewModel = viewModel()
     )
 }

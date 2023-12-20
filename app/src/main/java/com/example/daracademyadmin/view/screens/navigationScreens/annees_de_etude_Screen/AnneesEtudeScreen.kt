@@ -25,6 +25,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.bigsam.model.data.`object`.NormalTextStyles
 import com.example.daracademy.model.data.sealedClasses.screens.Screens
 import com.example.daracademy.model.data.variables.les_annees_d_etude.annees_de_C_E_M
@@ -41,8 +43,8 @@ import com.example.daracademyadmin.ui.theme.customWhite0
 
 @Composable
 fun AnneesDesEtudesScreen(
+    navController: NavController,
     phase : String,
-    onNavigate : (Screens , Annees)->Unit = {_,_->},
     modifier: Modifier = Modifier
 ) {
 
@@ -92,7 +94,7 @@ fun AnneesDesEtudesScreen(
                         .clip(RoundedCornerShape(16.dp))
                         .background(color = color)
                         .clickable {
-                            onNavigate(Screens.MatieresScreen() , annee)
+                            navController.navigate("${Screens.MatieresScreen().root}/$phase/${annee.id}")
                         }
                         .padding(top = 4.dp, bottom = 4.dp, start = 10.dp, end = 10.dp)
                 ) {
@@ -115,7 +117,7 @@ fun AnneesDesEtudesScreen(
                         .clip(RoundedCornerShape(16.dp))
                         .background(color = color)
                         .clickable {
-                            onNavigate(Screens.MatieresScreen() , annee)
+                            navController.navigate("${Screens.MatieresScreen().root}/$phase/${annee.id}")
                         }
                         .padding(top = 4.dp, bottom = 4.dp, start = 10.dp, end = 10.dp)
                 ) {
@@ -168,6 +170,7 @@ fun AnneesDesEtudesScreen(
 @Composable
 fun AnneesDesEtudesScreen_preview() {
     AnneesDesEtudesScreen(
+        navController = rememberNavController(),
         phase = PhaseDesEtudes.Primaire().phase
     )
 }

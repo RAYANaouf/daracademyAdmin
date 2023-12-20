@@ -60,10 +60,12 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.bigsam.grafic.material.topBar.AlphaTopBar2
 import com.example.bigsam.model.data.`object`.NormalTextStyles
 import com.example.daracademy.model.data.dataClasses.MessageBox
@@ -85,7 +87,7 @@ import com.example.daracademyadmin.ui.theme.DaracademyAdminTheme
 import com.example.daracademyadmin.ui.theme.color1
 import com.example.daracademyadmin.ui.theme.customWhite0
 import com.example.daracademyadmin.ui.theme.customWhite7
-import com.example.daracademyadmin.view.screens.MatieresScreen.MatieresScreen
+import com.example.daracademyadmin.view.screens.navigationScreens.MatieresScreen.MatieresScreen
 import com.example.daracademyadmin.view.screens.navigationScreens.addCours.AddCoursScreen
 import com.example.daracademyadmin.view.screens.navigationScreens.stageScreen.StageScreen
 import kotlinx.coroutines.launch
@@ -156,16 +158,6 @@ fun MainScreen(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
-
-    var chatId : String by rememberSaveable {
-        mutableStateOf("")
-    }
-    var phase : String by rememberSaveable {
-        mutableStateOf("")
-    }
-    var annee : String by rememberSaveable {
-        mutableStateOf("")
-    }
 
 
 
@@ -470,7 +462,8 @@ fun MainScreen(
 
             Scaffold(
                 topBar = {
-                    if ( navBackStackEntry?.destination?.route == Screens.HomeScreen().root ){
+                    if ( navBackStackEntry?.destination?.route == Screens.HomeScreen().root )
+                    {
                         AlphaTopBar2(
                             img = painterResource(id = R.drawable.daracademy),
                             onImgClick = {
@@ -586,6 +579,7 @@ fun MainScreen(
 
                     composable(route = Screens.HomeScreen().root) {
                         HomeScreen(
+                            navController = navController,
                             viewModel = viewModel,
                             onNavigate = {
                                 viewModel.setAppScreen(it)
@@ -651,14 +645,8 @@ fun MainScreen(
 
                     composable(route = Screens.ChatBoxsScreen().root){
                         ChatBoxsScreen(
+                            navController = navController,
                             viewModel = viewModel,
-                            onChatBoxClick = {
-                                chatId = it
-                            },
-                            onNavigate = {
-                                navController.navigate(it.root)
-                                viewModel.setAppScreen(it)
-                            },
                             modifier = Modifier
                                 .padding(
                                     top = paddingValues.calculateTopPadding()
@@ -666,10 +654,17 @@ fun MainScreen(
                         )
                     }
 
-                    composable(route = Screens.ChatScreen().root){
+                    composable(
+                        route = "${Screens.ChatScreen().root}/{chatId}",
+                        arguments = listOf(
+                            navArgument(name = "chatId"){
+                                type = NavType.StringType
+                            }
+                        )
+                    ){navBackStackEntry->
                         ChatScreen(
                             viewModel    = viewModel,
-                            messageBoxId = chatId,
+                            messageBoxId = navBackStackEntry.arguments?.getString("chatId") ?: "",
                             modifier     = Modifier
                                 .padding(
                                     top = paddingValues.calculateTopPadding()
@@ -677,65 +672,92 @@ fun MainScreen(
                         )
                     }
 
-                    composable(route = Screens.StageScreen().root){
+                    composable(
+                        route = Screens.StageScreen().root
+                    ){navBackStackEntry->
                         StageScreen(
-                            onNavigate = {screen , stage->
-                                phase = stage.phase
-                                navController.navigate(screen.root)
-                                viewModel.setAppScreen(screen)
-                            },
-                            modifier     = Modifier
+                            navController = navController,
+                            modifier  = Modifier
                                 .padding(
                                     top = paddingValues.calculateTopPadding()
                                 )
                         )
                     }
 
-                    composable(route = Screens.AnneesScreen().root){
+                    composable(
+                        route = "${Screens.AnneesScreen().root}/{phase}",
+                        arguments = listOf(
+                            navArgument(name = "phase"){
+                                type = NavType.StringType
+                            }
+                        )
+                    ){navBackStackEntry->
 
                         AnneesDesEtudesScreen(
-                            onNavigate = {screen , selectedAnnee->
-                                viewModel.setAppScreen(screen)
-                                navController.navigate(screen.root)
-                                annee = selectedAnnee.id
+                            navController = navController,
+                            phase = navBackStackEntry.arguments?.getString("phase") ?: "",
+                            modifier     = Modifier
+                                .padding(
+                                    top = paddingValues.calculateTopPadding()
+                                )
+                        )
+                    }
+
+                    composable(
+                        route = "${Screens.MatieresScreen().root}/{phase}/{annee}",
+                        arguments = listOf(
+                            navArgument("phase"){
+                                type = NavType.StringType
                             },
-                            phase = phase,
-                            modifier     = Modifier
-                                .padding(
-                                    top = paddingValues.calculateTopPadding()
-                                )
+                            navArgument("annee"){
+                                type = NavType.StringType
+                            }
                         )
-                    }
-
-                    composable(route = Screens.AddCoursScreen().root){
-                        AddCoursScreen(
-//                            onNavigate = {
-//
-//                            },
-//                            phase = phase,
-                            viewModel = viewModel,
-                            modifier     = Modifier
-                                .padding(
-                                    top = paddingValues.calculateTopPadding()
-                                )
-                        )
-                    }
-
-                    composable(route = Screens.MatieresScreen().root){
+                    ){navBackStackEntry->
                         MatieresScreen(
+                            navController = navController,
                             viewModel = viewModel,
-                            onNavigate = {screen->
-                                viewModel.setAppScreen(screen)
-                                navController.navigate(screen.root)
-                            },
-                            phase     = phase,
-                            annee     = annee,
+                            phase     = navBackStackEntry.arguments?.getString("phase") ?: "",
+                            annee     = navBackStackEntry.arguments?.getString("annee") ?: "",
                             modifier     = Modifier
                                 .padding(
                                     top = paddingValues.calculateTopPadding()
                                 )
                         )
                     }
+
+
+
+                    composable(
+                        route = "${Screens.AddCoursScreen().root}/{phase}/{annee}/{matiere}",
+                        arguments = listOf(
+                            navArgument("phase"){
+                                type = NavType.StringType
+                            },
+                            navArgument("annee"){
+                                type = NavType.StringType
+                            },
+                            navArgument("matiere"){
+                                type = NavType.StringType
+                            }
+                        )
+                    ){navBackStackEntry->
+                        AddCoursScreen(
+                            onNavigate = {
+                                navController.navigate(it.root)
+                                viewModel.setAppScreen(it)
+                            },
+                            phase = navBackStackEntry.arguments?.getString("phase") ?: "",
+                            annee = navBackStackEntry.arguments?.getString("annee") ?: "",
+                            matiere = navBackStackEntry.arguments?.getString("matiere") ?: "",
+                            viewModel = viewModel,
+                            modifier     = Modifier
+                                .padding(
+                                    top = paddingValues.calculateTopPadding()
+                                )
+                        )
+                    }
+
                 }
             }
 

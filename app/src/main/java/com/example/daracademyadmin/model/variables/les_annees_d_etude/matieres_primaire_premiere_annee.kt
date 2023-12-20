@@ -4,11 +4,11 @@ import com.example.daracademyadmin.R
 import com.example.daracademyadmin.model.dataClasses.Matiere
 
 val matieres_primaire_premiere_annee = listOf(
-    Matiere(img = R.drawable.math                 , name = "Match"),
-    Matiere(img = R.drawable.physics              , name = "physique"),
-    Matiere(img = R.drawable.histoire_geographie  , name = "Histoire & geo"),
-    Matiere(img = R.drawable.islamic              , name = "Islamique"),
-    Matiere(img = R.drawable.united_kingdom       , name = "Anglais"),
-    Matiere(img = R.drawable.france               , name = "Français"),
-    Matiere(img = R.drawable.arabic               , name = "arabe"),
+    Matiere(img = R.drawable.math                 , name = "Math"          ),
+    Matiere(img = R.drawable.physics              , name = "physique"       ),
+    Matiere(img = R.drawable.histoire_geographie  , name = "Histoire & geo" ),
+    Matiere(img = R.drawable.islamic              , name = "Islamique"      ),
+    Matiere(img = R.drawable.united_kingdom       , name = "Anglais"        ),
+    Matiere(img = R.drawable.france               , name = "Français"       ),
+    Matiere(img = R.drawable.arabic               , name = "arabe"          ),
 )

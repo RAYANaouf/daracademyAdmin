@@ -12,7 +12,9 @@ import com.example.daracademy.model.data.sealedClasses.screens.Screens
 import com.example.daracademy.model.data.variables.les_annees_d_etude.annees_de_C_E_M
 import com.example.daracademy.model.data.variables.les_annees_d_etude.annees_de_lycee
 import com.example.daracademy.model.data.variables.les_annees_d_etude.annees_de_primaire
+import com.example.daracademyadmin.model.dataClasses.Course
 import com.example.daracademyadmin.model.dataClasses.Formation
+import com.example.daracademyadmin.model.dataClasses.Lesson
 import com.example.daracademyadmin.model.dataClasses.Matiere
 import com.example.daracademyadmin.model.dataClasses.Post
 import com.example.daracademyadmin.model.dataClasses.Teacher
@@ -341,15 +343,13 @@ class DaracademyRepository {
 
     }
 
-    fun addFormation(name : String, desc : String, images : List<Uri>, hashtags : List<String>  , teachers : List<String> ,   onSuccessCallBack: () -> Unit = {}, onFailureCallBack: (ex : Exception) -> Unit = {}){
+    fun addFormation(name : String, desc : String, images : List<Uri>, lessons : List<Lesson>  , teacher : String ,   onSuccessCallBack: () -> Unit = {}, onFailureCallBack: (ex : Exception) -> Unit = {}){
 
         val formationsRef = storageRef.child("formations")
         val id  = System.currentTimeMillis()
 
 
-        val _images    = ArrayList<String>()
-        val _hashtags  =  ArrayList<String>()
-        val _teachers  =  ArrayList<String>()
+        val _images    =  ArrayList<String>()
 
 
 
@@ -357,13 +357,6 @@ class DaracademyRepository {
             _images.add("")
         }
 
-        hashtags.forEach { s ->
-            _hashtags.add(s)
-        }
-
-        teachers.forEach { s ->
-            _teachers.add(s)
-        }
 
 
 
@@ -381,32 +374,35 @@ class DaracademyRepository {
                     .putFile(uri)
                     .addOnSuccessListener{
 
-                        imageUriRef.downloadUrl.addOnSuccessListener {
-                            _images[index] = it.toString()
-                            success++
+                        imageUriRef.downloadUrl
+                            .addOnSuccessListener {
+                                _images[index] = it.toString()
+                                success++
 
-                            if (success == images.size){
+                                if (success == images.size){
 
-                                firebaseFirestore.collection("formations")
-                                    .add(
-                                        hashMapOf(
-                                            "name"     to name,
-                                            "desc"     to desc,
-                                            "imgs"     to _images,
-                                            "teachers" to teachers,
-                                            "hashtags" to hashtags
+                                    firebaseFirestore.collection("formations")
+                                        .add(
+                                            hashMapOf(
+                                                "name"     to name,
+                                                "desc"     to desc,
+                                                "imgs"     to _images,
+                                                "teacher"  to teacher,
+                                                "lessons"  to lessons
+                                            )
                                         )
-                                    )
-                                    .addOnSuccessListener {
-                                        onSuccessCallBack()
-                                    }
-                                    .addOnFailureListener{
-                                        onFailureCallBack(it)
-                                    }
+                                        .addOnSuccessListener {
+                                            onSuccessCallBack()
+                                        }
+                                        .addOnFailureListener{
+                                            onFailureCallBack(it)
+                                        }
 
+                                }
                             }
-
-                        }
+                            .addOnFailureListener {
+                                onFailureCallBack(it)
+                            }
 
 
 
@@ -426,9 +422,9 @@ class DaracademyRepository {
                     hashMapOf(
                         "name"     to name,
                         "desc"     to desc,
-                        "imgs"     to _images,
-                        "teachers" to _teachers,
-                        "hashtags" to _hashtags
+                        "imgs"     to emptyList<String>(),
+                        "teachers" to teacher,
+                        "lessons"  to lessons
                     )
                 )
                 .addOnSuccessListener {
@@ -539,7 +535,7 @@ class DaracademyRepository {
             .document(phase)
             .collection("annees")
             .document(annee)
-            .collection("matiere")
+            .collection("matieres")
             .document(matiere.name)
             .set(
                 hashMapOf(
@@ -576,7 +572,7 @@ class DaracademyRepository {
                 .document(phase)
                 .collection("annees")
                 .document(annee)
-                .collection("matiere")
+                .collection("matieres")
                 .get()
                 .addOnSuccessListener { docs->
                     var new_matieres = ArrayList<Matiere>()
@@ -588,9 +584,35 @@ class DaracademyRepository {
 
                     onSuccessCallBack(new_matieres)
                 }
+                .addOnFailureListener {
+                    onFailureCallBack(it)
+                }
         }
 
 
+    }
+
+
+    fun addCourses( phase : String , annee : String , matiere : String , course : Course , onSuccessCallBack: () -> Unit , onFailureCallBack: (ex: Exception) -> Unit){
+
+        val courseId  = System.currentTimeMillis().toString()
+
+
+        firebaseFirestore.collection("phases")
+            .document(phase)
+            .collection("annees")
+            .document(annee)
+            .collection("matieres")
+            .document(matiere)
+            .collection("courses")
+            .document(courseId)
+            .set(course.copy(courseId = courseId))
+            .addOnSuccessListener {
+                onSuccessCallBack()
+            }
+            .addOnFailureListener {
+                onFailureCallBack(it)
+            }
     }
 
 }

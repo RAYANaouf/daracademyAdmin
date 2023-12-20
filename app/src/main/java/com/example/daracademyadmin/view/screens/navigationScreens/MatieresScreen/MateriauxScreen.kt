@@ -1,4 +1,4 @@
-package com.example.daracademyadmin.view.screens.MatieresScreen
+package com.example.daracademyadmin.view.screens.navigationScreens.MatieresScreen
 
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
@@ -37,26 +37,29 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.bigsam.model.data.`object`.NormalTextStyles
 import com.example.daracademy.model.data.sealedClasses.screens.Screens
 import com.example.daracademyadmin.R
 import com.example.daracademyadmin.model.dataClasses.Matiere
+import com.example.daracademyadmin.model.variables.les_annees_d_etude.matieres_primaire_premiere_annee
 import com.example.daracademyadmin.ui.theme.color1
 import com.example.daracademyadmin.ui.theme.customWhite0
 import com.example.daracademyadmin.ui.theme.customWhite4
-import com.example.daracademyadmin.view.screens.MatieresScreen.AddMatieresDialog.AddMatieresDialog
+import com.example.daracademyadmin.view.screens.navigationScreens.MatieresScreen.AddMatieresDialog.AddMatieresDialog
 import com.example.daracademyadmin.viewModel.DaracademyAdminViewModel
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 
 
 @Composable
 fun MatieresScreen(
-    viewModel  : DaracademyAdminViewModel = viewModel(),
-    onNavigate : (Screens)->Unit = {},
-    phase      : String,
-    annee      : String,
-    modifier   : Modifier = Modifier
+    navController: NavController,
+    viewModel    : DaracademyAdminViewModel = viewModel(),
+    phase        : String,
+    annee        : String,
+    modifier     : Modifier = Modifier
 ) {
 
 //    val context = LocalContext.current
@@ -97,8 +100,10 @@ fun MatieresScreen(
                 MatieresScreenItem(
                     matiere = it,
                     modifier = Modifier
+                        .clip(RoundedCornerShape(16.dp))
                         .clickable {
-                            onNavigate(Screens.AddCoursScreen())
+                            navController.navigate("${Screens.AddCoursScreen().root}/$phase/$annee/${it.name}")
+
                         }
                 )
             }
@@ -108,7 +113,6 @@ fun MatieresScreen(
                 AddMatieresItem(
                     onClick = {
                         state_addMatiereDialog.show()
-                        Toast.makeText(context , "${viewModel.matieres}" , Toast.LENGTH_LONG).show()
                     },
                     background = customWhite0
                 )
@@ -148,7 +152,7 @@ fun MatieresScreenItem(
                 .padding(6.dp)
         ) {
             Image(
-                painter = if (matiere.img>0) painterResource(id = matiere.img) else rememberAsyncImagePainter(model = matiere.imgUrl),
+                painter = if (matiere.img>=0) painterResource(id = matieres_primaire_premiere_annee[matiere.img].img) else rememberAsyncImagePainter(model = matiere.imgUrl),
                 contentDescription = null,
                 modifier = Modifier
                     .size(70.dp)
@@ -208,6 +212,7 @@ fun AddMatieresItem(
 @Composable
 fun MatieresScreen_preview() {
     MatieresScreen(
+        navController = rememberNavController(),
         phase = "",
         annee = ""
     )

@@ -62,7 +62,6 @@ fun SchedulerBottomSheet(
 
 
         var bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-        var coroutineScope   = rememberCoroutineScope()
 
         ModalBottomSheet(
             onDismissRequest = {

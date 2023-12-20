@@ -32,6 +32,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.bigsam.model.data.`object`.NormalTextStyles
 import com.example.daracademy.model.data.sealedClasses.screens.Screens
 import com.example.daracademyadmin.R
@@ -48,6 +50,7 @@ import com.example.daracademyadmin.ui.theme.customWhite3
 
 @Composable
 fun HomeScreen(
+    navController : NavController,
     viewModel : DaracademyAdminViewModel,
     onNavigate : (Screens)->Unit = {},
     modifier: Modifier = Modifier
@@ -75,30 +78,29 @@ fun HomeScreen(
                     .clip(RoundedCornerShape(16.dp))
                     .background(color)
                     .clickable {
-//                    onNavigate(Screens.AnneesDesEtudes.annees_de_primaire_Screen())
-                        onNavigate(
-                            if (category.screen==Screens.HomeScreen().root){
-                                Screens.HomeScreen()
-                            }
-                            else if (category.screen==Screens.AddTeacherScreen().root){
-                                Screens.AddTeacherScreen()
-                            }
-                            else if (category.screen==Screens.AddPostScreen().root){
-                                Screens.AddPostScreen()
-                            }
-                            else if (category.screen==Screens.AddFormationScreen().root){
-                                Screens.AddFormationScreen()
-                            }
-                            else if (category.screen==Screens.AddStudentScreen().root){
-                                Screens.AddStudentScreen()
-                            }
-                            else if (category.screen==Screens.StageScreen().root){
-                                Screens.StageScreen()
-                            }
-                            else{
-                                Screens.HomeScreen()
-                            }
-                        )
+
+                        if (category.screen == Screens.HomeScreen().root) {
+                            navController.navigate(Screens.HomeScreen().root)
+                        }
+                        else if (category.screen == Screens.AddTeacherScreen().root) {
+                            navController.navigate(Screens.AddTeacherScreen().root)
+                        }
+                        else if (category.screen == Screens.AddPostScreen().root) {
+                            navController.navigate(Screens.AddPostScreen().root)
+                        }
+                        else if (category.screen == Screens.AddFormationScreen().root) {
+                            navController.navigate(Screens.AddFormationScreen().root)
+                        }
+                        else if (category.screen == Screens.AddStudentScreen().root) {
+                            navController.navigate(Screens.AddStudentScreen().root)
+                        }
+                        else if (category.screen == Screens.StageScreen().root) {
+                            navController.navigate(Screens.StageScreen().root)
+                        }
+                        else {
+                            navController.navigate(Screens.HomeScreen().root)
+                        }
+
                     }
                     .padding(4.dp)
 
@@ -213,6 +215,7 @@ fun HomeScreen_preview() {
     val context = LocalContext.current
 
     HomeScreen(
+        navController = rememberNavController(),
         viewModel = viewModel(
             factory = object  : ViewModelProvider.Factory{
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {

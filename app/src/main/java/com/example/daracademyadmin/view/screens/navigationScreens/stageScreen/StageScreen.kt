@@ -17,6 +17,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.bigsam.model.data.`object`.NormalTextStyles
 import com.example.daracademy.model.data.sealedClasses.screens.Screens
 import com.example.daracademyadmin.model.sealedClasses.phaseDesEtudes.PhaseDesEtudes
@@ -28,7 +30,7 @@ import com.example.daracademyadmin.ui.theme.customWhite0
 
 @Composable
 fun StageScreen(
-    onNavigate : (Screens , PhaseDesEtudes)->Unit = {_,_->},
+    navController : NavController,
     modifier : Modifier = Modifier
 ) {
 
@@ -48,7 +50,7 @@ fun StageScreen(
                 .weight(1f)
                 .clip(RoundedCornerShape(16.dp))
                 .clickable {
-                    onNavigate(Screens.AnneesScreen() , PhaseDesEtudes.Primaire())
+                    navController.navigate("${Screens.AnneesScreen().root}/${PhaseDesEtudes.Primaire().phase}")
                 }
                 .background(color1)
         ) {
@@ -67,7 +69,7 @@ fun StageScreen(
                 .weight(1f)
                 .clip(RoundedCornerShape(16.dp))
                 .clickable {
-                    onNavigate(Screens.AnneesScreen() , PhaseDesEtudes.CEM())
+                    navController.navigate("${Screens.AnneesScreen().root}/${PhaseDesEtudes.CEM().phase}")
                 }
                 .background(color2)
         ) {
@@ -86,7 +88,7 @@ fun StageScreen(
                 .weight(1f)
                 .clip(RoundedCornerShape(16.dp))
                 .clickable {
-                    onNavigate(Screens.AnneesScreen() , PhaseDesEtudes.Lycee())
+                    navController.navigate("${Screens.AnneesScreen().root}/${PhaseDesEtudes.Lycee().phase}")
                 }
                 .background(color3)
         ) {
@@ -106,5 +108,7 @@ fun StageScreen(
 @Preview
 @Composable
 fun StageScreen_preview() {
-    StageScreen()
+    StageScreen(
+        navController = rememberNavController()
+        )
 }

@@ -51,7 +51,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.bigsam.grafic.material.loadingEffect.loadingLottieAnimation
 import com.example.bigsam.model.data.`object`.NormalTextStyles
+import com.example.daracademy.model.data.sealedClasses.screens.Screens
 import com.example.daracademyadmin.R
+import com.example.daracademyadmin.model.dataClasses.Company
+import com.example.daracademyadmin.model.dataClasses.Course
 import com.example.daracademyadmin.model.dataClasses.Lesson
 import com.example.daracademyadmin.model.dataClasses.Teacher
 import com.example.daracademyadmin.model.variables.dayImg
@@ -69,8 +72,12 @@ import com.example.daracademyadmin.viewModel.DaracademyAdminViewModel
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AddCoursScreen(
-    viewModel : DaracademyAdminViewModel ,
-    modifier: Modifier = Modifier
+    viewModel  : DaracademyAdminViewModel ,
+    phase      : String,
+    annee      : String,
+    matiere    : String,
+    onNavigate : (Screens)->Unit = {},
+    modifier   : Modifier = Modifier
 ) {
 
     val context = LocalContext.current
@@ -79,11 +86,15 @@ fun AddCoursScreen(
         mutableStateOf(false)
     }
 
-    var courses : List<Lesson> by rememberSaveable {
+    var lessons : List<Lesson> by rememberSaveable {
         mutableStateOf(emptyList())
     }
 
     var selectedTeacher  : List<Teacher> by rememberSaveable {
+        mutableStateOf(emptyList())
+    }
+
+    var companies  : List<Company> by rememberSaveable {
         mutableStateOf(emptyList())
     }
 
@@ -114,7 +125,7 @@ fun AddCoursScreen(
         onAddClick  = { show_pickDateDialog        = true },
         onIdetClick = { index -> show_pickDateDialogForIdet = true },
         shape       = RoundedCornerShape(16.dp) ,
-        coursesList = courses,
+        coursesList = lessons,
         modifier    = Modifier
             .padding(start = 16.dp, end = 16.dp)
             .offset(x = 0.dp, y = -20.dp)
@@ -129,9 +140,9 @@ fun AddCoursScreen(
             show_pickDateDialog = false
         },
         onDoneClick = {
-            var newCourse = courses.toMutableList()
+            var newCourse = lessons.toMutableList()
             newCourse.add(it)
-            courses = newCourse
+            lessons = newCourse
         }
     )
 
@@ -142,10 +153,10 @@ fun AddCoursScreen(
             show_pickDateDialogForIdet = false
         },
         onDoneClick = {
-            var newCourse = courses.toMutableList()
+            var newCourse = lessons.toMutableList()
             newCourse.removeAt(index)
             newCourse.add(index , it)
-            courses = newCourse
+            lessons = newCourse
         }
     )
 
@@ -194,7 +205,7 @@ fun AddCoursScreen(
             if (!selectedTeacher.isEmpty()){
                 Item(
                     teacher = selectedTeacher[0] ,
-                    lessons = courses ,
+                    lessons = lessons ,
                     onEditClick = {itemIndex->
                         index = itemIndex
                         show_pickDateDialogForIdet = true
@@ -277,7 +288,20 @@ fun AddCoursScreen(
                     .fillMaxHeight()
                     .width(50.dp)
                     .clickable {
-
+                        loading = true
+                        viewModel.addCourses(
+                            phase ,
+                            annee ,
+                            matiere ,
+                            course = Course(courseId = "" , teacherId = selectedTeacher.get(0).id , lessons =  lessons ) ,
+                            onSuccessCallBack = {
+                                loading = false
+                                onNavigate(Screens.HomeScreen())
+                            },
+                            onFailureCallBack = {
+                                loading = false
+                            }
+                        )
                     }
             ) {
                 if (!loading){
@@ -481,6 +505,9 @@ fun AddCoursScreen_preview() {
                         throw IllegalArgumentException("can't create DaracademyAdminViewModel (addCoursScreen)")
                 }
             }
-        )
+        ),
+        phase = "",
+        annee = "",
+        matiere = ""
     )
 }

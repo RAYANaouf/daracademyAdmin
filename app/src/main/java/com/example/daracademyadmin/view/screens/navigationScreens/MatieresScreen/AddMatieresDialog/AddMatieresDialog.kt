@@ -1,4 +1,4 @@
-package com.example.daracademyadmin.view.screens.MatieresScreen.AddMatieresDialog
+package com.example.daracademyadmin.view.screens.navigationScreens.MatieresScreen.AddMatieresDialog
 
 import android.graphics.Color.parseColor
 import android.net.Uri
@@ -62,8 +62,8 @@ import com.example.daracademyadmin.ui.theme.color2
 import com.example.daracademyadmin.ui.theme.color3
 import com.example.daracademyadmin.ui.theme.customWhite0
 import com.example.daracademyadmin.ui.theme.customWhite4
-import com.example.daracademyadmin.view.screens.MatieresScreen.AddMatieresItem
-import com.example.daracademyadmin.view.screens.MatieresScreen.MatieresScreenItem
+import com.example.daracademyadmin.view.screens.navigationScreens.MatieresScreen.AddMatieresItem
+import com.example.daracademyadmin.view.screens.navigationScreens.MatieresScreen.MatieresScreenItem
 import com.example.daracademyadmin.viewModel.DaracademyAdminViewModel
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.MaterialDialogState
@@ -251,12 +251,12 @@ fun AddMatieresDialog(
                     ){
                         items(matieres_primaire_premiere_annee){
                             MatieresScreenItem(
-                                matiere = it,
+                                matiere = it.copy(img = matieres_primaire_premiere_annee.indexOf(it)),
                                 selected = it.name == selected?.name,
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(16.dp))
                                     .clickable {
-                                        selected = it
+                                        selected = it.copy(img = matieres_primaire_premiere_annee.indexOf(it))
                                     }
                             )
                         }

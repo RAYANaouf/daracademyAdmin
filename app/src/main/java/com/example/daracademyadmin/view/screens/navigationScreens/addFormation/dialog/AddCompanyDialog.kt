@@ -45,16 +45,13 @@ import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun AddHashtagDialog(
+fun AddCompanyDialog(
     state : MaterialDialogState,
     hashtags : List<String> = emptyList(),
     onAddHashtag : (String)->Unit = {}
 ) {
 
 
-    var hashtag by remember {
-        mutableStateOf("")
-    }
 
     MaterialDialog(
         dialogState = state,
@@ -185,5 +182,5 @@ fun AddHashtagDialog(
 @Preview
 @Composable
 fun AddHashtagDialog_preview() {
-    AddHashtagDialog(state = rememberMaterialDialogState())
+    AddCompanyDialog(state = rememberMaterialDialogState())
 }

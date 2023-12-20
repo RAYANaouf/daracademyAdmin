@@ -102,11 +102,8 @@ fun AddFormationScreen(
         mutableStateOf(emptyList())
     }
 
-    var hashtags : List<String> by rememberSaveable {
-        mutableStateOf(emptyList())
-    }
 
-    var courses : List<Lesson> by rememberSaveable {
+    var lessons : List<Lesson> by rememberSaveable {
         mutableStateOf(emptyList())
     }
 
@@ -121,19 +118,12 @@ fun AddFormationScreen(
 
     var launcher_imgs = rememberLauncherForActivityResult(contract =  ActivityResultContracts.PickMultipleVisualMedia()){uris->
         if (uris != null){
-            var new_photo_uris = ArrayList<Uri>()
-            new_photo_uris.addAll(photo_uris)
-            uris.forEach{uri->
-                new_photo_uris.add(uri)
-            }
+            var new_photo_uris = photo_uris.toMutableList()
+            new_photo_uris.addAll(uris)
             photo_uris = new_photo_uris
         }
     }
 
-
-//    var show_bottomSheet by remember{
-//        mutableStateOf(false)
-//    }
 
     var show_schedulerBottomSheet by remember{
         mutableStateOf(false)
@@ -163,21 +153,6 @@ fun AddFormationScreen(
 
 
 
-
-//    BottomSheet(
-//        show = show_bottomSheet,
-//        onDismiss = {
-//            show_bottomSheet = false
-//        },
-//        hashtagList = hashtag,
-//        onAddHashtagClick = {
-//            val newHashtagList = ArrayList<String>()
-//            newHashtagList.addAll(hashtag)
-//            newHashtagList.add(it)
-//            hashtag = newHashtagList
-//        }
-//    )
-
     SchedulerBottomSheet(
         show = show_schedulerBottomSheet,
         onDismiss = {
@@ -190,7 +165,7 @@ fun AddFormationScreen(
             idetIndex = it
             show_pickDateDialogForIdet = true
         },
-        coursesList = courses
+        coursesList = lessons
     )
 
 
@@ -200,10 +175,9 @@ fun AddFormationScreen(
             show_pickDateDialog = false
         },
         onDoneClick = {
-            val newCourses =  ArrayList<Lesson>()
-            newCourses.addAll(courses)
-            newCourses.add(it)
-            courses = newCourses
+            val newLessons = lessons.toMutableList()
+            newLessons.add(it)
+            lessons = newLessons
         }
     )
 
@@ -213,24 +187,23 @@ fun AddFormationScreen(
             show_pickDateDialogForIdet = false
         },
         onDoneClick = {
-            val newCourses =  ArrayList<Lesson>()
-            newCourses.addAll(courses)
-            newCourses.removeAt(idetIndex)
-            newCourses.add(it)
-            courses = newCourses
+            val newLesson =  lessons.toMutableList()
+            newLesson.removeAt(idetIndex)
+            newLesson.add(idetIndex , it)
+            lessons = newLesson
         }
     )
 
-    AddHashtagDialog(
-        state = hashtagDialogState,
-        hashtags = hashtags,
-        onAddHashtag = {
-            val newHashtags = ArrayList<String>()
-            newHashtags.addAll(hashtags)
-            newHashtags.add(it)
-            hashtags = newHashtags
-        }
-    )
+//    AddHashtagDialog(
+//        state = hashtagDialogState,
+//        hashtags = hashtags,
+//        onAddHashtag = {
+//            val newHashtags = ArrayList<String>()
+//            newHashtags.addAll(hashtags)
+//            newHashtags.add(it)
+//            hashtags = newHashtags
+//        }
+//    )
 
 
 
@@ -242,17 +215,9 @@ fun AddFormationScreen(
         teachers = teachers,
         selectedTeachers = selectedTeachers,
         onTeacherSelected = {
-            Toast.makeText(context  , "id : ${it.id}" , Toast.LENGTH_SHORT).show()
-            val newTeachers = ArrayList<Teacher>()
-            newTeachers.addAll(selectedTeachers)
-            if(newTeachers.contains(it)){
-                newTeachers.remove(it)
+            if(!selectedTeachers.contains(it)){
+                selectedTeachers = listOf(it)
             }
-            else{
-                newTeachers.add(it)
-            }
-
-            selectedTeachers = newTeachers
         }
     )
 
@@ -507,18 +472,18 @@ fun AddFormationScreen(
 
                         loading = true
 
-                        val teachers_id = ArrayList<String>()
-
-                        selectedTeachers.forEach {
-                            teachers_id.add(it.id)
+                        if (selectedTeachers.isEmpty()){
+                            Toast.makeText(context , "please, Select a teacher" , Toast.LENGTH_LONG).show()
+                            return@clickable
                         }
+
 
                         viewModel.addFormation(
                             name = name,
                             desc = desc,
                             images = photo_uris,
-                            hashtags = hashtags,
-                            teachers = teachers_id,
+                            lessons = lessons,
+                            teacher = selectedTeachers[0].id,
                             onSuccessCallBack = {
                                 loading = false
 

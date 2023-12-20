@@ -12,6 +12,8 @@ import androidx.lifecycle.ViewModel
 import com.example.daracademy.model.data.dataClasses.Message
 import com.example.daracademy.model.data.dataClasses.MessageBox
 import com.example.daracademy.model.data.sealedClasses.screens.Screens
+import com.example.daracademyadmin.model.dataClasses.Course
+import com.example.daracademyadmin.model.dataClasses.Lesson
 import com.example.daracademyadmin.model.dataClasses.Matiere
 import com.example.daracademyadmin.model.dataClasses.Teacher
 import com.example.daracademyadmin.repo.DaracademyRepository
@@ -92,8 +94,8 @@ class DaracademyAdminViewModel : ViewModel{
     }
 
 
-    fun addFormation(name: String, desc: String, images: List<Uri>, hashtags : List<String>, teachers : List<String>, onSuccessCallBack: () -> Unit, onFailureCallBack: (exp: Exception) -> Unit){
-        this.repo.addFormation(name = name , desc = desc , images = images , hashtags = hashtags , teachers = teachers , onSuccessCallBack, onFailureCallBack  )
+    fun addFormation(name: String, desc: String, images: List<Uri>, lessons : List<Lesson>, teacher : String, onSuccessCallBack: () -> Unit, onFailureCallBack: (exp: Exception) -> Unit){
+        this.repo.addFormation(name = name , desc = desc , images = images , lessons = lessons , teacher = teacher , onSuccessCallBack, onFailureCallBack  )
     }
 
     fun getAllTeachers() : List<Teacher>{
@@ -122,6 +124,9 @@ class DaracademyAdminViewModel : ViewModel{
     }
 
     fun getAllMatieres(phase : String , annee : String , onSuccessCallBack: (List<Matiere>) -> Unit  , onFailureCallBack: (ex: Exception) -> Unit){
+
+        this.matieres = emptyList()
+
         return repo.getAllMatieres(
             phase = phase ,
             annee = annee ,
@@ -148,6 +153,10 @@ class DaracademyAdminViewModel : ViewModel{
         )
     }
 
-}
+    fun addCourses(phase : String, annee : String, matiere : String, course : Course, onSuccessCallBack: () -> Unit, onFailureCallBack: (ex: Exception) -> Unit) {
+        this.repo.addCourses(phase,annee, matiere, course, onSuccessCallBack, onFailureCallBack)
+    }
+
+    }
 
 

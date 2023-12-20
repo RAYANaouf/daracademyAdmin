@@ -57,8 +57,6 @@ fun AddTeacherBottomSheet(
     if (show){
 
         var state            = rememberModalBottomSheetState()
-        var coroutineScope   = rememberCoroutineScope()
-        var context          = LocalContext.current
 
         ModalBottomSheet(
             onDismissRequest = {
