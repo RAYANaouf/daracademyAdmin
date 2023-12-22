@@ -29,7 +29,7 @@ import com.example.daracademyadmin.ui.theme.customWhite0
 @Composable
 fun AlphaBottomBar(
     modifier         : Modifier = Modifier,
-    onLoad           : Boolean,
+    onLoad           : Boolean  = false,
     onAddImageClick  : ()->Unit  = {},
     onPostClick      : ()-> Unit = {}
 ) {

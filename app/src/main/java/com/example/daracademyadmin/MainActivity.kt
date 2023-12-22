@@ -1,5 +1,6 @@
 package com.example.daracademyadmin
 
+import android.graphics.Paint.Align
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
@@ -73,6 +74,7 @@ import com.example.daracademy.model.data.sealedClasses.screens.Screens
 import com.example.daracademy.view.screens.annees_de_etude_Screen.AnneesDesEtudesScreen
 import com.example.daracademy.view.screens.chatBox.ChatScreen
 import com.example.daracademy.view.screens.chatScreen.ChatBoxsScreen
+import com.example.daracademyadmin.model.dataClasses.apis.progress.ProgressUpload
 import com.example.daracademyadmin.model.sealedClasses.phaseDesEtudes.PhaseDesEtudes
 import com.example.daracademyadmin.view.screens.fullScreen.SignInScreen
 import com.example.daracademyadmin.view.material.alphaTopBar.AlphaTopAppBar3
@@ -90,6 +92,7 @@ import com.example.daracademyadmin.ui.theme.customWhite7
 import com.example.daracademyadmin.view.screens.navigationScreens.MatieresScreen.MatieresScreen
 import com.example.daracademyadmin.view.screens.navigationScreens.addCours.AddCoursScreen
 import com.example.daracademyadmin.view.screens.navigationScreens.stageScreen.StageScreen
+import com.example.daracademyadmin.view.screens.navigationScreens.uploadScreen.UploadScreen
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -102,6 +105,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         WindowCompat.setDecorFitsSystemWindows(window , false)
+
+
 
         setContent {
 
@@ -318,7 +323,7 @@ fun MainScreen(
                             .fillMaxWidth()
                     ) {
                         Image(
-                            painter = painterResource(id = R.drawable.teacher),
+                            painter = painterResource(id = R.drawable.statistique),
                             contentDescription = null,
                             contentScale = ContentScale.Inside,
                             modifier = Modifier
@@ -328,7 +333,7 @@ fun MainScreen(
                         Spacer(modifier = Modifier.width(16.dp))
 
                         Text(
-                            text = "Etudiants",
+                            text = "statistique",
                             style = NormalTextStyles.TextStyleSZ7
                         )
                     }
@@ -388,6 +393,41 @@ fun MainScreen(
                             .height(65.dp)
                             .padding(start = 16.dp, end = 16.dp)
                             .clickable {
+
+                                navController.navigate(Screens.UploadsScreen().root)
+
+                                coroutineScope.launch {
+                                    drawerState.apply {
+                                        close()
+                                    }
+                                }
+                            }
+                            .padding(top = 6.dp, bottom = 6.dp)
+                            .fillMaxWidth()
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.upload),
+                            contentDescription = null,
+                            contentScale = ContentScale.Inside,
+                            modifier = Modifier
+                                .size(26.dp)
+                        )
+
+                        Spacer(modifier = Modifier.width(16.dp))
+
+                        Text(
+                            text = "Uploads",
+                            style = NormalTextStyles.TextStyleSZ7
+                        )
+                    }
+
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .height(65.dp)
+                            .padding(start = 16.dp, end = 16.dp)
+                            .clickable {
                                 coroutineScope.launch {
                                     drawerState.apply {
                                         close()
@@ -412,6 +452,8 @@ fun MainScreen(
                             style = NormalTextStyles.TextStyleSZ7
                         )
                     }
+
+
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -520,7 +562,11 @@ fun MainScreen(
                         AlphaTopAppBar3(
                             onCloseClicked = {
                                 viewModel.setAppScreen(Screens.HomeScreen())
-                                navController.navigate(Screens.HomeScreen().root)
+                                navController.navigate(Screens.HomeScreen().root){
+                                    popUpTo(Screens.HomeScreen().root){
+                                        inclusive = true
+                                    }
+                                }
                             },
                             centralTitle = {
                                 if(navBackStackEntry?.destination?.route != Screens.AddPostScreen().root){
@@ -597,7 +643,11 @@ fun MainScreen(
                         AddPostScreen(
                             viewModel = viewModel,
                             onNavigate = {
-                                navController.navigate(Screens.HomeScreen().root)
+                                navController.navigate(Screens.HomeScreen().root){
+                                    popUpTo(Screens.HomeScreen().root){
+                                        inclusive = true
+                                    }
+                                }
                                 viewModel.setAppScreen(Screens.HomeScreen())
                             },
                             modifier = Modifier
@@ -611,7 +661,11 @@ fun MainScreen(
                         AddTeacherScreen(
                             viewModel = viewModel,
                             onNavigate = {
-                                navController.navigate(it.root)
+                                navController.navigate(it.root){
+                                    popUpTo(Screens.HomeScreen().root){
+                                        inclusive = true
+                                    }
+                                }
                                 viewModel.setAppScreen(it)
                             },
                             modifier = Modifier
@@ -623,7 +677,11 @@ fun MainScreen(
                         AddFormationScreen(
                         viewModel = viewModel,
                         onNavigation = {
-                            navController.navigate(it.root)
+                            navController.navigate(it.root){
+                                popUpTo(Screens.HomeScreen().root){
+                                    inclusive = true
+                                }
+                            }
                             viewModel.setAppScreen(it)
                         },
                             modifier = Modifier
@@ -635,7 +693,11 @@ fun MainScreen(
                         AddStudentScreen(
                             viewModel = viewModel,
                             onNavigation = {
-                                navController.navigate(it.root)
+                                navController.navigate(it.root){
+                                    popUpTo(Screens.HomeScreen().root){
+                                        inclusive = true
+                                    }
+                                }
                                 viewModel.setAppScreen(it)
                             },
                             modifier = Modifier
@@ -744,7 +806,11 @@ fun MainScreen(
                     ){navBackStackEntry->
                         AddCoursScreen(
                             onNavigate = {
-                                navController.navigate(it.root)
+                                navController.navigate(it.root){
+                                    popUpTo(Screens.HomeScreen().root){
+                                        inclusive = true
+                                    }
+                                }
                                 viewModel.setAppScreen(it)
                             },
                             phase = navBackStackEntry.arguments?.getString("phase") ?: "",
@@ -756,6 +822,18 @@ fun MainScreen(
                                     top = paddingValues.calculateTopPadding()
                                 )
                         )
+                    }
+
+                    composable(
+                        route = "${Screens.UploadsScreen().root}"
+                    ){navBackStackEntry->
+
+                        UploadScreen(
+                            progresses = viewModel.getProgress(),
+                            modifier = Modifier
+                                .padding( top = paddingValues.calculateTopPadding())
+                        )
+
                     }
 
                 }
@@ -770,6 +848,16 @@ fun MainScreen(
 
     }
 
+}
+
+
+private fun somme(l : List<Float>):Float{
+    var result = 0.0f
+    l.forEach {
+        result += it
+    }
+
+    return (result/l.size)
 }
 
 

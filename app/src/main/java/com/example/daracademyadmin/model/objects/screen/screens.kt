@@ -17,6 +17,6 @@ object screens {
     val anneesScreen               = "anneesScreen"
     val addCoursScreen             = "addCoursScreen"
     val matieresScreen             = "matieresScreen"
-
+    val uploadsScreen              = "uploadsScreen"
 
 }

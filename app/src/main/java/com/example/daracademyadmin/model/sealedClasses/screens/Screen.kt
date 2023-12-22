@@ -20,4 +20,5 @@ sealed class Screens(val root : String){
     class AnneesScreen               : Screens(root = screens.anneesScreen)
     class AddCoursScreen             : Screens(root = screens.addCoursScreen)
     class MatieresScreen             : Screens(root = screens.matieresScreen)
+    class UploadsScreen             : Screens(root = screens.uploadsScreen)
 }

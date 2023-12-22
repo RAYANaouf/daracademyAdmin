@@ -340,17 +340,8 @@ fun AddTeacherScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            if (loading){
-                loadingLottieAnimation(
-                    modifier = Modifier
-                        .width(90.dp)
-
-                )
-            }
-            else{
                 Button(
                     onClick = {
-                        loading = true
                         viewModel.addTeacher(
                             name = name,
                             email = email,
@@ -360,15 +351,15 @@ fun AddTeacherScreen(
                             formation = listOf(),
                             support = listOf(),
                             onFailureCallBack = {
-                                loading = false
                                 Toast.makeText(context , "Failed : ${it.message}" , Toast.LENGTH_LONG).show()
                             },
                             onSuccessCallBack = {
-                                loading = false
                                 Toast.makeText(context , "the teacher has been added" , Toast.LENGTH_LONG).show()
-                                onNavigate(Screens.HomeScreen())
                             }
                         )
+
+                        onNavigate(Screens.HomeScreen())
+
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = color1),
                     shape = RoundedCornerShape(12.dp),
@@ -379,7 +370,7 @@ fun AddTeacherScreen(
                         style = NormalTextStyles.TextStyleSZ7.copy(color = customWhite0)
                     )
                 }
-            }
+            
 
 
             Spacer(modifier = Modifier.width(16.dp))

@@ -102,7 +102,11 @@ fun MatieresScreen(
                     modifier = Modifier
                         .clip(RoundedCornerShape(16.dp))
                         .clickable {
-                            navController.navigate("${Screens.AddCoursScreen().root}/$phase/$annee/${it.name}")
+                            navController.navigate("${Screens.AddCoursScreen().root}/$phase/$annee/${it.name}"){
+                                popUpTo(Screens.HomeScreen().root){
+                                    inclusive = true
+                                }
+                            }
 
                         }
                 )

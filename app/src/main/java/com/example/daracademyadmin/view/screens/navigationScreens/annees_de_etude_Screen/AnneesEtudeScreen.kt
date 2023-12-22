@@ -94,7 +94,11 @@ fun AnneesDesEtudesScreen(
                         .clip(RoundedCornerShape(16.dp))
                         .background(color = color)
                         .clickable {
-                            navController.navigate("${Screens.MatieresScreen().root}/$phase/${annee.id}")
+                            navController.navigate("${Screens.MatieresScreen().root}/$phase/${annee.id}"){
+                                popUpTo(Screens.HomeScreen().root){
+                                    inclusive = true
+                                }
+                            }
                         }
                         .padding(top = 4.dp, bottom = 4.dp, start = 10.dp, end = 10.dp)
                 ) {
@@ -117,7 +121,11 @@ fun AnneesDesEtudesScreen(
                         .clip(RoundedCornerShape(16.dp))
                         .background(color = color)
                         .clickable {
-                            navController.navigate("${Screens.MatieresScreen().root}/$phase/${annee.id}")
+                            navController.navigate("${Screens.MatieresScreen().root}/$phase/${annee.id}"){
+                                popUpTo(Screens.HomeScreen().root){
+                                    inclusive = true
+                                }
+                            }
                         }
                         .padding(top = 4.dp, bottom = 4.dp, start = 10.dp, end = 10.dp)
                 ) {

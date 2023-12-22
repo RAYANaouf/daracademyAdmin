@@ -104,6 +104,10 @@ dependencies {
     implementation("com.google.firebase:firebase-storage")
 
 
+    //dataStore
+    implementation("androidx.datastore:datastore-preferences-core:1.0.0")
+
+
 
 
 }

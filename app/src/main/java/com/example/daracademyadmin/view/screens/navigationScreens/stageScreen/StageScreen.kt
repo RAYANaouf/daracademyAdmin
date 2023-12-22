@@ -50,7 +50,11 @@ fun StageScreen(
                 .weight(1f)
                 .clip(RoundedCornerShape(16.dp))
                 .clickable {
-                    navController.navigate("${Screens.AnneesScreen().root}/${PhaseDesEtudes.Primaire().phase}")
+                    navController.navigate("${Screens.AnneesScreen().root}/${PhaseDesEtudes.Primaire().phase}"){
+                        popUpTo(Screens.HomeScreen().root){
+                            inclusive = true
+                        }
+                    }
                 }
                 .background(color1)
         ) {
@@ -69,7 +73,11 @@ fun StageScreen(
                 .weight(1f)
                 .clip(RoundedCornerShape(16.dp))
                 .clickable {
-                    navController.navigate("${Screens.AnneesScreen().root}/${PhaseDesEtudes.CEM().phase}")
+                    navController.navigate("${Screens.AnneesScreen().root}/${PhaseDesEtudes.CEM().phase}"){
+                        popUpTo(Screens.HomeScreen().root){
+                            inclusive = true
+                        }
+                    }
                 }
                 .background(color2)
         ) {
@@ -88,7 +96,11 @@ fun StageScreen(
                 .weight(1f)
                 .clip(RoundedCornerShape(16.dp))
                 .clickable {
-                    navController.navigate("${Screens.AnneesScreen().root}/${PhaseDesEtudes.Lycee().phase}")
+                    navController.navigate("${Screens.AnneesScreen().root}/${PhaseDesEtudes.Lycee().phase}"){
+                        popUpTo(Screens.HomeScreen().root){
+                            inclusive = true
+                        }
+                    }
                 }
                 .background(color3)
         ) {

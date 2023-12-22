@@ -76,10 +76,6 @@ fun AddPostScreen(
         mutableStateOf("")
     }
 
-    var onLoad by rememberSaveable {
-        mutableStateOf(false)
-    }
-
     var context = LocalContext.current
 
 
@@ -206,22 +202,20 @@ fun AddPostScreen(
                     "image/*"
                 )
             },
-            onLoad = onLoad,
             onPostClick = {
-                onLoad = true
                 viewModel.addPost(
                     name    = title   ,
                     desc    = desc    ,
                     images  = images  ,
                     onSuccessCallBack = {
-                        onLoad = false
-                        onNavigate(Screens.HomeScreen())
                         Toast.makeText(context , "the post is added successfully" , Toast.LENGTH_LONG).show()
                     },
                     onFailureCallBack = {
-                        onLoad = false
                     }
                 )
+
+                onNavigate(Screens.HomeScreen())
+
             }
         )
 

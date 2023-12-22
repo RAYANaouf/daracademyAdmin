@@ -1,30 +1,32 @@
 package com.example.daracademyadmin.repo
 
-import android.content.Context
 import android.net.Uri
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.datastore.core.DataStore
 import com.example.daracademy.model.data.dataClasses.Message
 import com.example.daracademy.model.data.dataClasses.MessageBox
-import com.example.daracademy.model.data.sealedClasses.screens.Screens
 import com.example.daracademy.model.data.variables.les_annees_d_etude.annees_de_C_E_M
 import com.example.daracademy.model.data.variables.les_annees_d_etude.annees_de_lycee
 import com.example.daracademy.model.data.variables.les_annees_d_etude.annees_de_primaire
+import com.example.daracademyadmin.model.dataClasses.Company
 import com.example.daracademyadmin.model.dataClasses.Course
 import com.example.daracademyadmin.model.dataClasses.Formation
 import com.example.daracademyadmin.model.dataClasses.Lesson
 import com.example.daracademyadmin.model.dataClasses.Matiere
 import com.example.daracademyadmin.model.dataClasses.Post
 import com.example.daracademyadmin.model.dataClasses.Teacher
+import com.example.daracademyadmin.model.dataClasses.apis.progress.PrograssType
+import com.example.daracademyadmin.model.dataClasses.apis.progress.ProgressUpload
 import com.example.daracademyadmin.model.sealedClasses.phaseDesEtudes.PhaseDesEtudes
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
+import java.util.prefs.Preferences
 
 class DaracademyRepository {
 
@@ -34,6 +36,11 @@ class DaracademyRepository {
     private val firebaseFirestore  by mutableStateOf(Firebase.firestore)
     private val storageRef         by mutableStateOf(Firebase.storage.reference)
 
+
+    private val dataStore : DataStore<Preferences> by preferencesDataStore("")
+
+
+    /******************************** live info ********************************************/
     var teachers           by mutableStateOf<List<Teacher>>(emptyList())
         private set
     private var isListen_teachers  = false
@@ -44,33 +51,45 @@ class DaracademyRepository {
         private set
     private var isListen_formations  = false
 
+    /***************************************************************************************/
+
+    /******************************** in porogree ******************************************/
+
+
+    var progresses  = mutableStateListOf<ProgressUpload>()
+
+
+    /***************************************************************************************/
 
     var matieres : HashMap<String , HashMap< String , List<Matiere>? > > =
         hashMapOf(
             PhaseDesEtudes.Primaire().phase to hashMapOf(
-                annees_de_primaire[0].id     to MatieresCollection.primaire_pre,
-                annees_de_primaire[1].id     to MatieresCollection.primaire_premiere,
-                annees_de_primaire[2].id     to MatieresCollection.primaire_deuxieme,
-                annees_de_primaire[3].id     to MatieresCollection.primaire_troisieme,
-                annees_de_primaire[4].id     to MatieresCollection.primaire_quatrieme,
-                annees_de_primaire[5].id     to MatieresCollection.primaire_cinquieme,
-                annees_de_primaire[6].id     to MatieresCollection.primaire_sixieme,
+                annees_de_primaire[0].id     to null,
+                annees_de_primaire[1].id     to null,
+                annees_de_primaire[2].id     to null,
+                annees_de_primaire[3].id     to null,
+                annees_de_primaire[4].id     to null,
+                annees_de_primaire[5].id     to null,
+                annees_de_primaire[6].id     to null,
             ),
             PhaseDesEtudes.CEM().phase      to hashMapOf(
-                annees_de_C_E_M[0].id        to MatieresCollection.cem_premiere,
-                annees_de_C_E_M[1].id        to MatieresCollection.cem_deuxieme,
-                annees_de_C_E_M[2].id        to MatieresCollection.cem_troisieme,
-                annees_de_C_E_M[3].id        to MatieresCollection.cem_quatrieme,
-                annees_de_C_E_M[4].id        to MatieresCollection.cem_bem,
+                annees_de_C_E_M[0].id        to null,
+                annees_de_C_E_M[1].id        to null,
+                annees_de_C_E_M[2].id        to null,
+                annees_de_C_E_M[3].id        to null,
+                annees_de_C_E_M[4].id        to null,
             ),
             PhaseDesEtudes.Lycee().phase    to hashMapOf(
-                annees_de_lycee[0].id        to MatieresCollection.lycee_premiere,
-                annees_de_lycee[1].id        to MatieresCollection.lycee_deuxieme,
-                annees_de_lycee[2].id        to MatieresCollection.lycee_troisieme,
-                annees_de_lycee[3].id        to MatieresCollection.lycee_bac,
+                annees_de_lycee[0].id        to null,
+                annees_de_lycee[1].id        to null,
+                annees_de_lycee[2].id        to null,
+                annees_de_lycee[3].id        to null,
             )
 
         )
+
+
+
 
 
 
@@ -165,8 +184,22 @@ class DaracademyRepository {
 
     fun addPost(name : String, desc : String, images : List<Uri>,  onSuccessCallBack: () -> Unit = {}, onFailureCallBack: (ex : Exception) -> Unit = {}){
 
+        //add ref
         val postsRef = storageRef.child("posts")
         val postId   = System.currentTimeMillis().toString()
+
+
+       //progresses
+        val progressPostIndex = progresses.size
+        progresses.add(
+            ProgressUpload(
+                id = postId ,
+                progress = emptyList(),
+                type = PrograssType.Post()
+            )
+        )
+        var imgProg = ArrayList<Float>()
+
 
 
         val imgUris = ArrayList<String>()
@@ -183,12 +216,26 @@ class DaracademyRepository {
 
         val myPostRef = postsRef.child("${name}_Post_${System.currentTimeMillis()}")
 
+
         images.forEachIndexed { index, uri ->
+            imgProg.add(0f)
 
             val imageUriRef = myPostRef.child("/img_$index")
 
             imageUriRef
                 .putFile(uri)
+                .addOnProgressListener {
+
+                    imgProg[index] = (  (100f * it.bytesTransferred) / it.totalByteCount  )
+                    val item = this.progresses[progressPostIndex]
+                    this.progresses.removeAt(progressPostIndex)
+
+                    //op
+                    item.progress =  imgProg
+
+                    this.progresses.add(progressPostIndex , item )
+
+                }
                 .addOnSuccessListener{
 
                     imageUriRef.downloadUrl.addOnSuccessListener {
@@ -222,6 +269,13 @@ class DaracademyRepository {
 
                 }
                 .addOnFailureListener(){
+                    var item = progresses[progressPostIndex]
+                    progresses.removeAt(progressPostIndex)
+
+                    //do something
+                    item = item.copy(failed = true)
+
+                    progresses.add(progressPostIndex , item)
                     onFailureCallBack(it)
                 }
 
@@ -242,10 +296,36 @@ class DaracademyRepository {
         val teachersRef = storageRef.child("teachers")
         val id          = System.currentTimeMillis()
 
+        //progresses
+        val progressPostIndex = progresses.size
+        progresses.add(
+            ProgressUpload(
+                id = id.toString() ,
+                progress = emptyList(),
+                type = PrograssType.Teacher()
+            )
+        )
+        var imgProg = ArrayList<Float>()
+
+
         if (photo != null){
             val photoRef = teachersRef.child("${name}_${id}/photo")
 
+            imgProg.add(0f)
+
             photoRef.putFile(photo)
+                .addOnProgressListener {
+
+                    imgProg[0] = 100f * it.bytesTransferred / it.totalByteCount
+                    var item = progresses[progressPostIndex]
+                    progresses.removeAt(progressPostIndex)
+
+                    //do
+                    item = item.copy(progress = imgProg )
+
+                    progresses.add(progressPostIndex , item)
+
+                }
                 .addOnSuccessListener { _->
                     //get the uri
                     photoRef.downloadUrl
@@ -268,10 +348,31 @@ class DaracademyRepository {
                         }
                         .addOnFailureListener { onFailureCallBack(it) }
                 }
-                .addOnFailureListener{ onFailureCallBack(it) }
+                .addOnFailureListener{
+
+                    var item = progresses[progressPostIndex]
+                    progresses.removeAt(progressPostIndex)
+
+                    //do
+                    item = item.copy(failed = true )
+
+                    progresses.add(progressPostIndex , item)
+
+                    onFailureCallBack(it)
+                }
 
         }
         else{
+            imgProg.add(100f)
+
+            var item = progresses[progressPostIndex]
+            progresses.removeAt(progressPostIndex)
+
+            //do
+            item = item.copy(progress = imgProg )
+
+            progresses.add(progressPostIndex , item)
+
             firebaseFirestore.collection("teachers")
                 .document("$id")
                 .set(
@@ -343,10 +444,21 @@ class DaracademyRepository {
 
     }
 
-    fun addFormation(name : String, desc : String, images : List<Uri>, lessons : List<Lesson>  , teacher : String ,   onSuccessCallBack: () -> Unit = {}, onFailureCallBack: (ex : Exception) -> Unit = {}){
+    fun addFormation(name : String, desc : String, images : List<Uri>, lessons : List<Lesson> , companies : List<Company>  , teacher : String ,   onSuccessCallBack: () -> Unit = {}, onFailureCallBack: (ex : Exception) -> Unit = {}){
 
         val formationsRef = storageRef.child("formations")
         val id  = System.currentTimeMillis()
+
+        //progresses
+        val progressFormationIndex = progresses.size
+        progresses.add(
+            ProgressUpload(
+                id = id.toString() ,
+                progress = emptyList(),
+                type = PrograssType.Formation()
+            )
+        )
+        var imgForm = ArrayList<Float>()
 
 
         val _images    =  ArrayList<String>()
@@ -367,11 +479,21 @@ class DaracademyRepository {
 
         if (images.size>0){
             images.forEachIndexed { index, uri ->
-
+                imgForm.add(0f)
                 val imageUriRef = myFormationRef.child("/img_$index")
 
                 imageUriRef
                     .putFile(uri)
+                    .addOnProgressListener {
+                        imgForm[index] = (  (100f * it.bytesTransferred) / it.totalByteCount  )
+                        val item = this.progresses[progressFormationIndex]
+                        this.progresses.removeAt(progressFormationIndex)
+
+                        //op
+                        item.progress =  imgForm
+
+                        this.progresses.add(progressFormationIndex , item )
+                    }
                     .addOnSuccessListener{
 
                         imageUriRef.downloadUrl
@@ -384,11 +506,12 @@ class DaracademyRepository {
                                     firebaseFirestore.collection("formations")
                                         .add(
                                             hashMapOf(
-                                                "name"     to name,
-                                                "desc"     to desc,
-                                                "imgs"     to _images,
-                                                "teacher"  to teacher,
-                                                "lessons"  to lessons
+                                                "name"      to name,
+                                                "desc"      to desc,
+                                                "imgs"      to _images,
+                                                "teacher"   to teacher,
+                                                "lessons"   to lessons,
+                                                "companies" to companies
                                             )
                                         )
                                         .addOnSuccessListener {
@@ -408,6 +531,13 @@ class DaracademyRepository {
 
                     }
                     .addOnFailureListener(){
+                        var item = progresses[progressFormationIndex]
+                        progresses.removeAt(progressFormationIndex)
+
+                        //do something
+                        item = item.copy(failed = true)
+
+                        progresses.add(progressFormationIndex , item)
                         onFailureCallBack(it)
                     }
 
@@ -614,5 +744,12 @@ class DaracademyRepository {
                 onFailureCallBack(it)
             }
     }
+
+    fun getAllProgresses():List<ProgressUpload>{
+        return  this.progresses
+    }
+
+
+
 
 }

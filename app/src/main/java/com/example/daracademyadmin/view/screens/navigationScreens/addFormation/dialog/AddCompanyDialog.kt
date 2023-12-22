@@ -1,5 +1,10 @@
 package com.example.daracademyadmin.view.screens.navigationScreens.addFormation.dialog
 
+import android.graphics.Color.parseColor
+import android.net.Uri
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,6 +21,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
@@ -27,30 +33,50 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
 import com.example.alphaspace.screens.common.textFields.AlphaTextField
 import com.example.bigsam.model.data.`object`.NormalTextStyles
 import com.example.daracademyadmin.R
+import com.example.daracademyadmin.model.dataClasses.Company
 import com.example.daracademyadmin.view.material.AlphaHashtag.AlphaHashtag
 import com.example.daracademyadmin.model.variables.firaSansFamily
 import com.example.daracademyadmin.ui.theme.color1
 import com.example.daracademyadmin.ui.theme.customWhite0
+import com.example.daracademyadmin.ui.theme.customWhite3
 import com.example.daracademyadmin.ui.theme.customWhite4
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.MaterialDialogState
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AddCompanyDialog(
-    state : MaterialDialogState,
-    hashtags : List<String> = emptyList(),
-    onAddHashtag : (String)->Unit = {}
+    state        : MaterialDialogState,
+    onCompanyAdd : (Company)->Unit = {}
 ) {
 
+
+    var image_uri : Uri? by remember{
+        mutableStateOf(null)
+    }
+
+    var company_name : String by remember{
+        mutableStateOf("")
+    }
+
+    val launcher_image = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent() ){uri->
+        if(uri != null){
+            image_uri = uri
+
+        }
+    }
+    
+    val context = LocalContext.current
 
 
     MaterialDialog(
@@ -71,106 +97,85 @@ fun AddCompanyDialog(
                     .fillMaxWidth()
                     .height(70.dp)
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.hashtag_icon) ,
-                    contentDescription = null,
-                    contentScale = ContentScale.FillBounds,
-                    modifier = Modifier
-                        .size(35.dp)
-                )
-
-                Spacer(modifier = Modifier.width(10.dp))
-
                 Text(
-                    text = "Add Hashtag",
+                    text = "Add Company",
                     style = NormalTextStyles.TextStyleSZ4.copy(color = color1 , fontFamily = firaSansFamily)
                 )
             }
 
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center,
+            Image(
+                painter = if (image_uri == null) painterResource(id = R.drawable.company) else rememberAsyncImagePainter(model =image_uri) ,
+                contentDescription = null,
+                contentScale = if (image_uri == null)  ContentScale.Inside  else  ContentScale.Crop,
                 modifier = Modifier
-                    .height(50.dp)
-                    .padding(start = 20.dp, end = 20.dp)
-            ) {
-                AlphaTextField(
-                    text = hashtag,
-                    onValueChange = {txt->
-                        hashtag = txt.filter {chars-> chars.isLetter() or chars.equals("_")  }
-                    },
-                    textFieldStyle = NormalTextStyles.TextStyleSZ6 ,
-                    hint = "Hashtag",
-                    hintStyle = NormalTextStyles.TextStyleSZ6,
-                    cursorColor = color1,
-                    modifier = Modifier
-                        .height(45.dp)
-                        .weight(1f)
-                )
-
-                Spacer(modifier = Modifier.width(12.dp))
-
-                Image(
-                    painter = painterResource(id = R.drawable.send_icon),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(30.dp)
-                        .clickable {
-                            onAddHashtag(hashtag)
-                            hashtag = ""
-                        }
-                )
-
-            }
-            
-            
-            Spacer(modifier = Modifier
-                .padding(top = 12.dp, bottom = 12.dp, start = 20.dp, end = 20.dp)
-                .background(customWhite4)
-                .height(1.dp)
-                .fillMaxWidth(1f))
+                    .size(70.dp)
+                    .clip(CircleShape)
+                    .background(Color(parseColor("#e5e5e5")))
+                    .padding(if (image_uri == null) 5.dp else 0.dp)
+                    .clickable {
+                        launcher_image.launch("image/*")
+                    }
+            )
 
 
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            Spacer(modifier = Modifier.height(36.dp))
+
+
+            AlphaTextField(
+                text = company_name,
+                onValueChange = {txt->
+                    company_name = txt
+                },
+                textFieldStyle = NormalTextStyles.TextStyleSZ6 ,
+                hint = "Company name",
+                hintStyle = NormalTextStyles.TextStyleSZ6,
+                cursorColor = color1,
                 modifier = Modifier
-                    .height(80.dp)
-                    .verticalScroll(rememberScrollState())
-                    .fillMaxWidth()
-                    .padding(start = 12.dp , end = 12.dp)
-            ) {
-                hashtags.forEach {
-                    AlphaHashtag(txt = it , style = NormalTextStyles.TextStyleSZ9 , width = 2.dp , modifier = Modifier.padding(top = 4.dp , bottom = 4.dp))
-                }
-            }
+                    .height(45.dp)
+                    .width(220.dp)
+            )
 
 
-
+            Spacer(modifier = Modifier.height(36.dp))
+            
             Row(
-                horizontalArrangement = Arrangement.End,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 20.dp, end = 20.dp, bottom = 12.dp, top = 12.dp)
-            ) {
+            ){
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .width(90.dp)
-                        .height(40.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(color1)
+                        .padding(top = 12.dp , bottom = 12.dp , start = 16.dp, end = 16.dp)
                         .clickable {
                             state.hide()
                         }
-                ){
+                ) {
+                    Text(
+                        text = "Cancel",
+                        style = NormalTextStyles.TextStyleSZ8.copy(color = customWhite3 , fontFamily = firaSansFamily)
+                    )
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .padding(top = 12.dp , bottom = 12.dp , start = 16.dp, end = 16.dp)
+                        .clickable {
+                            if (image_uri== null || company_name == ""){
+                                Toast.makeText(context , "select photo and name" , Toast.LENGTH_LONG).show()
+                                return@clickable
+                            }
+                            onCompanyAdd(Company(name = company_name , img = image_uri.toString()))
+                            state.hide()
+                        }
+                ) {
                     Text(
                         text = "Done",
-                        style = NormalTextStyles.TextStyleSZ8.copy(color = customWhite0 , fontFamily = firaSansFamily)
+                        style = NormalTextStyles.TextStyleSZ8.copy(color = color1 , fontFamily = firaSansFamily)
                     )
                 }
             }
-
 
         }
 

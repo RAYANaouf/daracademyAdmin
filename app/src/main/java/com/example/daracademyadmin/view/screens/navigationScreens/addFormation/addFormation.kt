@@ -56,12 +56,12 @@ import com.example.bigsam.grafic.material.loadingEffect.loadingLottieAnimation
 import com.example.bigsam.model.data.`object`.NormalTextStyles
 import com.example.daracademy.model.data.sealedClasses.screens.Screens
 import com.example.daracademyadmin.R
+import com.example.daracademyadmin.model.dataClasses.Company
 import com.example.daracademyadmin.model.dataClasses.Lesson
 import com.example.daracademyadmin.view.material.AlphaTextFields.AlphaUnderLinedTextField
 import com.example.daracademyadmin.view.material.alphaBottomBar.AlphaAdjustableBottomBar
 import com.example.daracademyadmin.view.common.AddTeacherBottomSheet
 import com.example.daracademyadmin.view.common.SchedulerBottomSheet
-import com.example.daracademyadmin.view.screens.navigationScreens.addFormation.dialog.AddHashtagDialog
 import com.example.daracademyadmin.view.screens.navigationScreens.addFormation.dialog.PickDayDialog
 import com.example.daracademyadmin.model.dataClasses.Teacher
 import com.example.daracademyadmin.model.variables.josefinSansFamily
@@ -71,6 +71,7 @@ import com.example.daracademyadmin.ui.theme.customBlack9
 import com.example.daracademyadmin.ui.theme.customWhite0
 import com.example.daracademyadmin.ui.theme.customWhite1
 import com.example.daracademyadmin.ui.theme.customWhite2
+import com.example.daracademyadmin.view.screens.navigationScreens.addFormation.dialog.AddCompanyDialog
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -85,7 +86,7 @@ fun AddFormationScreen(
     var context = LocalContext.current
 
 
-    var teachers : List<Teacher> by rememberSaveable {
+    var teachers : List<Teacher> by remember {
         mutableStateOf(viewModel.getAllTeachers())
     }
 
@@ -104,6 +105,10 @@ fun AddFormationScreen(
 
 
     var lessons : List<Lesson> by rememberSaveable {
+        mutableStateOf(emptyList())
+    }
+
+    var companies : List<Company> by rememberSaveable {
         mutableStateOf(emptyList())
     }
 
@@ -141,6 +146,8 @@ fun AddFormationScreen(
         mutableStateOf(false)
     }
 
+    var state_companyDialog = rememberMaterialDialogState()
+
     var idetIndex by remember{
         mutableStateOf(-1)
     }
@@ -148,8 +155,6 @@ fun AddFormationScreen(
     var selectedTeachers : List<Teacher> by rememberSaveable {
         mutableStateOf(emptyList())
     }
-
-    val hashtagDialogState    = rememberMaterialDialogState()
 
 
 
@@ -194,16 +199,14 @@ fun AddFormationScreen(
         }
     )
 
-//    AddHashtagDialog(
-//        state = hashtagDialogState,
-//        hashtags = hashtags,
-//        onAddHashtag = {
-//            val newHashtags = ArrayList<String>()
-//            newHashtags.addAll(hashtags)
-//            newHashtags.add(it)
-//            hashtags = newHashtags
-//        }
-//    )
+    AddCompanyDialog(
+        state = state_companyDialog,
+        onCompanyAdd = {
+            val newlist = companies.toMutableList()
+            newlist.add(it)
+            companies = newlist
+        }
+    )
 
 
 
@@ -410,7 +413,7 @@ fun AddFormationScreen(
                     .width(65.dp)
                     .clickable {
 //                        show_bottomSheet = true
-                        hashtagDialogState.show()
+                        state_companyDialog.show()
                     }
             ) {
                 Icon(
@@ -470,10 +473,11 @@ fun AddFormationScreen(
                     .width(50.dp)
                     .clickable {
 
-                        loading = true
 
-                        if (selectedTeachers.isEmpty()){
-                            Toast.makeText(context , "please, Select a teacher" , Toast.LENGTH_LONG).show()
+                        if (selectedTeachers.isEmpty()) {
+                            Toast
+                                .makeText(context, "please, Select a teacher", Toast.LENGTH_LONG)
+                                .show()
                             return@clickable
                         }
 
@@ -482,12 +486,11 @@ fun AddFormationScreen(
                             name = name,
                             desc = desc,
                             images = photo_uris,
+                            companies = companies,
                             lessons = lessons,
                             teacher = selectedTeachers[0].id,
                             onSuccessCallBack = {
-                                loading = false
 
-                                onNavigation(Screens.HomeScreen())
                                 Toast
                                     .makeText(
                                         context,
@@ -497,7 +500,6 @@ fun AddFormationScreen(
                                     .show()
                             },
                             onFailureCallBack = {
-                                loading = false
 
                                 Toast
                                     .makeText(
@@ -508,9 +510,10 @@ fun AddFormationScreen(
                                     .show()
                             }
                         )
+
+                        onNavigation(Screens.HomeScreen())
                     }
             ) {
-                if (!loading){
                     Image(
                         painter = painterResource(id = R.drawable.send_icon),
                         contentDescription = null,
@@ -518,10 +521,7 @@ fun AddFormationScreen(
                         modifier = Modifier
                             .fillMaxSize(0.65f)
                     )
-                }
-                else{
-                    loadingLottieAnimation()
-                }
+
             }
 
 

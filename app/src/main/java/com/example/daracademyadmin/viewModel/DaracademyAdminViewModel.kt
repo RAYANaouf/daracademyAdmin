@@ -9,13 +9,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.util.rangeTo
 import androidx.lifecycle.ViewModel
+import com.airbnb.lottie.compose.LottieClipSpec
 import com.example.daracademy.model.data.dataClasses.Message
 import com.example.daracademy.model.data.dataClasses.MessageBox
 import com.example.daracademy.model.data.sealedClasses.screens.Screens
+import com.example.daracademyadmin.model.dataClasses.Company
 import com.example.daracademyadmin.model.dataClasses.Course
 import com.example.daracademyadmin.model.dataClasses.Lesson
 import com.example.daracademyadmin.model.dataClasses.Matiere
 import com.example.daracademyadmin.model.dataClasses.Teacher
+import com.example.daracademyadmin.model.dataClasses.apis.progress.ProgressUpload
 import com.example.daracademyadmin.repo.DaracademyRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -35,13 +38,7 @@ class DaracademyAdminViewModel : ViewModel{
     private val repo : DaracademyRepository
 
 
-    private val auth: FirebaseAuth by mutableStateOf(Firebase.auth)
-    private val firebaseFirestore  by mutableStateOf(Firebase.firestore)
-    private val storageRef         by mutableStateOf(Firebase.storage.reference)
-
     var matieres : List<Matiere>by mutableStateOf(emptyList())
-
-    var user : FirebaseUser?  by mutableStateOf(auth.currentUser)
 
 
     init {
@@ -94,8 +91,8 @@ class DaracademyAdminViewModel : ViewModel{
     }
 
 
-    fun addFormation(name: String, desc: String, images: List<Uri>, lessons : List<Lesson>, teacher : String, onSuccessCallBack: () -> Unit, onFailureCallBack: (exp: Exception) -> Unit){
-        this.repo.addFormation(name = name , desc = desc , images = images , lessons = lessons , teacher = teacher , onSuccessCallBack, onFailureCallBack  )
+    fun addFormation(name: String, desc: String, images: List<Uri>, companies : List<Company> , lessons : List<Lesson>, teacher : String, onSuccessCallBack: () -> Unit, onFailureCallBack: (exp: Exception) -> Unit){
+        this.repo.addFormation(name = name , desc = desc , images = images , companies = companies , lessons = lessons , teacher = teacher , onSuccessCallBack = onSuccessCallBack, onFailureCallBack = onFailureCallBack  )
     }
 
     fun getAllTeachers() : List<Teacher>{
@@ -156,6 +153,11 @@ class DaracademyAdminViewModel : ViewModel{
     fun addCourses(phase : String, annee : String, matiere : String, course : Course, onSuccessCallBack: () -> Unit, onFailureCallBack: (ex: Exception) -> Unit) {
         this.repo.addCourses(phase,annee, matiere, course, onSuccessCallBack, onFailureCallBack)
     }
+
+    fun getProgress(): List<ProgressUpload>{
+        return repo.progresses
+    }
+
 
     }
 
