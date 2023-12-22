@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -45,11 +46,16 @@ fun ChatBoxsScreen(
 
     val context = LocalContext.current
 
-    viewModel.getAllMessageBoxs(
-        onSuccessCallBack = {boxs,size->
-
-        }
-    )
+    LaunchedEffect(key1 = true ){
+        viewModel.getAllMessageBoxs(
+            onSuccessCallBack = {boxs,size->
+                Toast.makeText(context , "size : ${size}\n boxs : ${boxs}" , Toast.LENGTH_LONG).show()
+            },
+            onFailureCallBack = {
+                Toast.makeText(context , "${it.message}" , Toast.LENGTH_LONG).show()
+            }
+        )
+    }
 
     Column(
         modifier = modifier

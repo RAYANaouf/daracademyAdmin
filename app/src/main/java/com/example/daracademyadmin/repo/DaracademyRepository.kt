@@ -1,11 +1,11 @@
 package com.example.daracademyadmin.repo
 
+import android.content.Context
 import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.datastore.core.DataStore
 import com.example.daracademy.model.data.dataClasses.Message
 import com.example.daracademy.model.data.dataClasses.MessageBox
 import com.example.daracademy.model.data.variables.les_annees_d_etude.annees_de_C_E_M
@@ -21,24 +21,26 @@ import com.example.daracademyadmin.model.dataClasses.Teacher
 import com.example.daracademyadmin.model.dataClasses.apis.progress.PrograssType
 import com.example.daracademyadmin.model.dataClasses.apis.progress.ProgressUpload
 import com.example.daracademyadmin.model.sealedClasses.phaseDesEtudes.PhaseDesEtudes
+import com.example.daracademyadmin.repo.dataStore.DataStoreRepo
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
-import java.util.prefs.Preferences
 
 class DaracademyRepository {
 
 
-
+    private val context  : Context
     private val auth: FirebaseAuth by mutableStateOf(Firebase.auth)
     private val firebaseFirestore  by mutableStateOf(Firebase.firestore)
     private val storageRef         by mutableStateOf(Firebase.storage.reference)
 
 
-    private val dataStore : DataStore<Preferences> by preferencesDataStore("")
 
+    private val dataStoreRepo : DataStoreRepo
 
     /******************************** live info ********************************************/
     var teachers           by mutableStateOf<List<Teacher>>(emptyList())
@@ -50,6 +52,9 @@ class DaracademyRepository {
     var formations         by mutableStateOf<List<Formation>>(emptyList())
         private set
     private var isListen_formations  = false
+
+
+    var chatListener  :  ListenerRegistration? = null
 
     /***************************************************************************************/
 
@@ -94,7 +99,11 @@ class DaracademyRepository {
 
 
 
-    constructor(){
+    constructor(context: Context){
+        this.context = context
+
+        dataStoreRepo = DataStoreRepo(context)
+
         listenToTeachers()
         listenToPosts()
         listenToformations()
@@ -601,7 +610,7 @@ class DaracademyRepository {
 
                 for (doc in result){
 
-                    messageBoxs.add(MessageBox(id = doc.id))
+                    messageBoxs.add(MessageBox(id = doc.id  ))
 
                 }
 
@@ -617,9 +626,13 @@ class DaracademyRepository {
 
     fun getAllMessage(id : String, onSuccessCallBack: (List<Message>) -> Unit = {}, onFailureCallBack: (exp : Exception) -> Unit = {}  ){
 
-        firebaseFirestore.collection("chats")
+
+        chatListener?.remove()
+
+        chatListener = firebaseFirestore.collection("chats")
             .document(id)
             .collection("messages")
+            .orderBy("id")
             .addSnapshotListener { snapshot, error ->
                 if (error != null){
                     onFailureCallBack(error)
@@ -641,9 +654,13 @@ class DaracademyRepository {
         val chatBoxRef = firebaseFirestore.collection("chats").document(id).collection("messages")
 
         chatBoxRef
-            .document(System.currentTimeMillis().toString())
+            .document()
             .set(
-                hashMapOf("msg" to newMassage.msg , "person_msg" to  newMassage.person_msg)
+                hashMapOf(
+                    "id"         to FieldValue.serverTimestamp(),
+                    "msg"        to newMassage.msg ,
+                    "person_msg" to  newMassage.person_msg
+                )
             )
             .addOnSuccessListener(){
                 onSuccessCallBack()

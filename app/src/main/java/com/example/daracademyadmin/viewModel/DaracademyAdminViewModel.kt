@@ -42,7 +42,11 @@ class DaracademyAdminViewModel : ViewModel{
 
 
     init {
-        this.repo = DaracademyRepository()
+
+    }
+
+    constructor(context : Context){
+        this.repo = DaracademyRepository( context = context )
         repo.isSignIn{signIn->
             if(signIn){
                 setAppScreen(Screens.HomeScreen())
@@ -51,10 +55,6 @@ class DaracademyAdminViewModel : ViewModel{
                 setAppScreen(Screens.SignInScreen())
             }
         }
-    }
-
-    constructor(context : Context){
-
     }
 
     fun setAppScreen(newScreen : Screens){
