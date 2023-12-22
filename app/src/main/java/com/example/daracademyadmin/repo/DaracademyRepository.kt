@@ -632,7 +632,7 @@ class DaracademyRepository {
         chatListener = firebaseFirestore.collection("chats")
             .document(id)
             .collection("messages")
-            .orderBy("id")
+            .orderBy("timestamp")
             .addSnapshotListener { snapshot, error ->
                 if (error != null){
                     onFailureCallBack(error)
@@ -659,7 +659,8 @@ class DaracademyRepository {
                 hashMapOf(
                     "id"         to FieldValue.serverTimestamp(),
                     "msg"        to newMassage.msg ,
-                    "person_msg" to  newMassage.person_msg
+                    "person_msg" to newMassage.person_msg,
+                    "timestamp"  to FieldValue.serverTimestamp()
                 )
             )
             .addOnSuccessListener(){
