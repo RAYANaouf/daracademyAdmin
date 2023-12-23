@@ -657,7 +657,7 @@ class DaracademyRepository {
             .document()
             .set(
                 hashMapOf(
-                    "id"         to FieldValue.serverTimestamp(),
+                    "id"         to newMassage.id,
                     "msg"        to newMassage.msg ,
                     "person_msg" to newMassage.person_msg,
                     "timestamp"  to FieldValue.serverTimestamp()
