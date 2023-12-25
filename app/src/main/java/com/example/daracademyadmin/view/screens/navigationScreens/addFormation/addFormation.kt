@@ -22,6 +22,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -170,7 +172,11 @@ fun AddFormationScreen(
             idetIndex = it
             show_pickDateDialogForIdet = true
         },
-        coursesList = lessons
+        coursesList = lessons,
+        modifier = Modifier
+            .padding(start = 16.dp, end = 16.dp)
+            .offset(x = 0.dp, y = -20.dp)
+            .heightIn(max = 500.dp)
     )
 
 
@@ -221,7 +227,11 @@ fun AddFormationScreen(
             if(!selectedTeachers.contains(it)){
                 selectedTeachers = listOf(it)
             }
-        }
+        },
+        modifier = Modifier
+            .padding(start = 16.dp, end = 16.dp)
+            .offset(x = 0.dp, y = -20.dp)
+            .heightIn(max = 500.dp)
     )
 
     Column(
