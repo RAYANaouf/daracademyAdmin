@@ -97,6 +97,7 @@ import com.example.daracademyadmin.view.screens.navigationScreens.MatieresScreen
 import com.example.daracademyadmin.view.screens.navigationScreens.Posts.PostsScreen
 import com.example.daracademyadmin.view.screens.navigationScreens.addCours.AddCoursScreen
 import com.example.daracademyadmin.view.screens.navigationScreens.stageScreen.StageScreen
+import com.example.daracademyadmin.view.screens.navigationScreens.statistics.StatisticsScreen
 import com.example.daracademyadmin.view.screens.navigationScreens.uploadScreen.UploadScreen
 import kotlinx.coroutines.launch
 
@@ -322,6 +323,11 @@ fun MainScreen(
                             .height(65.dp)
                             .padding(start = 16.dp, end = 16.dp)
                             .clickable {
+                                navController.navigate(Screens.StatisticsScreen().root){
+                                    popUpTo(Screens.HomeScreen().root){
+                                        inclusive = true
+                                    }
+                                }
                                 coroutineScope.launch {
                                     drawerState.apply {
                                         close()
@@ -905,6 +911,21 @@ fun MainScreen(
                                 )
                         )
                     }
+
+
+                    composable(
+                        route = "${Screens.StatisticsScreen().root}"
+                    ){navBackStackEntry->
+
+
+
+                        StatisticsScreen(
+                            modifier = Modifier
+                                .padding( top = paddingValues.calculateTopPadding())
+                        )
+
+                    }
+
 
                     composable(
                         route = "${Screens.UploadsScreen().root}"

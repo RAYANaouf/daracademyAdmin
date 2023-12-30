@@ -19,7 +19,8 @@ sealed class Screens(val root : String){
     class TeachersScreen           : Screens(root = screens.TeachersScreen)
     class FormationsScreen         : Screens(root = screens.FormationsScreen)
     class StudentsScreen           : Screens(root = screens.StudentsScreen)
-    class CoursesScreen             : Screens(root = screens.CoursesScreen)
+    class CoursesScreen            : Screens(root = screens.CoursesScreen)
+    class StatisticsScreen         : Screens(root = screens.StatisticsScreen)
 
     class ChatScreen                 : Screens(root = screens.chatScreen)
     class ChatBoxsScreen             : Screens(root = screens.chatBoxsScreen)

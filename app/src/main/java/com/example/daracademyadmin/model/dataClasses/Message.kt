@@ -7,7 +7,7 @@ data class Message(
     val msg        : String     = "",
     val photo      : String     = "",
     val file       : String     = "",
-    val person_msg : Boolean    = true,
+    val person_msg : Boolean    = false,
     val timestamp  : Timestamp? = null // Change this to Timestamp
 
 )

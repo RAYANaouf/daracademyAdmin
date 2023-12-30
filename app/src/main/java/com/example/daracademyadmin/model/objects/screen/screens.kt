@@ -10,6 +10,7 @@ object screens {
     val StudentsScreen             = "StudentsScreen"
     val TeachersScreen             = "TeachersScreen"
     val CoursesScreen              = "CoursesScreen"
+    val StatisticsScreen           = "StatisticsScreen"
 
 
     val addPostScreen              = "addPostScreen"

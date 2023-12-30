@@ -671,7 +671,7 @@ class DaracademyRepository {
     fun sendMsg(userId : String , productId : String , newMassage : Message , onSuccessCallBack: () -> Unit = {}, onFailureCallBack: (exp : Exception) -> Unit = {}  ){
 
 
-        val chatBoxRef = firebaseFirestore.collection("chats").document("$userId").collection("products").document("$productId")
+        val chatBoxRef = firebaseFirestore.collection("chats").document("${userId}_${productId}")
         val chatMessageCollectionRef = chatBoxRef.collection("messages")
 
 
@@ -688,9 +688,10 @@ class DaracademyRepository {
             .addOnSuccessListener(){
                 //lastMessage
                 chatBoxRef.set(
-                    mapOf(
-                        "lastMessage" to newMassage.msg,
-                        "timestamp"  to  FieldValue.serverTimestamp()
+                    hashMapOf(
+                        "msg"        to newMassage.msg ,
+                        "person_msg" to newMassage.person_msg,
+                        "timestamp"  to FieldValue.serverTimestamp()
                     ),
                     SetOptions.merge()
                 )
@@ -712,33 +713,77 @@ class DaracademyRepository {
 
         //add to firebase
 
+        var id = System.currentTimeMillis().toString()
 
+        if (matiere.imgUrl != ""){
+            val imgRef = storageRef.child("matieres/$phase/$annee/${matiere.name}/$id")
+            imgRef.putFile(Uri.parse(matiere.imgUrl))
+                .addOnSuccessListener {
+                    imgRef.downloadUrl
+                        .addOnSuccessListener {storageUri->
 
-        firebaseFirestore.collection("phases")
-            .document(phase)
-            .collection("annees")
-            .document(annee)
-            .collection("matieres")
-            .document(matiere.name)
-            .set(
-                hashMapOf(
-                    "name"   to matiere.name,
-                    "img"    to matiere.img,
-                    "imgUrl" to matiere.imgUrl
+                        firebaseFirestore.collection("phases")
+                            .document(phase)
+                            .collection("annees")
+                            .document(annee)
+                            .collection("matieres")
+                            .document(matiere.name)
+                            .set(
+                                hashMapOf(
+                                    "name"   to matiere.name,
+                                    "img"    to matiere.img,
+                                    "imgUrl" to storageUri
+                                )
+                            )
+                            .addOnSuccessListener {
+                                var list = matieres.get(phase)?.get(annee)?.toMutableList()
+                                list?.add(matiere)
+                                matieres.get(phase)?.set(annee , list ?: emptyList())
+
+                                onSuccessCallBack(
+                                    list ?: emptyList()
+                                )
+                            }
+                            .addOnFailureListener {
+                                onFailureCallBack(it)
+                            }
+
+                        }
+                        .addOnFailureListener(onFailureCallBack)
+                }
+                .addOnFailureListener(onFailureCallBack)
+        }
+        else{
+            firebaseFirestore.collection("phases")
+                .document(phase)
+                .collection("annees")
+                .document(annee)
+                .collection("matieres")
+                .document(matiere.name)
+                .set(
+                    hashMapOf(
+                        "name"   to matiere.name,
+                        "img"    to matiere.img,
+                    )
                 )
-            )
-            .addOnSuccessListener {
-                var list = matieres.get(phase)?.get(annee)?.toMutableList()
-                list?.add(matiere)
-                matieres.get(phase)?.set(annee , list ?: emptyList())
+                .addOnSuccessListener {
+                    var list = matieres.get(phase)?.get(annee)?.toMutableList()
+                    list?.add(matiere)
+                    matieres.get(phase)?.set(annee , list ?: emptyList())
 
-                onSuccessCallBack(
-                    list ?: emptyList()
-                )
-            }
-            .addOnFailureListener {
-                onFailureCallBack(it)
-            }
+                    onSuccessCallBack(
+                        list ?: emptyList()
+                    )
+                }
+                .addOnFailureListener {
+                    onFailureCallBack(it)
+                }
+
+        }
+
+
+
+
 
 
 

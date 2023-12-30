@@ -6,6 +6,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -58,6 +59,7 @@ import com.example.daracademyadmin.ui.theme.color1
 import com.example.daracademyadmin.ui.theme.customWhite0
 import com.example.daracademyadmin.ui.theme.customWhite1
 import com.example.daracademyadmin.ui.theme.customWhite2
+import com.example.daracademyadmin.ui.theme.customWhite3
 import com.example.daracademyadmin.ui.theme.customWhite6
 import com.example.daracademyadmin.viewModel.DaracademyAdminViewModel
 
@@ -265,7 +267,7 @@ fun messageItem(
 
         Surface(
             shadowElevation = elevation,
-            shape = RoundedCornerShape(topStart = if (message.person_msg) 0.dp else 20.dp , topEnd = if (message.person_msg) 20.dp else 0.dp , bottomStart = 20.dp , bottomEnd = 20.dp ),
+            shape = RoundedCornerShape(topStart = if (message.person_msg) 0.dp else 18.dp , topEnd = if (message.person_msg) 18.dp else 0.dp , bottomStart = 18.dp , bottomEnd = 18.dp ),
             color = if (message.person_msg) leftColor else rightColor,
             modifier = Modifier
                 .padding(top = 20.dp)
@@ -273,24 +275,27 @@ fun messageItem(
 
             Column(
                 modifier = Modifier
-                    .padding(top = 4.dp , bottom = 8.dp , start = 8.dp , end = 8.dp)
+                    .padding(8.dp)
             ) {
-                Text(
-                    text = message.msg,
-                    style = NormalTextStyles.TextStyleSZ8.copy(color = if (message.person_msg) leftColor_text else rightColor_text)
-                )
+                if (message.msg != ""){
+                    Text(
+                        text = message.msg,
+                        style = NormalTextStyles.TextStyleSZ8.copy(color = if (message.person_msg) leftColor_text else rightColor_text)
+                    )
+                }
+
 
                 if (message.photo != ""){
                     Spacer(modifier = Modifier.height(4.dp))
 
                     Image(
-                        painter = rememberAsyncImagePainter(model    = message.photo) ,
+                        painter = rememberAsyncImagePainter(model    = message.photo ) ,
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier           = Modifier
-                            .widthIn(  max = 150.dp , min = 30.dp)
-                            .heightIn( max = 200.dp , min = 50.dp)
-                            .clip(RoundedCornerShape(topStart = if (message.person_msg) 0.dp else 10.dp , topEnd = if (message.person_msg) 10.dp else 0.dp , bottomStart = 10.dp , bottomEnd = 10.dp ))
+                            .widthIn(  max = 150.dp , min = 50.dp)
+                            .heightIn( max = 350.dp , min = 50.dp)
+                            .clip(RoundedCornerShape(topStart = if (message.person_msg) 0.dp else 12.dp , topEnd = if (message.person_msg) 12.dp else 0.dp , bottomStart = 12.dp , bottomEnd = 12.dp ))
                     )
                 }
 
