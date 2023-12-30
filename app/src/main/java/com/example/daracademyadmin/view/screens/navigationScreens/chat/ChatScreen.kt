@@ -1,6 +1,9 @@
 package com.example.daracademy.view.screens.chatBox
 
 import android.graphics.Color.parseColor
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,6 +19,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -27,6 +31,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +47,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.rememberAsyncImagePainter
 import com.example.alphaspace.screens.common.textFields.AlphaTextField
 import com.example.bigsam.grafic.material.loadingEffect.loadingLottieAnimation
 import com.example.bigsam.model.data.`object`.NormalTextStyles
@@ -57,15 +63,29 @@ import com.example.daracademyadmin.viewModel.DaracademyAdminViewModel
 
 @Composable
 fun ChatScreen(
-    viewModel   : DaracademyAdminViewModel,
-    messageBoxId  : String,
-    modifier    : Modifier = Modifier
+    viewModel     : DaracademyAdminViewModel,
+    userId        : String,
+    productId     : String,
+    name          : String,
+    modifier      : Modifier = Modifier
 ) {
 
 
     var message by remember {
         mutableStateOf("")
     }
+
+    var photo_uri : Uri? by rememberSaveable {
+        mutableStateOf(null)
+    }
+
+
+    var launcher_imgs = rememberLauncherForActivityResult(contract =  ActivityResultContracts.PickVisualMedia()){ uri->
+        if (uri != null){
+            photo_uri = uri
+        }
+    }
+
 
     var loading by remember {
         mutableStateOf(false)
@@ -81,7 +101,8 @@ fun ChatScreen(
 
     LaunchedEffect(key1 = true ){
         viewModel.getAllMessage(
-            id = messageBoxId,
+            userId            = userId,
+            productId         = productId,
             onSuccessCallBack = {
                 messages = it
             },
@@ -174,8 +195,9 @@ fun ChatScreen(
 
                             loading = true
                             viewModel.sendMsg(
-                                messageBoxId ,
-                                Message(msg = msg , person_msg = false ),
+                                userId     = userId,
+                                productId  = productId,
+                                newMassage = Message(msg = msg , person_msg = false ),
                                 onSuccessCallBack = {
                                     loading = false
                                 },
@@ -240,6 +262,7 @@ fun messageItem(
         }
 
 
+
         Surface(
             shadowElevation = elevation,
             shape = RoundedCornerShape(topStart = if (message.person_msg) 0.dp else 20.dp , topEnd = if (message.person_msg) 20.dp else 0.dp , bottomStart = 20.dp , bottomEnd = 20.dp ),
@@ -248,14 +271,29 @@ fun messageItem(
                 .padding(top = 20.dp)
         ) {
 
-            Box(
+            Column(
                 modifier = Modifier
-                    .padding(top = 4.dp , bottom = 4.dp , start = 8.dp , end = 8.dp)
+                    .padding(top = 4.dp , bottom = 8.dp , start = 8.dp , end = 8.dp)
             ) {
                 Text(
                     text = message.msg,
                     style = NormalTextStyles.TextStyleSZ8.copy(color = if (message.person_msg) leftColor_text else rightColor_text)
                 )
+
+                if (message.photo != ""){
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    Image(
+                        painter = rememberAsyncImagePainter(model    = message.photo) ,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier           = Modifier
+                            .widthIn(  max = 150.dp , min = 30.dp)
+                            .heightIn( max = 200.dp , min = 50.dp)
+                            .clip(RoundedCornerShape(topStart = if (message.person_msg) 0.dp else 10.dp , topEnd = if (message.person_msg) 10.dp else 0.dp , bottomStart = 10.dp , bottomEnd = 10.dp ))
+                    )
+                }
+
             }
         }
     }
@@ -267,6 +305,9 @@ fun messageItem(
 fun ChatBoxScreen_preview() {
     ChatScreen(
         viewModel(),
+        "",
+        "",
         ""
+
     )
 }

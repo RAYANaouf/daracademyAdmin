@@ -91,7 +91,10 @@ import com.example.daracademyadmin.ui.theme.DaracademyAdminTheme
 import com.example.daracademyadmin.ui.theme.color1
 import com.example.daracademyadmin.ui.theme.customWhite0
 import com.example.daracademyadmin.ui.theme.customWhite7
+import com.example.daracademyadmin.view.screens.navigationScreens.Courses.CoursesScreen
+import com.example.daracademyadmin.view.screens.navigationScreens.Formations.FormationsScreen
 import com.example.daracademyadmin.view.screens.navigationScreens.MatieresScreen.MatieresScreen
+import com.example.daracademyadmin.view.screens.navigationScreens.Posts.PostsScreen
 import com.example.daracademyadmin.view.screens.navigationScreens.addCours.AddCoursScreen
 import com.example.daracademyadmin.view.screens.navigationScreens.stageScreen.StageScreen
 import com.example.daracademyadmin.view.screens.navigationScreens.uploadScreen.UploadScreen
@@ -130,14 +133,15 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
 
-                    if (viewModel.appScreen == Screens.SignInScreen().root) {
-                        SignInScreen(
+
+
+                    if (viewModel.isSignIn){
+                        MainScreen(
                             viewModel = viewModel
                         )
                     }
-                    else
-                    {
-                        MainScreen(
+                    else{
+                        SignInScreen(
                             viewModel = viewModel
                         )
                     }
@@ -171,6 +175,8 @@ fun MainScreen(
             Column(
                 modifier = Modifier
                     .fillMaxHeight()
+                    .widthIn(max = 450.dp)
+                    .fillMaxWidth(0.75f)
                     .background(Color.White)
             ) {
                 Box(
@@ -219,6 +225,9 @@ fun MainScreen(
                             .padding(start = 16.dp, end = 16.dp)
                             .clickable {
                                 coroutineScope.launch {
+
+                                    navController.navigate("${Screens.StageScreen().root}/view")
+
                                     drawerState.apply {
                                         close()
                                     }
@@ -250,6 +259,7 @@ fun MainScreen(
                             .padding(start = 16.dp, end = 16.dp)
                             .clickable {
                                 coroutineScope.launch {
+                                    navController.navigate(Screens.FormationsScreen().root)
                                     drawerState.apply {
                                         close()
                                     }
@@ -281,6 +291,7 @@ fun MainScreen(
                             .padding(start = 16.dp, end = 16.dp)
                             .clickable {
                                 coroutineScope.launch {
+                                    navController.navigate(Screens.PostsScreen().root)
                                     drawerState.apply {
                                         close()
                                     }
@@ -350,7 +361,7 @@ fun MainScreen(
                             .height(65.dp)
                             .padding(start = 16.dp, end = 16.dp)
                             .clickable {
-                                viewModel.setAppScreen(Screens.ChatBoxsScreen())
+//                                viewModel.setAppScreen(Screens.ChatBoxsScreen())
                                 navController.navigate(Screens.ChatBoxsScreen().root)
                                 coroutineScope.launch {
                                     drawerState.apply {
@@ -508,7 +519,6 @@ fun MainScreen(
                             img = painterResource(id = R.drawable.daracademy),
                             onImgClick = {
                                 coroutineScope.launch {
-                                    Toast.makeText(context , "${navBackStackEntry?.destination?.route}" , Toast.LENGTH_LONG).show()
                                     drawerState.apply {
                                         open()
                                     }
@@ -534,7 +544,7 @@ fun MainScreen(
                                 R.drawable.formation
                             }
                             else{
-                                R.drawable.about_us
+                                -1
                             }
                         }
 
@@ -552,14 +562,14 @@ fun MainScreen(
                                 "Add formation"
                             }
                             else{
-                                "I dont know"
+                                ""
                             }
                         }
 
 
                         AlphaTopAppBar3(
                             onCloseClicked = {
-                                viewModel.setAppScreen(Screens.HomeScreen())
+//                                viewModel.setAppScreen(Screens.HomeScreen())
                                 navController.navigate(Screens.HomeScreen().root){
                                     popUpTo(Screens.HomeScreen().root){
                                         inclusive = true
@@ -571,22 +581,24 @@ fun MainScreen(
 
                                 }
 
-                                Image(
-                                    painter = painterResource(id = img),
-                                    contentDescription = null,
-                                    contentScale = ContentScale.Inside,
-                                    modifier = Modifier
-                                        .size(26.dp)
-                                        .clickable {
-                                            Toast
-                                                .makeText(
-                                                    context,
-                                                    "${navBackStackEntry?.destination?.route == Screens.AddPostScreen().root} ${Screens.AddPostScreen().root} ",
-                                                    Toast.LENGTH_LONG
-                                                )
-                                                .show()
-                                        }
-                                )
+                                if (img >0){
+                                    Image(
+                                        painter = painterResource(id = img),
+                                        contentDescription = null,
+                                        contentScale = ContentScale.Inside,
+                                        modifier = Modifier
+                                            .size(26.dp)
+                                            .clickable {
+                                                Toast
+                                                    .makeText(
+                                                        context,
+                                                        "${navBackStackEntry?.destination?.route == Screens.AddPostScreen().root} ${Screens.AddPostScreen().root} ",
+                                                        Toast.LENGTH_LONG
+                                                    )
+                                                    .show()
+                                            }
+                                    )
+                                }
 
                                 Spacer(modifier = Modifier.width(10.dp))
 
@@ -626,7 +638,7 @@ fun MainScreen(
                             navController = navController,
                             viewModel = viewModel,
                             onNavigate = {
-                                viewModel.setAppScreen(it)
+//                                viewModel.setAppScreen(it)
                                 navController.navigate(it.root)
                             },
                             modifier = Modifier
@@ -637,6 +649,56 @@ fun MainScreen(
                         )
                     }
 
+                    composable(route = Screens.PostsScreen().root) {
+                        PostsScreen(
+//                            navController = navController,
+                            viewModel = viewModel,
+//                            onNavigate = {
+//                                viewModel.setAppScreen(it)
+//                                navController.navigate(it.root)
+//                            },
+                            modifier = Modifier
+                                .background(Color(android.graphics.Color.parseColor("#F9F9F9")))
+                                .padding(
+                                    top = paddingValues.calculateTopPadding(),
+                                )
+                        )
+                    }
+
+                    composable(route = Screens.FormationsScreen().root) {
+                        FormationsScreen(
+//                            navController = navController,
+                            viewModel = viewModel,
+//                            onNavigate = {
+//                                viewModel.setAppScreen(it)
+//                                navController.navigate(it.root)
+//                            },
+                            modifier = Modifier
+                                .background(Color(android.graphics.Color.parseColor("#F9F9F9")))
+                                .padding(
+                                    top = paddingValues.calculateTopPadding(),
+                                )
+                        )
+                    }
+
+                    composable(route = Screens.CoursesScreen().root) {
+                        CoursesScreen(
+//                            navController = navController,
+                            viewModel = viewModel,
+//                            onNavigate = {
+//                                viewModel.setAppScreen(it)
+//                                navController.navigate(it.root)
+//                            },
+                            modifier = Modifier
+                                .background(Color(android.graphics.Color.parseColor("#F9F9F9")))
+                                .padding(
+                                    top = paddingValues.calculateTopPadding(),
+                                )
+                        )
+                    }
+
+
+
                     composable(route = Screens.AddPostScreen().root){
                         AddPostScreen(
                             viewModel = viewModel,
@@ -646,7 +708,7 @@ fun MainScreen(
                                         inclusive = true
                                     }
                                 }
-                                viewModel.setAppScreen(Screens.HomeScreen())
+//                                viewModel.setAppScreen(Screens.HomeScreen())
                             },
                             modifier = Modifier
                                 .padding(
@@ -664,7 +726,7 @@ fun MainScreen(
                                         inclusive = true
                                     }
                                 }
-                                viewModel.setAppScreen(it)
+//                                viewModel.setAppScreen(it)
                             },
                             modifier = Modifier
                                 .padding(top = paddingValues.calculateTopPadding()  )
@@ -680,7 +742,7 @@ fun MainScreen(
                                     inclusive = true
                                 }
                             }
-                            viewModel.setAppScreen(it)
+//                            viewModel.setAppScreen(it)
                         },
                             modifier = Modifier
                                 .padding(top = paddingValues.calculateTopPadding() )
@@ -696,7 +758,7 @@ fun MainScreen(
                                         inclusive = true
                                     }
                                 }
-                                viewModel.setAppScreen(it)
+//                                viewModel.setAppScreen(it)
                             },
                             modifier = Modifier
                                 .padding(top = paddingValues.calculateTopPadding())
@@ -715,16 +777,24 @@ fun MainScreen(
                     }
 
                     composable(
-                        route = "${Screens.ChatScreen().root}/{chatId}",
+                        route = "${Screens.ChatScreen().root}/{userId}/{productId}/{name}",
                         arguments = listOf(
-                            navArgument(name = "chatId"){
+                            navArgument(name = "userId"){
+                                type = NavType.StringType
+                            },
+                            navArgument(name = "productId"){
+                                type = NavType.StringType
+                            },
+                            navArgument(name = "name"){
                                 type = NavType.StringType
                             }
                         )
                     ){navBackStackEntry->
                         ChatScreen(
                             viewModel    = viewModel,
-                            messageBoxId = navBackStackEntry.arguments?.getString("chatId") ?: "",
+                            userId       = navBackStackEntry.arguments?.getString("userId")    ?: "",
+                            productId    = navBackStackEntry.arguments?.getString("productId") ?: "",
+                            name         = navBackStackEntry.arguments?.getString("name")      ?: "",
                             modifier     = Modifier
                                 .padding(
                                     top = paddingValues.calculateTopPadding()
@@ -733,10 +803,16 @@ fun MainScreen(
                     }
 
                     composable(
-                        route = Screens.StageScreen().root
+                        route = "${Screens.StageScreen().root}/{kind}",
+                        arguments = listOf(
+                            navArgument("kind"){
+                                type = NavType.StringType
+                            }
+                        )
                     ){navBackStackEntry->
                         StageScreen(
                             navController = navController,
+                            kind          = navBackStackEntry.arguments?.getString("kind") ?: "",
                             modifier  = Modifier
                                 .padding(
                                     top = paddingValues.calculateTopPadding()
@@ -745,9 +821,12 @@ fun MainScreen(
                     }
 
                     composable(
-                        route = "${Screens.AnneesScreen().root}/{phase}",
+                        route = "${Screens.AnneesScreen().root}/{phase}/{kind}",
                         arguments = listOf(
                             navArgument(name = "phase"){
+                                type = NavType.StringType
+                            },
+                            navArgument(name = "kind"){
                                 type = NavType.StringType
                             }
                         )
@@ -756,6 +835,7 @@ fun MainScreen(
                         AnneesDesEtudesScreen(
                             navController = navController,
                             phase = navBackStackEntry.arguments?.getString("phase") ?: "",
+                            kind  = navBackStackEntry.arguments?.getString("kind") ?: "",
                             modifier     = Modifier
                                 .padding(
                                     top = paddingValues.calculateTopPadding()
@@ -764,12 +844,15 @@ fun MainScreen(
                     }
 
                     composable(
-                        route = "${Screens.MatieresScreen().root}/{phase}/{annee}",
+                        route = "${Screens.MatieresScreen().root}/{phase}/{annee}/{kind}",
                         arguments = listOf(
                             navArgument("phase"){
                                 type = NavType.StringType
                             },
                             navArgument("annee"){
+                                type = NavType.StringType
+                            },
+                            navArgument("kind"){
                                 type = NavType.StringType
                             }
                         )
@@ -779,6 +862,7 @@ fun MainScreen(
                             viewModel = viewModel,
                             phase     = navBackStackEntry.arguments?.getString("phase") ?: "",
                             annee     = navBackStackEntry.arguments?.getString("annee") ?: "",
+                            kind      = navBackStackEntry.arguments?.getString("kind") ?: "",
                             modifier     = Modifier
                                 .padding(
                                     top = paddingValues.calculateTopPadding()
@@ -809,7 +893,7 @@ fun MainScreen(
                                         inclusive = true
                                     }
                                 }
-                                viewModel.setAppScreen(it)
+//                                viewModel.setAppScreen(it)
                             },
                             phase = navBackStackEntry.arguments?.getString("phase") ?: "",
                             annee = navBackStackEntry.arguments?.getString("annee") ?: "",

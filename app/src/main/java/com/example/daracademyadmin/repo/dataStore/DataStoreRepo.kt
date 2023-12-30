@@ -20,6 +20,17 @@ class DataStoreRepo {
         this.context  = context
     }
 
+    suspend fun isSignIn() : Boolean{
+        return context.dataStore.data.first()[dataStoreKeys.Key_signIn] ?: false
+    }
+
+    suspend fun saveSignIn() {
+
+        context.dataStore.edit {
+            it[dataStoreKeys.Key_signIn] = true
+        }
+    }
+
     suspend fun getChatId() : String?{
         return context.dataStore.data.first()[dataStoreKeys.Key_chatFeatureId] ?: null
     }
@@ -30,5 +41,7 @@ class DataStoreRepo {
             it[dataStoreKeys.Key_chatFeatureId] = id
         }
     }
+
+
 
 }

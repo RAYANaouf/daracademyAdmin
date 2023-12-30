@@ -9,64 +9,80 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.util.rangeTo
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.airbnb.lottie.compose.LottieClipSpec
 import com.example.daracademy.model.data.dataClasses.Message
 import com.example.daracademy.model.data.dataClasses.MessageBox
 import com.example.daracademy.model.data.sealedClasses.screens.Screens
 import com.example.daracademyadmin.model.dataClasses.Company
 import com.example.daracademyadmin.model.dataClasses.Course
+import com.example.daracademyadmin.model.dataClasses.Formation
 import com.example.daracademyadmin.model.dataClasses.Lesson
 import com.example.daracademyadmin.model.dataClasses.Matiere
 import com.example.daracademyadmin.model.dataClasses.Teacher
 import com.example.daracademyadmin.model.dataClasses.apis.progress.ProgressUpload
 import com.example.daracademyadmin.repo.DaracademyRepository
+import com.example.daracademyadmin.repo.dataStore.DataStoreRepo
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
+import kotlinx.coroutines.launch
+
 class DaracademyAdminViewModel : ViewModel{
 
 
-    var appScreen by mutableStateOf("")
-
-
-    var boxMessages by mutableStateOf<List<MessageBox>>(emptyList())
+    var isSignIn by mutableStateOf(true )
         private set
 
     private val repo : DaracademyRepository
+
+    private val dataStoreRepo : DataStoreRepo
+
+    var boxMessages by mutableStateOf<List<MessageBox>>(emptyList())
+        private set
 
 
     var matieres : List<Matiere>by mutableStateOf(emptyList())
 
 
-    init {
-
-    }
 
     constructor(context : Context){
-        this.repo = DaracademyRepository( context = context )
-        repo.isSignIn{signIn->
-            if(signIn){
-                setAppScreen(Screens.HomeScreen())
-            }
-            else{
-                setAppScreen(Screens.SignInScreen())
-            }
+        this.repo = DaracademyRepository  ( context = context )
+        this.dataStoreRepo = DataStoreRepo( context = context )
+        isSignIn {
+            isSignIn = it
         }
     }
 
-    fun setAppScreen(newScreen : Screens){
-        appScreen = newScreen.root
+    fun isSignIn(onResult: (Boolean)->Unit = {} ){
+        viewModelScope.launch {
+            onResult(dataStoreRepo.isSignIn())
+        }
     }
 
     fun signIn(email : String , password : String , onSuccessCallBack : ()->Unit = {}  ,  onFailureCallBack : (ex : Exception)->Unit = {}){
 
-        this.repo.signIn(email = email, password = password , onSuccessCallBack = onSuccessCallBack , onFailureCallBack = onFailureCallBack)
+        this.repo.signIn(
+            email = email,
+            password = password ,
+            onSuccessCallBack = {
+                this.viewModelScope.launch {
+                    dataStoreRepo.saveSignIn()
+                }
+                isSignIn = true
+                onSuccessCallBack()
+            } ,
+            onFailureCallBack = onFailureCallBack
+        )
 
     }
-
+    fun getAllFormation() = this.repo.getAllFormation()
+    fun getAllPosts()     = this.repo.getAllPosts()
+    fun getAllTeachers()  = this.repo.getAllTeachers()
+    fun getAllStudent()   = this.repo.getAllStudents()
 
     fun addPost( name : String , desc : String , images : List<Uri> ,  onSuccessCallBack: () -> Unit = {} , onFailureCallBack: (ex : Exception) -> Unit = {}){
 
@@ -95,15 +111,11 @@ class DaracademyAdminViewModel : ViewModel{
         this.repo.addFormation(name = name , desc = desc , images = images , companies = companies , lessons = lessons , teacher = teacher , onSuccessCallBack = onSuccessCallBack, onFailureCallBack = onFailureCallBack  )
     }
 
-    fun getAllTeachers() : List<Teacher>{
-        return repo.getAllTeachers()
-    }
 
-
-    fun getAllMessageBoxs(onSuccessCallBack: (List<MessageBox>  , Int) -> Unit = {_,_->}, onFailureCallBack: (ex : Exception) -> Unit = {} ){
+    fun getAllMessageBoxs(onSuccessCallBack: (List<MessageBox> ) -> Unit = {}, onFailureCallBack: (ex : Exception) -> Unit = {} ){
         repo.getAllMessageBoxs(
-            onSuccessCallBack = {boxs , size ->
-                onSuccessCallBack(boxs , size)
+            onSuccessCallBack = {boxs  ->
+                onSuccessCallBack(boxs)
                 this.boxMessages = boxs
             },
             onFailureCallBack = {
@@ -112,12 +124,12 @@ class DaracademyAdminViewModel : ViewModel{
         )
     }
 
-    fun getAllMessage(id : String, onSuccessCallBack: (List<Message>) -> Unit = {}, onFailureCallBack: (exp : Exception) -> Unit = {}  ){
-        repo.getAllMessage(id, onSuccessCallBack, onFailureCallBack)
+    fun getAllMessage(userId : String , productId : String , onSuccessCallBack: (List<Message>) -> Unit = {}, onFailureCallBack: (exp : Exception) -> Unit = {}  ){
+        repo.getAllMessage(userId , productId , onSuccessCallBack, onFailureCallBack)
     }
 
-    fun sendMsg(id : String , newMassage : Message , onSuccessCallBack: () -> Unit = {}, onFailureCallBack: (exp : Exception) -> Unit = {}  ){
-        repo.sendMsg(id, newMassage, onSuccessCallBack, onFailureCallBack)
+    fun sendMsg(userId : String , productId : String , newMassage : Message , onSuccessCallBack: () -> Unit = {}, onFailureCallBack: (exp : Exception) -> Unit = {}  ){
+        repo.sendMsg(userId, productId , newMassage , onSuccessCallBack, onFailureCallBack)
     }
 
     fun getAllMatieres(phase : String , annee : String , onSuccessCallBack: (List<Matiere>) -> Unit  , onFailureCallBack: (ex: Exception) -> Unit){

@@ -17,6 +17,7 @@ import com.example.daracademyadmin.model.dataClasses.Formation
 import com.example.daracademyadmin.model.dataClasses.Lesson
 import com.example.daracademyadmin.model.dataClasses.Matiere
 import com.example.daracademyadmin.model.dataClasses.Post
+import com.example.daracademyadmin.model.dataClasses.Student
 import com.example.daracademyadmin.model.dataClasses.Teacher
 import com.example.daracademyadmin.model.dataClasses.apis.progress.PrograssType
 import com.example.daracademyadmin.model.dataClasses.apis.progress.ProgressUpload
@@ -25,7 +26,10 @@ import com.example.daracademyadmin.repo.dataStore.DataStoreRepo
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
@@ -40,21 +44,22 @@ class DaracademyRepository {
 
 
 
-    private val dataStoreRepo : DataStoreRepo
-
     /******************************** live info ********************************************/
-    var teachers           by mutableStateOf<List<Teacher>>(emptyList())
+    var teachers         : List<Teacher>?  = null
         private set
-    private var isListen_teachers  = false
-    var posts              by mutableStateOf<List<Post>>(emptyList())
+    var posts            : List<Post>?  = null
         private set
-    private var isListen_posts  = false
-    var formations         by mutableStateOf<List<Formation>>(emptyList())
+    var formations       : List<Formation>?  = null
         private set
-    private var isListen_formations  = false
+    var students         : List<Student>?  = null
+        private set
+    var loaded by mutableStateOf(false)
 
 
-    var chatListener  :  ListenerRegistration? = null
+
+    var chatListener      :  ListenerRegistration? = null
+    var chatBoxsListener  :  ListenerRegistration? = null
+
 
     /***************************************************************************************/
 
@@ -102,11 +107,11 @@ class DaracademyRepository {
     constructor(context: Context){
         this.context = context
 
-        dataStoreRepo = DataStoreRepo(context)
 
         listenToTeachers()
         listenToPosts()
         listenToformations()
+        listenToStudents()
     }
 
     fun isSignIn(result : (Boolean)-> Unit = {}){
@@ -125,6 +130,7 @@ class DaracademyRepository {
         auth.signInWithEmailAndPassword(email , password)
             .addOnSuccessListener {
                 onSuccessCallBack()
+
             }
             .addOnFailureListener{
                 onFailureCallBack(it)
@@ -136,11 +142,9 @@ class DaracademyRepository {
         firebaseFirestore.collection("teachers")
             .addSnapshotListener { snapshot, error ->
                 if (error != null){
-                    isListen_teachers = false
                     onFailureCallBack(error)
                     return@addSnapshotListener
                 }
-                isListen_teachers = true
                 if (snapshot==null || snapshot.isEmpty ){
                     return@addSnapshotListener
                 }
@@ -151,15 +155,30 @@ class DaracademyRepository {
 
             }
     }
+    fun listenToStudents( onFailureCallBack : (ex : Exception)->Unit = {}){
+        firebaseFirestore.collection("students")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null){
+                    onFailureCallBack(error)
+                    return@addSnapshotListener
+                }
+                if (snapshot==null || snapshot.isEmpty ){
+                    return@addSnapshotListener
+                }
+
+                students = snapshot.documents.mapNotNull { documentSnapshot ->
+                    documentSnapshot.toObject(Student::class.java)
+                }
+
+            }
+    }
     fun listenToPosts( onFailureCallBack : (ex : Exception)->Unit = {}){
         firebaseFirestore.collection("posts")
             .addSnapshotListener { snapshot, error ->
                 if (error != null){
-                    isListen_posts = false
                     onFailureCallBack(error)
                     return@addSnapshotListener
                 }
-                isListen_posts = true
                 if (snapshot==null || snapshot.isEmpty ){
                     return@addSnapshotListener
                 }
@@ -174,11 +193,9 @@ class DaracademyRepository {
         firebaseFirestore.collection("formations")
             .addSnapshotListener { snapshot, error ->
                 if (error != null){
-                    isListen_formations = false
                     onFailureCallBack(error)
                     return@addSnapshotListener
                 }
-                isListen_formations = true
                 if (snapshot==null || snapshot.isEmpty ){
                     return@addSnapshotListener
                 }
@@ -189,6 +206,7 @@ class DaracademyRepository {
 
             }
     }
+
 
 
     fun addPost(name : String, desc : String, images : List<Uri>,  onSuccessCallBack: () -> Unit = {}, onFailureCallBack: (ex : Exception) -> Unit = {}){
@@ -581,56 +599,57 @@ class DaracademyRepository {
 
 
     //geters
-    fun getAllTeachers( ) : List<Teacher>{
-        if (!isListen_teachers)
+    fun getAllTeachers( ) : List<Teacher>?{
+        if (this.teachers == null)
             listenToTeachers()
 
         return this.teachers
     }
-    fun getAllPosts( ) : List<Post>{
-        if (!isListen_posts)
+    fun getAllStudents( ) : List<Student>?{
+        if (this.students == null)
+            listenToformations()
+        return this.students
+    }
+    fun getAllPosts( ) : List<Post>?{
+        if (this.posts == null)
             listenToPosts()
         return this.posts
     }
-    fun getAllFormation( ) : List<Formation>{
-        if (!isListen_formations)
+    fun getAllFormation( ) : List<Formation>?{
+        if (this.formations == null)
             listenToformations()
         return this.formations
     }
 
-    fun getAllMessageBoxs(onSuccessCallBack: (List<MessageBox> , Int) -> Unit = {_,_->}, onFailureCallBack: (exp : Exception) -> Unit = {}  ){
+    fun getAllMessageBoxs( onSuccessCallBack: (List<MessageBox> ) -> Unit = {} , onFailureCallBack: (exp : Exception) -> Unit = {}  ){
 
 
+        chatBoxsListener?.remove()
 
-        firebaseFirestore.collection("chats")
-            .get()
-            .addOnSuccessListener { result->
-
-                val messageBoxs = ArrayList<MessageBox>()
-
-                for (doc in result){
-
-                    messageBoxs.add(MessageBox(id = doc.id  ))
-
+        chatBoxsListener = firebaseFirestore.collection("chats")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null){
+                    onFailureCallBack(error)
+                    return@addSnapshotListener
                 }
-
-                onSuccessCallBack(messageBoxs , result.documents.size)
-
-            }
-            .addOnFailureListener {
-                onFailureCallBack(it)
+                if (snapshot != null && !snapshot.isEmpty){
+                    val chatBoxs = snapshot.documents.mapNotNull { doc ->
+                        val ids = doc.id.split("_")
+                        doc.toObject(MessageBox::class.java)?.copy(userId = ids[0] , productId = ids[1])
+                    }
+                    onSuccessCallBack(chatBoxs)
+                }
             }
 
     }
 
 
-    fun getAllMessage(id : String, onSuccessCallBack: (List<Message>) -> Unit = {}, onFailureCallBack: (exp : Exception) -> Unit = {}  ){
+    fun getAllMessage(userId : String , productId : String , onSuccessCallBack: (List<Message>) -> Unit = {}, onFailureCallBack: (exp : Exception) -> Unit = {}  ){
 
 
         chatListener?.remove()
 
-        chatListener = firebaseFirestore.collection("chats")
-            .document(id)
+        chatListener = firebaseFirestore.collection("chats").document("${userId}_${productId}")
             .collection("messages")
             .orderBy("timestamp")
             .addSnapshotListener { snapshot, error ->
@@ -649,11 +668,14 @@ class DaracademyRepository {
 
     }
 
-    fun sendMsg(id : String , newMassage : Message , onSuccessCallBack: () -> Unit = {}, onFailureCallBack: (exp : Exception) -> Unit = {}  ){
+    fun sendMsg(userId : String , productId : String , newMassage : Message , onSuccessCallBack: () -> Unit = {}, onFailureCallBack: (exp : Exception) -> Unit = {}  ){
 
-        val chatBoxRef = firebaseFirestore.collection("chats").document(id).collection("messages")
 
-        chatBoxRef
+        val chatBoxRef = firebaseFirestore.collection("chats").document("$userId").collection("products").document("$productId")
+        val chatMessageCollectionRef = chatBoxRef.collection("messages")
+
+
+        chatMessageCollectionRef
             .document()
             .set(
                 hashMapOf(
@@ -664,7 +686,20 @@ class DaracademyRepository {
                 )
             )
             .addOnSuccessListener(){
-                onSuccessCallBack()
+                //lastMessage
+                chatBoxRef.set(
+                    mapOf(
+                        "lastMessage" to newMassage.msg,
+                        "timestamp"  to  FieldValue.serverTimestamp()
+                    ),
+                    SetOptions.merge()
+                )
+                    .addOnFailureListener {
+                        onFailureCallBack(it)
+                    }
+                    .addOnSuccessListener {
+                        onSuccessCallBack()
+                    }
             }
             .addOnFailureListener(onFailureCallBack)
 

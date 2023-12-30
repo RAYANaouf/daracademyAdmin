@@ -13,10 +13,7 @@ data class Teacher(
 }
 
 
-data class Phone(
-    val type   : String = "07",
-    val number : String = ""
-)
+
 
 
 

@@ -32,13 +32,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.example.bigsam.model.data.`object`.NormalTextStyles
+import com.example.daracademy.view.material.lottie.LottieAnimation_loading
 import com.example.daracademyadmin.R
 import com.example.daracademyadmin.model.dataClasses.Teacher
 import com.example.daracademyadmin.model.variables.firaSansFamily
 import com.example.daracademyadmin.ui.theme.color1
 import com.example.daracademyadmin.ui.theme.customWhite0
 import com.example.daracademyadmin.ui.theme.customWhite5
-
+import com.example.daracademyadmin.view.material.lottie.LottieAnimation_empty
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,7 +47,7 @@ import com.example.daracademyadmin.ui.theme.customWhite5
 fun AddTeacherBottomSheet(
     show       : Boolean,
     onDismiss  : ()->Unit = {},
-    teachers    : List<Teacher>,
+    teachers    : List<Teacher>?,
     selectedTeachers    : List<Teacher> = emptyList(),
     onTeacherSelected   : (Teacher)->Unit = {},
     shape: Shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp ),
@@ -96,55 +97,63 @@ fun AddTeacherBottomSheet(
                     .height(150.dp)
                     .horizontalScroll(rememberScrollState())
             ) {
-                teachers.forEachIndexed { index , item ->
+                if (teachers == null){
+                    LottieAnimation_loading()
+                }
+                else if (teachers.size == 0){
+                    LottieAnimation_empty()
+                }
+                else{
+                    teachers.forEachIndexed { index , item ->
 
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    Box(
-
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier
-                                .width(80.dp)
-                                .clickable {
-                                    onTeacherSelected(item)
-                                }
-                        ) {
-                            Image(
-                                painter = rememberAsyncImagePainter(model = Uri.parse(item.photo)),
-                                contentDescription = null,
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .size(60.dp)
-                                    .clip(CircleShape)
-                                    .background(color1)
-
-                            )
-
-                            Spacer(modifier = Modifier.height(10.dp))
-
-                            Text(
-                                text  = item.name,
-                                style = NormalTextStyles.TextStyleSZ9.copy(fontFamily = firaSansFamily)
-                            )
-                        }
-
-                        if ( selectedTeachers.contains(item) ){
-                            Image(
-                                painter = painterResource(id = R.drawable.done_icon),
-                                contentDescription = null ,
-                                modifier = Modifier
-                                    .size(16.dp)
-                                    .align(Alignment.TopEnd)
-                            )
-                        }
-                    }
-
-                    if (index == teachers.size-1){
                         Spacer(modifier = Modifier.width(16.dp))
-                    }
 
+                        Box(
+
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier
+                                    .width(80.dp)
+                                    .clickable {
+                                        onTeacherSelected(item)
+                                    }
+                            ) {
+                                Image(
+                                    painter = rememberAsyncImagePainter(model = Uri.parse(item.photo)),
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier
+                                        .size(60.dp)
+                                        .clip(CircleShape)
+                                        .background(color1)
+
+                                )
+
+                                Spacer(modifier = Modifier.height(10.dp))
+
+                                Text(
+                                    text  = item.name,
+                                    style = NormalTextStyles.TextStyleSZ9.copy(fontFamily = firaSansFamily)
+                                )
+                            }
+
+                            if ( selectedTeachers.contains(item) ){
+                                Image(
+                                    painter = painterResource(id = R.drawable.done_icon),
+                                    contentDescription = null ,
+                                    modifier = Modifier
+                                        .size(16.dp)
+                                        .align(Alignment.TopEnd)
+                                )
+                            }
+                        }
+
+                        if (index == teachers.size-1){
+                            Spacer(modifier = Modifier.width(16.dp))
+                        }
+
+                    }
                 }
             }
 

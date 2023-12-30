@@ -95,7 +95,7 @@ fun HomeScreen(
                             navController.navigate(Screens.AddStudentScreen().root)
                         }
                         else if (category.screen == Screens.StageScreen().root) {
-                            navController.navigate(Screens.StageScreen().root)
+                            navController.navigate("${Screens.StageScreen().root}/edit")
                         }
                         else {
                             navController.navigate(Screens.HomeScreen().root)

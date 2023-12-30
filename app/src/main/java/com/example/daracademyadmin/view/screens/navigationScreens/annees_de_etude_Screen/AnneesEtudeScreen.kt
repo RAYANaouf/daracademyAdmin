@@ -44,6 +44,7 @@ import com.example.daracademyadmin.ui.theme.customWhite0
 @Composable
 fun AnneesDesEtudesScreen(
     navController: NavController,
+    kind         : String = "",
     phase : String,
     modifier: Modifier = Modifier
 ) {
@@ -94,7 +95,7 @@ fun AnneesDesEtudesScreen(
                         .clip(RoundedCornerShape(16.dp))
                         .background(color = color)
                         .clickable {
-                            navController.navigate("${Screens.MatieresScreen().root}/$phase/${annee.id}"){
+                            navController.navigate("${Screens.MatieresScreen().root}/$phase/${annee.id}/${kind}"){
                                 popUpTo(Screens.HomeScreen().root){
                                     inclusive = true
                                 }
@@ -121,7 +122,7 @@ fun AnneesDesEtudesScreen(
                         .clip(RoundedCornerShape(16.dp))
                         .background(color = color)
                         .clickable {
-                            navController.navigate("${Screens.MatieresScreen().root}/$phase/${annee.id}"){
+                            navController.navigate("${Screens.MatieresScreen().root}/$phase/${annee.id}/${kind}"){
                                 popUpTo(Screens.HomeScreen().root){
                                     inclusive = true
                                 }

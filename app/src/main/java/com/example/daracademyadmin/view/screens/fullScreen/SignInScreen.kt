@@ -118,7 +118,7 @@ fun SignInScreen(
                 viewModel.signIn(email , password ,
                     onSuccessCallBack = {
                         Toast.makeText(context , "Welcome in Daraacademy admin space" , Toast.LENGTH_LONG).show()
-                        viewModel.setAppScreen(Screens.HomeScreen())
+
                     },
                     onFailureCallBack = {
                         Toast.makeText(context , "failed" , Toast.LENGTH_LONG).show()

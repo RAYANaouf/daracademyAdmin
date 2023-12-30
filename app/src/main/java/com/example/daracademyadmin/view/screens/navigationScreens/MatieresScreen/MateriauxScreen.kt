@@ -59,6 +59,7 @@ fun MatieresScreen(
     viewModel    : DaracademyAdminViewModel = viewModel(),
     phase        : String,
     annee        : String,
+    kind         : String = "",
     modifier     : Modifier = Modifier
 ) {
 
@@ -102,9 +103,18 @@ fun MatieresScreen(
                     modifier = Modifier
                         .clip(RoundedCornerShape(16.dp))
                         .clickable {
-                            navController.navigate("${Screens.AddCoursScreen().root}/$phase/$annee/${it.name}"){
-                                popUpTo(Screens.HomeScreen().root){
-                                    inclusive = true
+                            if (kind == "view"){
+                                navController.navigate("${Screens.CoursesScreen().root}"){
+                                    popUpTo(Screens.HomeScreen().root){
+                                        inclusive = true
+                                    }
+                                }
+                            }
+                            else if(kind == "edit"){
+                                navController.navigate("${Screens.AddCoursScreen().root}/$phase/$annee/${it.name}"){
+                                    popUpTo(Screens.HomeScreen().root){
+                                        inclusive = true
+                                    }
                                 }
                             }
 

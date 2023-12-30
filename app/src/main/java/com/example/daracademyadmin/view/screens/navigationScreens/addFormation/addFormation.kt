@@ -88,7 +88,7 @@ fun AddFormationScreen(
     var context = LocalContext.current
 
 
-    var teachers : List<Teacher> by remember {
+    var teachers : List<Teacher>? by remember {
         mutableStateOf(viewModel.getAllTeachers())
     }
 

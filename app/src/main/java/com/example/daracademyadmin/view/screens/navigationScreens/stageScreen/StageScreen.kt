@@ -30,8 +30,9 @@ import com.example.daracademyadmin.ui.theme.customWhite0
 
 @Composable
 fun StageScreen(
+    kind          : String = "edit",
     navController : NavController,
-    modifier : Modifier = Modifier
+    modifier      : Modifier = Modifier
 ) {
 
     Column(
@@ -50,7 +51,7 @@ fun StageScreen(
                 .weight(1f)
                 .clip(RoundedCornerShape(16.dp))
                 .clickable {
-                    navController.navigate("${Screens.AnneesScreen().root}/${PhaseDesEtudes.Primaire().phase}"){
+                    navController.navigate("${Screens.AnneesScreen().root}/${PhaseDesEtudes.Primaire().phase}/${kind}"){
                         popUpTo(Screens.HomeScreen().root){
                             inclusive = true
                         }
@@ -73,7 +74,7 @@ fun StageScreen(
                 .weight(1f)
                 .clip(RoundedCornerShape(16.dp))
                 .clickable {
-                    navController.navigate("${Screens.AnneesScreen().root}/${PhaseDesEtudes.CEM().phase}"){
+                    navController.navigate("${Screens.AnneesScreen().root}/${PhaseDesEtudes.CEM().phase}/${kind}"){
                         popUpTo(Screens.HomeScreen().root){
                             inclusive = true
                         }
@@ -96,7 +97,7 @@ fun StageScreen(
                 .weight(1f)
                 .clip(RoundedCornerShape(16.dp))
                 .clickable {
-                    navController.navigate("${Screens.AnneesScreen().root}/${PhaseDesEtudes.Lycee().phase}"){
+                    navController.navigate("${Screens.AnneesScreen().root}/${PhaseDesEtudes.Lycee().phase}/${kind}"){
                         popUpTo(Screens.HomeScreen().root){
                             inclusive = true
                         }
