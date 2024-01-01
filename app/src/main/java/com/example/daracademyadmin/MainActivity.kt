@@ -88,6 +88,7 @@ import com.example.daracademyadmin.view.screens.navigationScreens.homeScreen.Hom
 import com.example.daracademyadmin.model.variables.firaSansFamily
 import com.example.daracademyadmin.viewModel.DaracademyAdminViewModel
 import com.example.daracademyadmin.ui.theme.DaracademyAdminTheme
+import com.example.daracademyadmin.ui.theme.backgroundLight
 import com.example.daracademyadmin.ui.theme.color1
 import com.example.daracademyadmin.ui.theme.customWhite0
 import com.example.daracademyadmin.ui.theme.customWhite7
@@ -124,6 +125,10 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             )
+
+            LaunchedEffect(key1 = true ){
+                viewModel.repo.listenToChatBoxs()
+            }
 
 
 
@@ -323,8 +328,8 @@ fun MainScreen(
                             .height(65.dp)
                             .padding(start = 16.dp, end = 16.dp)
                             .clickable {
-                                navController.navigate(Screens.StatisticsScreen().root){
-                                    popUpTo(Screens.HomeScreen().root){
+                                navController.navigate(Screens.StatisticsScreen().root) {
+                                    popUpTo(Screens.HomeScreen().root) {
                                         inclusive = true
                                     }
                                 }
@@ -554,6 +559,18 @@ fun MainScreen(
                             }
                         }
 
+                        val translate_img = remember {
+                            if(navBackStackEntry?.destination?.route == Screens.AddPostScreen().root){
+                                R.drawable.translation_inline
+                            }
+                            else if(navBackStackEntry?.destination?.route == Screens.AddFormationScreen().root){
+                                R.drawable.translation_inline
+                            }
+                            else{
+                                -1
+                            }
+                        }
+
                         val title = remember {
                             if(navBackStackEntry?.destination?.route == Screens.AddPostScreen().root){
                                 "Add post"
@@ -615,16 +632,19 @@ fun MainScreen(
 
                             },
                             trailingActions = {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.translation_inline),
-                                    contentDescription = null,
-                                    tint = color1,
-                                    modifier = Modifier
-                                        .size(26.dp)
-                                        .clickable {
+                                if (translate_img > 0){
+                                    Icon(
+                                        painter = painterResource(id = translate_img),
+                                        contentDescription = null,
+                                        tint = color1,
+                                        modifier = Modifier
+                                            .size(26.dp)
+                                            .clickable {
 
-                                        }
-                                )
+                                            }
+                                    )
+                                }
+
                             },
                         )
                     }
@@ -648,7 +668,7 @@ fun MainScreen(
                                 navController.navigate(it.root)
                             },
                             modifier = Modifier
-                                .background(Color(android.graphics.Color.parseColor("#F9F9F9")))
+                                .background(backgroundLight)
                                 .padding(
                                     top = paddingValues.calculateTopPadding(),
                                 )
@@ -664,7 +684,7 @@ fun MainScreen(
 //                                navController.navigate(it.root)
 //                            },
                             modifier = Modifier
-                                .background(Color(android.graphics.Color.parseColor("#F9F9F9")))
+                                .background(backgroundLight)
                                 .padding(
                                     top = paddingValues.calculateTopPadding(),
                                 )
@@ -680,7 +700,7 @@ fun MainScreen(
 //                                navController.navigate(it.root)
 //                            },
                             modifier = Modifier
-                                .background(Color(android.graphics.Color.parseColor("#F9F9F9")))
+                                .background(backgroundLight)
                                 .padding(
                                     top = paddingValues.calculateTopPadding(),
                                 )
@@ -696,7 +716,7 @@ fun MainScreen(
 //                                navController.navigate(it.root)
 //                            },
                             modifier = Modifier
-                                .background(Color(android.graphics.Color.parseColor("#F9F9F9")))
+                                .background(backgroundLight)
                                 .padding(
                                     top = paddingValues.calculateTopPadding(),
                                 )
@@ -717,6 +737,7 @@ fun MainScreen(
 //                                viewModel.setAppScreen(Screens.HomeScreen())
                             },
                             modifier = Modifier
+                                .background(backgroundLight)
                                 .padding(
                                     top = paddingValues.calculateTopPadding(),
                                 )
@@ -735,6 +756,7 @@ fun MainScreen(
 //                                viewModel.setAppScreen(it)
                             },
                             modifier = Modifier
+                                .background(backgroundLight)
                                 .padding(top = paddingValues.calculateTopPadding()  )
                         )
                     }
@@ -751,6 +773,7 @@ fun MainScreen(
 //                            viewModel.setAppScreen(it)
                         },
                             modifier = Modifier
+                                .background(backgroundLight)
                                 .padding(top = paddingValues.calculateTopPadding() )
                         )
                     }
@@ -767,6 +790,7 @@ fun MainScreen(
 //                                viewModel.setAppScreen(it)
                             },
                             modifier = Modifier
+                                .background(backgroundLight)
                                 .padding(top = paddingValues.calculateTopPadding())
                         )
                     }
@@ -776,6 +800,7 @@ fun MainScreen(
                             navController = navController,
                             viewModel = viewModel,
                             modifier = Modifier
+                                .background(backgroundLight)
                                 .padding(
                                     top = paddingValues.calculateTopPadding()
                                 )
@@ -802,6 +827,7 @@ fun MainScreen(
                             productId    = navBackStackEntry.arguments?.getString("productId") ?: "",
                             name         = navBackStackEntry.arguments?.getString("name")      ?: "",
                             modifier     = Modifier
+                                .background(backgroundLight)
                                 .padding(
                                     top = paddingValues.calculateTopPadding()
                                 )
@@ -820,6 +846,7 @@ fun MainScreen(
                             navController = navController,
                             kind          = navBackStackEntry.arguments?.getString("kind") ?: "",
                             modifier  = Modifier
+                                .background(backgroundLight)
                                 .padding(
                                     top = paddingValues.calculateTopPadding()
                                 )
@@ -843,6 +870,7 @@ fun MainScreen(
                             phase = navBackStackEntry.arguments?.getString("phase") ?: "",
                             kind  = navBackStackEntry.arguments?.getString("kind") ?: "",
                             modifier     = Modifier
+                                .background(backgroundLight)
                                 .padding(
                                     top = paddingValues.calculateTopPadding()
                                 )
@@ -870,6 +898,7 @@ fun MainScreen(
                             annee     = navBackStackEntry.arguments?.getString("annee") ?: "",
                             kind      = navBackStackEntry.arguments?.getString("kind") ?: "",
                             modifier     = Modifier
+                                .background(backgroundLight)
                                 .padding(
                                     top = paddingValues.calculateTopPadding()
                                 )
@@ -901,11 +930,12 @@ fun MainScreen(
                                 }
 //                                viewModel.setAppScreen(it)
                             },
-                            phase = navBackStackEntry.arguments?.getString("phase") ?: "",
-                            annee = navBackStackEntry.arguments?.getString("annee") ?: "",
-                            matiere = navBackStackEntry.arguments?.getString("matiere") ?: "",
-                            viewModel = viewModel,
-                            modifier     = Modifier
+                            phase      = navBackStackEntry.arguments?.getString("phase") ?: "",
+                            annee      = navBackStackEntry.arguments?.getString("annee") ?: "",
+                            matiere    = navBackStackEntry.arguments?.getString("matiere") ?: "",
+                            viewModel  = viewModel,
+                            modifier   = Modifier
+                                .background(backgroundLight)
                                 .padding(
                                     top = paddingValues.calculateTopPadding()
                                 )
@@ -920,7 +950,9 @@ fun MainScreen(
 
 
                         StatisticsScreen(
+                            viewModel = viewModel,
                             modifier = Modifier
+                                .background(backgroundLight)
                                 .padding( top = paddingValues.calculateTopPadding())
                         )
 
@@ -934,6 +966,7 @@ fun MainScreen(
                         UploadScreen(
                             progresses = viewModel.getProgress(),
                             modifier = Modifier
+                                .background(backgroundLight)
                                 .padding( top = paddingValues.calculateTopPadding())
                         )
 

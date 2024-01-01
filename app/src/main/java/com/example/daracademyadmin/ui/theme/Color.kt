@@ -42,6 +42,12 @@ val customBlack10 = Color(0xFFB0B0B0)
 
 /**************************************************/
 
+/***************  backgrounds    ******************/
+
+val backgroundLight = Color(0xFFF9F9F9)
+
+/**************************************************/
+
 
 /***************  costume color  ******************/
 val color0 = Color(0xFFCDFFFF)

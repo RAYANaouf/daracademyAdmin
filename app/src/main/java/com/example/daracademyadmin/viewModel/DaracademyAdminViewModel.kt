@@ -37,11 +37,11 @@ class DaracademyAdminViewModel : ViewModel{
     var isSignIn by mutableStateOf(true )
         private set
 
-    private val repo : DaracademyRepository
+    val repo : DaracademyRepository
 
     private val dataStoreRepo : DataStoreRepo
 
-    var boxMessages by mutableStateOf<List<MessageBox>>(emptyList())
+    var boxMessages = mutableListOf<MessageBox>()
         private set
 
 
@@ -116,7 +116,7 @@ class DaracademyAdminViewModel : ViewModel{
         repo.getAllMessageBoxs(
             onSuccessCallBack = {boxs  ->
                 onSuccessCallBack(boxs)
-                this.boxMessages = boxs
+                this.boxMessages = boxs.toMutableList()
             },
             onFailureCallBack = {
                 onFailureCallBack(it)

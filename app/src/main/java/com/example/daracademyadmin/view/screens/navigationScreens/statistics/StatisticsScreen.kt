@@ -20,6 +20,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,16 +33,48 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.daracademyadmin.R
+import com.example.daracademyadmin.model.dataClasses.Student
 import com.example.daracademyadmin.ui.theme.customWhite0
 import com.example.daracademyadmin.ui.theme.customWhite4
+import com.example.daracademyadmin.viewModel.DaracademyAdminViewModel
 
 @Composable
 fun StatisticsScreen(
-    modifier : Modifier = Modifier
+    viewModel : DaracademyAdminViewModel,
+    modifier  : Modifier = Modifier
 ) {
 
     val context = LocalContext.current
+
+    var students : Int? by rememberSaveable {
+        mutableStateOf(null)
+    }
+    var teachers : Int? by rememberSaveable {
+        mutableStateOf(null)
+    }
+
+    LaunchedEffect(key1 = true  ){
+        viewModel.repo.getAllStudents(
+            onSuccessCallBack = {
+                students = it.count()
+            },
+            onFailureCallBack = {
+
+            }
+        )
+        viewModel.repo.getAllTeachers(
+            onSuccessCallBack = {
+                teachers = it.count()
+            },
+            onFailureCallBack = {
+
+            }
+        )
+    }
 
 
     Column(
@@ -48,114 +85,377 @@ fun StatisticsScreen(
 
         Spacer(modifier = Modifier.height(36.dp))
 
-        Row(
+        teachersAndStudents(
+            teachers = teachers,
+            students = students,
             modifier = Modifier
                 .fillMaxWidth(0.8f)
-                .height(100.dp)
-        ) {
-
-
-
-            Box(
-                modifier = Modifier
-                    .weight(4f)
-                    .aspectRatio(1f)
-                    .clip(RoundedCornerShape(12.dp))
-                    .border(
-                        width = 1.5.dp,
-                        color = customWhite4,
-                        shape = RoundedCornerShape(12.dp)
-                    )
-                    .background(customWhite0)
-                    .clickable { }
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .fillMaxSize()
-                ) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(3f)
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.teacher),
-                            contentDescription = null ,
-                            contentScale = ContentScale.Inside,
-                            modifier = Modifier
-                                .fillMaxSize(0.7f)
-                        )
-                    }
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(2f)
-                    ) {
-                        Text(text = "15")
-                    }
-
-                }
-            }
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            Box(
-                modifier = Modifier
-                    .weight(4f)
-                    .aspectRatio(1f)
-                    .clip(RoundedCornerShape(12.dp))
-                    .border(
-                        width = 1.5.dp,
-                        color = customWhite4,
-                        shape = RoundedCornerShape(12.dp)
-                    )
-                    .background(customWhite0)
-                    .clickable { }
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .fillMaxSize()
-                ) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(3f)
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.student_icon),
-                            contentDescription = null ,
-                            contentScale = ContentScale.Inside,
-                            modifier = Modifier
-                                .fillMaxSize(0.7f)
-                        )
-                    }
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(2f)
-                    ) {
-                        Text(text = "15")
-                    }
-
-                }
-            }
-
-
-
-
-        }
+            )
 
         Spacer(modifier = Modifier.height(36.dp))
 
-        Box {
+        statisticsBox(
+            modifier = Modifier
+                .fillMaxWidth(0.8f)
+                .aspectRatio(1f)
+                .background(customWhite0)
+        )
 
+        Spacer(modifier = Modifier.height(36.dp))
+
+        matieresAndCourses(
+            matieres = 150,
+            courses  = 10 ,
+            modifier = Modifier
+                .fillMaxWidth(0.8f)
+        )
+
+    }
+
+}
+
+
+@Composable
+fun teachersAndStudents(
+    teachers  : Int? ,
+    students  : Int? ,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .height(100.dp)
+    ) {
+
+
+
+        Box(
+            modifier = Modifier
+                .weight(4f)
+                .aspectRatio(1f)
+                .clip(RoundedCornerShape(12.dp))
+                .border(
+                    width = 1.5.dp,
+                    color = customWhite4,
+                    shape = RoundedCornerShape(12.dp)
+                )
+                .background(customWhite0)
+                .clickable { }
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(3f)
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.teacher),
+                        contentDescription = null ,
+                        contentScale = ContentScale.Inside,
+                        modifier = Modifier
+                            .fillMaxSize(0.7f)
+                    )
+                }
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(2f)
+                ) {
+                    Text(text = "${teachers ?: "00"}")
+                }
+
+            }
         }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        Box(
+            modifier = Modifier
+                .weight(4f)
+                .aspectRatio(1f)
+                .clip(RoundedCornerShape(12.dp))
+                .border(
+                    width = 1.5.dp,
+                    color = customWhite4,
+                    shape = RoundedCornerShape(12.dp)
+                )
+                .background(customWhite0)
+                .clickable { }
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(3f)
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.student_icon),
+                        contentDescription = null ,
+                        contentScale = ContentScale.Inside,
+                        modifier = Modifier
+                            .fillMaxSize(0.7f)
+                    )
+                }
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(2f)
+                ) {
+                    Text(text = "${students ?: "00"}")
+                }
+
+            }
+        }
+
+
+
+
+    }
+}
+
+@Composable
+fun matieresAndCourses(
+    matieres  : Int? ,
+    courses  : Int? ,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .height(100.dp)
+    ) {
+
+
+
+        Box(
+            modifier = Modifier
+                .weight(4f)
+                .aspectRatio(1f)
+                .clip(RoundedCornerShape(12.dp))
+                .border(
+                    width = 1.5.dp,
+                    color = customWhite4,
+                    shape = RoundedCornerShape(12.dp)
+                )
+                .background(customWhite0)
+                .clickable { }
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(3f)
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.add_model),
+                        contentDescription = null ,
+                        contentScale = ContentScale.Inside,
+                        modifier = Modifier
+                            .fillMaxSize(0.7f)
+                    )
+                }
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(2f)
+                ) {
+                    Text(text = "${matieres ?: "00"}")
+                }
+
+            }
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        Box(
+            modifier = Modifier
+                .weight(4f)
+                .aspectRatio(1f)
+                .clip(RoundedCornerShape(12.dp))
+                .border(
+                    width = 1.5.dp,
+                    color = customWhite4,
+                    shape = RoundedCornerShape(12.dp)
+                )
+                .background(customWhite0)
+                .clickable { }
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(3f)
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.courses),
+                        contentDescription = null ,
+                        contentScale = ContentScale.Inside,
+                        modifier = Modifier
+                            .fillMaxSize(0.7f)
+                    )
+                }
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(2f)
+                ) {
+                    Text(text = "${courses ?: "00"}")
+                }
+
+            }
+        }
+
+
+
+
+    }
+}
+
+@Composable
+fun formationsAndMoney(
+    formations : Int? ,
+    money      : Int? ,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .height(100.dp)
+    ) {
+
+
+
+        Box(
+            modifier = Modifier
+                .weight(4f)
+                .aspectRatio(1f)
+                .clip(RoundedCornerShape(12.dp))
+                .border(
+                    width = 1.5.dp,
+                    color = customWhite4,
+                    shape = RoundedCornerShape(12.dp)
+                )
+                .background(customWhite0)
+                .clickable { }
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(3f)
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.formation),
+                        contentDescription = null ,
+                        contentScale = ContentScale.Inside,
+                        modifier = Modifier
+                            .fillMaxSize(0.7f)
+                    )
+                }
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(2f)
+                ) {
+                    Text(text = "${formations ?: "00"}")
+                }
+
+            }
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        Box(
+            modifier = Modifier
+                .weight(4f)
+                .aspectRatio(1f)
+                .clip(RoundedCornerShape(12.dp))
+                .border(
+                    width = 1.5.dp,
+                    color = customWhite4,
+                    shape = RoundedCornerShape(12.dp)
+                )
+                .background(customWhite0)
+                .clickable { }
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(3f)
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.student_icon),
+                        contentDescription = null ,
+                        contentScale = ContentScale.Inside,
+                        modifier = Modifier
+                            .fillMaxSize(0.7f)
+                    )
+                }
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(2f)
+                ) {
+                    Text(text = "${money ?: "00"}")
+                }
+
+            }
+        }
+
+
+
+
+    }
+}
+
+
+@Composable
+fun statisticsBox(
+    modifier: Modifier = Modifier
+) {
+
+    Box(
+        modifier = modifier
+            .border(
+                width = 1.5.dp,
+                color = customWhite4,
+                shape = RoundedCornerShape(12.dp)
+            )
+    ) {
 
     }
 
@@ -164,5 +464,20 @@ fun StatisticsScreen(
 @Preview
 @Composable
 fun StatisticsScreen_preview() {
-    StatisticsScreen()
+
+    val context = LocalContext.current
+
+    StatisticsScreen(
+        viewModel = viewModel(
+            factory = object : ViewModelProvider.Factory{
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    if (modelClass.isAssignableFrom(DaracademyAdminViewModel::class.java))
+                        return DaracademyAdminViewModel(context) as T
+                    else
+                        throw IllegalArgumentException("cant create viewModel (statistics screen)")
+                }
+            }
+        )
+    )
+
 }

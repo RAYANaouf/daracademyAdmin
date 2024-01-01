@@ -2,7 +2,9 @@ package com.example.daracademy.view.screens.chatBox
 
 import android.graphics.Color.parseColor
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -25,6 +27,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -146,8 +149,8 @@ fun ChatScreen(
         }
 
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
+        Column(
+//            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
                 .background(customWhite0)
@@ -162,63 +165,126 @@ fun ChatScreen(
                 .padding(top = 5.dp, bottom = 5.dp)
         ) {
 
-            Spacer(modifier = Modifier.width(26.dp))
+            if (photo_uri != null){
 
-            AlphaTextField(
-                text = message,
-                onValueChange = {
-                    message = it
-                },
-                textFieldStyle = NormalTextStyles.TextStyleSZ8,
-                hint = "message",
-                hintStyle = NormalTextStyles.TextStyleSZ8,
-                maxLine = 4,
-                shape = RoundedCornerShape(20.dp),
-                background = Color(parseColor("#f5f5f5")),
-                cursorColor = color1,
-                modifier = Modifier
-                    .weight(1f)
-                    .heightIn(min = 40.dp)
-            )
-
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            if (!loading){
-                Image(
-                    painter = painterResource(id = R.drawable.send_icon) ,
-                    contentDescription = null,
-                    contentScale = ContentScale.Inside,
+                Row(
                     modifier = Modifier
-                        .size(26.dp)
-                        .clickable {
-                            val msg = message
-                            message = ""
+                        .fillMaxWidth()
+                        .background(customWhite0)
+                ) {
 
-                            loading = true
-                            viewModel.sendMsg(
-                                userId     = userId,
-                                productId  = productId,
-                                newMassage = Message(msg = msg , person_msg = false ),
-                                onSuccessCallBack = {
-                                    loading = false
-                                },
-                                onFailureCallBack = {
-                                    loading = false
-                                }
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    Image(
+                        painter = rememberAsyncImagePainter(model = photo_uri),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .height(150.dp)
+                            .width(95.dp)
+                            .padding(top = 10.dp, bottom = 10.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .border(
+                                width = 1.dp,
+                                color = customWhite2,
+                                shape = RoundedCornerShape(8.dp)
                             )
-                        }
-                )
+                    )
+
+
+
+                }
+
             }
-            else{
-                loadingLottieAnimation(
+
+            Row {
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Box(
+                    contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .size(26.dp)
+                        .size(40.dp)
+                        .clickable {
+                            launcher_imgs.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                        }
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.photo_icon_inline) ,
+                        contentDescription = null  ,
+                        tint               = color1,
+                        modifier           = Modifier
+                            .size(26.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                AlphaTextField(
+                    text = message,
+                    onValueChange = {
+                        message = it
+                    },
+                    textFieldStyle = NormalTextStyles.TextStyleSZ8,
+                    hint = "message",
+                    hintStyle = NormalTextStyles.TextStyleSZ8,
+                    maxLine = 4,
+                    shape = RoundedCornerShape(20.dp),
+                    background = Color(parseColor("#f5f5f5")),
+                    cursorColor = color1,
+                    modifier = Modifier
+                        .weight(1f)
+                        .heightIn(min = 40.dp)
                 )
+
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                if (!loading){
+                    val context = LocalContext.current
+                    Image(
+                        painter = painterResource(id = R.drawable.send_icon) ,
+                        contentDescription = null,
+                        contentScale = ContentScale.Inside,
+                        modifier = Modifier
+                            .size(26.dp)
+                            .clickable {
+
+                                loading = true
+
+
+                                viewModel.sendMsg(
+                                    userId,
+                                    productId,
+                                    Message(
+                                        msg = message,
+                                        photo = photo_uri?.toString() ?: "",
+                                    ),
+                                    onSuccessCallBack = {
+                                        loading = false
+                                        message = ""
+                                        photo_uri = null
+
+                                    },
+                                    onFailureCallBack = {
+                                        loading = false
+                                        Toast
+                                            .makeText(context, "$it", Toast.LENGTH_LONG)
+                                            .show()
+                                    }
+                                )
+                            }
+                    )
+                }
+                else{
+                    loadingLottieAnimation(
+                        modifier = Modifier
+                            .size(26.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(16.dp))
+
             }
-
-            Spacer(modifier = Modifier.width(16.dp))
-
 
         }
 

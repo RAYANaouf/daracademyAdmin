@@ -60,24 +60,6 @@ fun ChatBoxsScreen(
 
     val context = LocalContext.current
 
-    var loading by rememberSaveable {
-        mutableStateOf(true)
-    }
-
-    LaunchedEffect(key1 = true ){
-
-        if (!viewModel.boxMessages.isEmpty())
-            loading = false
-
-        viewModel.getAllMessageBoxs(
-            onSuccessCallBack = {
-                loading = false
-            },
-            onFailureCallBack = {
-                Toast.makeText(context , "${it.message}" , Toast.LENGTH_LONG).show()
-            }
-        )
-    }
 
     Column(
         modifier = modifier
@@ -85,7 +67,7 @@ fun ChatBoxsScreen(
     ) {
 
 
-        if (loading){
+        if (false){
             LottieAnimation_loading()
         }
         else{
@@ -95,7 +77,7 @@ fun ChatBoxsScreen(
                     .weight(1f)
             ) {
 
-                items(viewModel.boxMessages){
+                items(viewModel.repo.chatBoxs){
                     Item(
                         messageBox = it,
                         modifier = Modifier
