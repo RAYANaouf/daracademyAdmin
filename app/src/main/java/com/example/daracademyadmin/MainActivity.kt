@@ -1,5 +1,6 @@
 package com.example.daracademyadmin
 
+import android.content.Context
 import android.graphics.Paint.Align
 import android.os.Build
 import android.os.Bundle
@@ -60,6 +61,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
 import androidx.core.view.WindowCompat
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -103,6 +107,8 @@ import com.example.daracademyadmin.view.screens.navigationScreens.uploadScreen.U
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+
+    private val Context.dataStore  : DataStore<Preferences> by preferencesDataStore(name = "dataStore")
 
 
     @RequiresApi(Build.VERSION_CODES.O)
