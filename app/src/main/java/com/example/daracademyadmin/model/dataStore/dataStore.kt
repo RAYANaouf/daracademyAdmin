@@ -2,20 +2,17 @@ package com.example.daracademyadmin.model.dataStore
 
 import android.content.Context
 import androidx.datastore.core.DataStore
-import androidx.datastore.dataStoreFile
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
-import androidx.datastore.preferences.preferencesDataStoreFile
 
 
 object dataStore {
-    private var instance: DataStore<Preferences>? = null
+
+    private val Context.dataStore  : DataStore<Preferences> by preferencesDataStore(name = "dataStore")
+
 
     fun getInstance(context: Context): DataStore<Preferences> {
-        return instance ?: createDataStore(context).also { instance = it }
+        return context.dataStore
     }
 
-    private fun createDataStore(context: Context): DataStore<Preferences> {
-        return context.preferencesDataStore
-    }
 }

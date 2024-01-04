@@ -112,18 +112,6 @@ class DaracademyAdminViewModel : ViewModel{
     }
 
 
-    fun getAllMessageBoxs(onSuccessCallBack: (List<MessageBox> ) -> Unit = {}, onFailureCallBack: (ex : Exception) -> Unit = {} ){
-        repo.getAllMessageBoxs(
-            onSuccessCallBack = {boxs  ->
-                onSuccessCallBack(boxs)
-                this.boxMessages = boxs.toMutableList()
-            },
-            onFailureCallBack = {
-                onFailureCallBack(it)
-            }
-        )
-    }
-
     fun getAllMessage(userId : String , productId : String , onSuccessCallBack: (List<Message>) -> Unit = {}, onFailureCallBack: (exp : Exception) -> Unit = {}  ){
         repo.getAllMessage(userId , productId , onSuccessCallBack, onFailureCallBack)
     }

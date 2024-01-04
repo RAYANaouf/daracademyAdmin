@@ -6,38 +6,38 @@ import androidx.datastore.dataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStore
+import com.example.daracademyadmin.model.dataStore.dataStore
 import kotlinx.coroutines.flow.first
 
 class DataStoreRepo {
 
     private val context : Context
 
-    // At the top level of your kotlin file:
-    private val Context.dataStore  : DataStore<Preferences> by preferencesDataStore(name = "dataStore")
-
+    private val dataStoreInst : DataStore<Preferences>
 
     constructor(context: Context){
         this.context  = context
+        dataStoreInst = dataStore.getInstance(context)
     }
 
     suspend fun isSignIn() : Boolean{
-        return context.dataStore.data.first()[dataStoreKeys.Key_signIn] ?: false
+        return dataStoreInst.data.first()[dataStoreKeys.Key_signIn] ?: false
     }
 
     suspend fun saveSignIn() {
 
-        context.dataStore.edit {
+        dataStoreInst.edit {
             it[dataStoreKeys.Key_signIn] = true
         }
     }
 
     suspend fun getChatId() : String?{
-        return context.dataStore.data.first()[dataStoreKeys.Key_chatFeatureId] ?: null
+        return dataStoreInst.data.first()[dataStoreKeys.Key_chatFeatureId] ?: null
     }
 
     suspend fun createChatFeatureId(id : String) {
 
-        context.dataStore.edit {
+        dataStoreInst.edit {
             it[dataStoreKeys.Key_chatFeatureId] = id
         }
     }

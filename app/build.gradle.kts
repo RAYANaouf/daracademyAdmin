@@ -96,12 +96,15 @@ dependencies {
 
 
 
+    // https://mvnrepository.com/artifact/me.saket.swipe/swipe
+    implementation("me.saket.swipe:swipe:1.2.0")
 
     /****************************  firebase   ****************************/
     implementation(platform("com.google.firebase:firebase-bom:32.6.0"))
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-storage")
+    implementation("com.google.firebase:firebase-analytics")
 
 
     //dataStore

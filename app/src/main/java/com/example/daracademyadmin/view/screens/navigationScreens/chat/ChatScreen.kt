@@ -359,8 +359,8 @@ fun messageItem(
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier           = Modifier
-                            .widthIn(  max = 150.dp , min = 50.dp)
-                            .heightIn( max = 350.dp , min = 50.dp)
+                            .width(200.dp)
+                            .height(200.dp)
                             .clip(RoundedCornerShape(topStart = if (message.person_msg) 0.dp else 12.dp , topEnd = if (message.person_msg) 12.dp else 0.dp , bottomStart = 12.dp , bottomEnd = 12.dp ))
                     )
                 }

@@ -97,7 +97,6 @@ import com.example.daracademyadmin.ui.theme.color1
 import com.example.daracademyadmin.ui.theme.customWhite0
 import com.example.daracademyadmin.ui.theme.customWhite7
 import com.example.daracademyadmin.view.screens.navigationScreens.Courses.CoursesScreen
-import com.example.daracademyadmin.view.screens.navigationScreens.Formations.FormationsScreen
 import com.example.daracademyadmin.view.screens.navigationScreens.MatieresScreen.MatieresScreen
 import com.example.daracademyadmin.view.screens.navigationScreens.Posts.PostsScreen
 import com.example.daracademyadmin.view.screens.navigationScreens.addCours.AddCoursScreen
@@ -697,21 +696,21 @@ fun MainScreen(
                         )
                     }
 
-                    composable(route = Screens.FormationsScreen().root) {
-                        FormationsScreen(
-//                            navController = navController,
-                            viewModel = viewModel,
-//                            onNavigate = {
-//                                viewModel.setAppScreen(it)
-//                                navController.navigate(it.root)
-//                            },
-                            modifier = Modifier
-                                .background(backgroundLight)
-                                .padding(
-                                    top = paddingValues.calculateTopPadding(),
-                                )
-                        )
-                    }
+//                    composable(route = Screens.FormationsScreen().root) {
+//                        FormationsScreen(
+////                            navController = navController,
+//                            viewModel = viewModel,
+////                            onNavigate = {
+////                                viewModel.setAppScreen(it)
+////                                navController.navigate(it.root)
+////                            },
+//                            modifier = Modifier
+//                                .background(backgroundLight)
+//                                .padding(
+//                                    top = paddingValues.calculateTopPadding(),
+//                                )
+//                        )
+//                    }
 
                     composable(route = Screens.CoursesScreen().root) {
                         CoursesScreen(
@@ -976,6 +975,19 @@ fun MainScreen(
                                 .padding( top = paddingValues.calculateTopPadding())
                         )
 
+                    }
+
+                    composable(
+                        route = "${Screens.FormationsScreen().root}"
+                    ){navBackStackEntry->
+                        com.example.daracademy.view.screens.formations.FormationsScreen(
+                            viewModel = viewModel,
+                            navController = navController,
+                            modifier = Modifier
+                                .background(Color(android.graphics.Color.parseColor("#f9f9f9")))
+                                .padding(top = paddingValues.calculateTopPadding())
+                                .windowInsetsPadding(WindowInsets.navigationBars)
+                        )
                     }
 
                 }

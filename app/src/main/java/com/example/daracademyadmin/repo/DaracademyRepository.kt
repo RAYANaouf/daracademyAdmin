@@ -51,6 +51,10 @@ class DaracademyRepository {
         private set
     var formations       : List<Formation>?  = null
         private set
+
+    var _formations       = mutableStateListOf<Formation>()
+        private set
+
     var students         : List<Student>?  = null
         private set
     var loaded by mutableStateOf(false)
@@ -205,6 +209,9 @@ class DaracademyRepository {
                 formations = snapshot.documents.mapNotNull { documentSnapshot ->
                     documentSnapshot.toObject(Formation::class.java)
                 }
+
+                _formations.clear()
+                _formations.addAll(formations?.toMutableList() ?: emptyList())
 
             }
     }
