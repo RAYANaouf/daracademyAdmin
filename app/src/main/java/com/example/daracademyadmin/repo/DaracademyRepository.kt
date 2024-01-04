@@ -23,6 +23,8 @@ import com.example.daracademyadmin.model.dataClasses.apis.progress.PrograssType
 import com.example.daracademyadmin.model.dataClasses.apis.progress.ProgressUpload
 import com.example.daracademyadmin.model.sealedClasses.phaseDesEtudes.PhaseDesEtudes
 import com.example.daracademyadmin.repo.dataStore.DataStoreRepo
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FieldValue
@@ -39,8 +41,9 @@ class DaracademyRepository {
 
     private val context  : Context
     private val auth: FirebaseAuth by mutableStateOf(Firebase.auth)
-    private val firebaseFirestore  by mutableStateOf(Firebase.firestore)
-    private val storageRef         by mutableStateOf(Firebase.storage.reference)
+    private val firebaseFirestore  =  Firebase.firestore
+    private val storageRef         =  Firebase.storage.reference
+    private val analytics          =  Firebase.analytics
 
 
 
