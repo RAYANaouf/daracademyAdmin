@@ -1,5 +1,6 @@
 package com.example.daracademy.view.screens.chatBox
 
+import android.app.Activity
 import android.graphics.Color.parseColor
 import android.net.Uri
 import android.widget.Toast
@@ -44,8 +45,10 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -58,6 +61,7 @@ import com.example.bigsam.model.data.`object`.NormalTextStyles
 import com.example.daracademy.model.data.dataClasses.Message
 import com.example.daracademy.model.data.dataClasses.MessageBox
 import com.example.daracademyadmin.R
+import com.example.daracademyadmin.ui.theme.backgroundLight
 import com.example.daracademyadmin.ui.theme.color1
 import com.example.daracademyadmin.ui.theme.customWhite0
 import com.example.daracademyadmin.ui.theme.customWhite1
@@ -74,6 +78,15 @@ fun ChatScreen(
     name          : String,
     modifier      : Modifier = Modifier
 ) {
+
+
+    val window = LocalView.current.context as Activity
+
+    LaunchedEffect(key1 = window){
+        window.window.apply {
+            navigationBarColor = backgroundLight.toArgb()
+        }
+    }
 
 
     var message by remember {

@@ -1,5 +1,6 @@
 package com.example.daracademy.view.screens.formations
 
+import android.app.Activity
 import android.content.ClipData.Item
 import android.widget.Toast
 import androidx.compose.animation.core.FiniteAnimationSpec
@@ -45,8 +46,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -67,6 +70,7 @@ import com.example.daracademyadmin.R
 import com.example.daracademyadmin.model.dataClasses.Formation
 import com.example.daracademyadmin.model.dataClasses.Teacher
 import com.example.daracademyadmin.model.variables.josefinSansFamily
+import com.example.daracademyadmin.ui.theme.backgroundLight
 import com.example.daracademyadmin.ui.theme.color1
 import com.example.daracademyadmin.ui.theme.color2
 import com.example.daracademyadmin.ui.theme.customBlack5
@@ -85,11 +89,18 @@ import me.saket.swipe.SwipeableActionsBox
 @Composable
 fun FormationsScreen(
     viewModel      : DaracademyAdminViewModel,
-    navController  : NavController = rememberNavController() ,
     modifier       : Modifier = Modifier
 ) {
 
 
+
+    val window = LocalView.current.context as Activity
+
+    LaunchedEffect(key1 = window){
+        window.window.apply {
+            navigationBarColor = backgroundLight.toArgb()
+        }
+    }
 
 
 
@@ -398,12 +409,13 @@ fun Item_preview() {
 @Composable
 fun FormationsScreen_preview() {
     val context = LocalContext.current
+    val navController = rememberNavController()
     FormationsScreen(
         viewModel = viewModel(
             factory = object : ViewModelProvider.Factory{
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     if (modelClass.isAssignableFrom(DaracademyAdminViewModel::class.java)){
-                        return DaracademyAdminViewModel(context) as T
+                        return DaracademyAdminViewModel(context ,  navController ) as T
                     }
                     else
                         throw IllegalArgumentException("creation if daracademyViewModel (formations screen)")

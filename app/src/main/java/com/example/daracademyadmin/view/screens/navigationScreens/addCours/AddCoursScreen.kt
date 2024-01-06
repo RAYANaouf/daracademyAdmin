@@ -1,6 +1,8 @@
 package com.example.daracademyadmin.view.screens.navigationScreens.addCours
 
+import android.app.Activity
 import android.os.Build
+import android.view.View
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
@@ -28,6 +30,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,8 +41,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -48,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.bigsam.grafic.material.loadingEffect.loadingLottieAnimation
 import com.example.bigsam.model.data.`object`.NormalTextStyles
@@ -76,11 +82,18 @@ fun AddCoursScreen(
     phase      : String,
     annee      : String,
     matiere    : String,
-    onNavigate : (Screens)->Unit = {},
     modifier   : Modifier = Modifier
 ) {
 
     val context = LocalContext.current
+
+    val window = LocalView.current.context as Activity
+
+    LaunchedEffect(key1 = window){
+        window.window.apply {
+            navigationBarColor = Color.White.toArgb()
+        }
+    }
 
     var loading by rememberSaveable {
         mutableStateOf(false)
@@ -296,7 +309,7 @@ fun AddCoursScreen(
                             course = Course(courseId = "" , teacherId = selectedTeacher.get(0).id , lessons =  lessons ) ,
                             onSuccessCallBack = {
                                 loading = false
-                                onNavigate(Screens.HomeScreen())
+                                viewModel.screenRepo.navigate_to_screen(Screens.HomeScreen().root)
                             },
                             onFailureCallBack = {
                                 loading = false
@@ -495,12 +508,13 @@ fun LessonCard(
 @Composable
 fun AddCoursScreen_preview() {
     val context = LocalContext.current
+    val navController = rememberNavController()
     AddCoursScreen(
         viewModel = viewModel(
             factory = object : ViewModelProvider.Factory{
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     if (modelClass.isAssignableFrom(DaracademyAdminViewModel::class.java))
-                        return DaracademyAdminViewModel(context) as T
+                        return DaracademyAdminViewModel(context , navController) as T
                     else
                         throw IllegalArgumentException("can't create DaracademyAdminViewModel (addCoursScreen)")
                 }

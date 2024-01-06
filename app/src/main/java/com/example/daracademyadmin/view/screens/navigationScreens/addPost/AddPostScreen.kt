@@ -1,5 +1,6 @@
 package com.example.daracademyadmin.view.screens.navigationScreens.addPost
 
+import android.app.Activity
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -24,6 +25,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -33,18 +35,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.bigsam.model.data.`object`.NormalTextStyles
 import com.example.daracademy.model.data.sealedClasses.screens.Screens
 import com.example.daracademyadmin.R
+import com.example.daracademyadmin.ui.theme.backgroundLight
 import com.example.daracademyadmin.view.material.AlphaTextFields.AlphaUnderLinedTextField
 import com.example.daracademyadmin.view.material.alphaBottomBar.AlphaBottomBar
 import com.example.daracademyadmin.viewModel.DaracademyAdminViewModel
@@ -58,6 +65,16 @@ fun AddPostScreen(
     onNavigate : (Screens)->Unit = {},
     modifier: Modifier = Modifier
 ) {
+
+
+    val window = LocalView.current.context as Activity
+
+    LaunchedEffect(key1 = window){
+        window.window.apply {
+            navigationBarColor = Color.White.toArgb()
+        }
+    }
+
 
 
     var images : List<Uri> by rememberSaveable {
@@ -230,13 +247,14 @@ fun AddPostScreen(
 fun AddPostScreen_preview() {
 
     val context = LocalContext.current
+    val navController = rememberNavController()
 
     AddPostScreen(
         viewModel = viewModel(
         factory = object  : ViewModelProvider.Factory{
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 if (modelClass.isAssignableFrom(DaracademyAdminViewModel::class.java))
-                    return DaracademyAdminViewModel(context) as T
+                    return DaracademyAdminViewModel(context , navController) as T
                 throw IllegalArgumentException("can't create DaracademyAdminViewModel (MainActivity)")
             }
         }

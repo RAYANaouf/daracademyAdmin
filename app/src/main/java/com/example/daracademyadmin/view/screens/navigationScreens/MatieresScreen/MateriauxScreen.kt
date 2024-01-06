@@ -1,5 +1,6 @@
 package com.example.daracademyadmin.view.screens.navigationScreens.MatieresScreen
 
+import android.app.Activity
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -25,12 +26,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,6 +49,7 @@ import com.example.daracademy.model.data.sealedClasses.screens.Screens
 import com.example.daracademyadmin.R
 import com.example.daracademyadmin.model.dataClasses.Matiere
 import com.example.daracademyadmin.model.variables.les_annees_d_etude.matieres_primaire_premiere_annee
+import com.example.daracademyadmin.ui.theme.backgroundLight
 import com.example.daracademyadmin.ui.theme.color1
 import com.example.daracademyadmin.ui.theme.customWhite0
 import com.example.daracademyadmin.ui.theme.customWhite4
@@ -55,7 +60,6 @@ import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 
 @Composable
 fun MatieresScreen(
-    navController: NavController,
     viewModel    : DaracademyAdminViewModel = viewModel(),
     phase        : String,
     annee        : String,
@@ -64,6 +68,14 @@ fun MatieresScreen(
 ) {
 
 //    val context = LocalContext.current
+
+    val window = LocalView.current.context as Activity
+
+    LaunchedEffect(key1 = window){
+        window.window.apply {
+            navigationBarColor = backgroundLight.toArgb()
+        }
+    }
 
 
 
@@ -104,18 +116,14 @@ fun MatieresScreen(
                         .clip(RoundedCornerShape(16.dp))
                         .clickable {
                             if (kind == "view"){
-                                navController.navigate("${Screens.CoursesScreen().root}"){
-                                    popUpTo(Screens.HomeScreen().root){
-                                        inclusive = true
-                                    }
-                                }
+
+                                viewModel.screenRepo.navigate_to_screen(Screens.CoursesScreen().root )
+
+
                             }
                             else if(kind == "edit"){
-                                navController.navigate("${Screens.AddCoursScreen().root}/$phase/$annee/${it.name}"){
-                                    popUpTo(Screens.HomeScreen().root){
-                                        inclusive = true
-                                    }
-                                }
+                                viewModel.screenRepo.navigate_to_screen(Screens.AddCoursScreen().root , phase , annee , it.name )
+
                             }
 
                         }
@@ -226,7 +234,6 @@ fun AddMatieresItem(
 @Composable
 fun MatieresScreen_preview() {
     MatieresScreen(
-        navController = rememberNavController(),
         phase = "",
         annee = ""
     )

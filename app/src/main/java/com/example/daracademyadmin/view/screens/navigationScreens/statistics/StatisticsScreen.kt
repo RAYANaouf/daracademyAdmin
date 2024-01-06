@@ -1,5 +1,6 @@
 package com.example.daracademyadmin.view.screens.navigationScreens.statistics
 
+import android.app.Activity
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -28,8 +29,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -41,6 +44,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.daracademy.model.data.sealedClasses.screens.Screens
 import com.example.daracademyadmin.R
 import com.example.daracademyadmin.model.dataClasses.Student
+import com.example.daracademyadmin.ui.theme.backgroundLight
 import com.example.daracademyadmin.ui.theme.customWhite0
 import com.example.daracademyadmin.ui.theme.customWhite4
 import com.example.daracademyadmin.viewModel.DaracademyAdminViewModel
@@ -48,12 +52,20 @@ import com.example.daracademyadmin.viewModel.DaracademyAdminViewModel
 @Composable
 fun StatisticsScreen(
     viewModel       : DaracademyAdminViewModel,
-    navController   : NavController = rememberNavController(),
-    onClick         : ()->Unit ={},
     modifier        : Modifier = Modifier
 ) {
 
     val context = LocalContext.current
+
+
+    val window = LocalView.current.context as Activity
+
+    LaunchedEffect(key1 = window){
+        window.window.apply {
+            navigationBarColor = backgroundLight.toArgb()
+        }
+    }
+
 
     var students : Int? by rememberSaveable {
         mutableStateOf(null)
@@ -101,12 +113,7 @@ fun StatisticsScreen(
 //                }
             },
             onStudentClick = {
-//                navController.navigate(Screens.StudentsScreen().root){
-//                    popUpTo(Screens.HomeScreen().root){
-//                        inclusive = true
-//                    }
-//                }
-                onClick()
+                viewModel.screenRepo.navigate_to_screen(Screens.StudentsScreen().root)
             },
             modifier = Modifier
                 .fillMaxWidth(0.8f)
@@ -492,13 +499,14 @@ fun statisticsBox(
 fun StatisticsScreen_preview() {
 
     val context = LocalContext.current
+    val navController = rememberNavController()
 
     StatisticsScreen(
         viewModel = viewModel(
             factory = object : ViewModelProvider.Factory{
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     if (modelClass.isAssignableFrom(DaracademyAdminViewModel::class.java))
-                        return DaracademyAdminViewModel(context) as T
+                        return DaracademyAdminViewModel(context , navController) as T
                     else
                         throw IllegalArgumentException("cant create viewModel (statistics screen)")
                 }

@@ -1,5 +1,6 @@
 package com.example.daracademyadmin.view.screens.navigationScreens.students
 
+import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -15,6 +16,7 @@ import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -23,12 +25,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.example.bigsam.model.data.`object`.NormalTextStyles
 import com.example.daracademyadmin.model.variables.firaSansFamily
 import com.example.daracademyadmin.model.variables.josefinSansFamily
+import com.example.daracademyadmin.ui.theme.backgroundLight
 import com.example.daracademyadmin.ui.theme.color1
 import com.example.daracademyadmin.ui.theme.color3
 import com.example.daracademyadmin.ui.theme.customBlack7
@@ -39,6 +44,16 @@ import com.example.daracademyadmin.ui.theme.customWhite4
 fun StudentsScreen(
     modifier: Modifier = Modifier
 ) {
+
+
+    val window = LocalView.current.context as Activity
+
+    LaunchedEffect(key1 = window){
+        window.window.apply {
+            navigationBarColor = backgroundLight.toArgb()
+        }
+    }
+
 
     var page by rememberSaveable {
         mutableStateOf(0)

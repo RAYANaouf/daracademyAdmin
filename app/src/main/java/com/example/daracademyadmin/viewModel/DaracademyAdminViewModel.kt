@@ -10,6 +10,9 @@ import androidx.compose.runtime.setValue
 import androidx.core.util.rangeTo
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.airbnb.lottie.compose.LottieClipSpec
 import com.example.daracademy.model.data.dataClasses.Message
 import com.example.daracademy.model.data.dataClasses.MessageBox
@@ -22,6 +25,7 @@ import com.example.daracademyadmin.model.dataClasses.Matiere
 import com.example.daracademyadmin.model.dataClasses.Teacher
 import com.example.daracademyadmin.model.dataClasses.apis.progress.ProgressUpload
 import com.example.daracademyadmin.repo.DaracademyRepository
+import com.example.daracademyadmin.repo.ScreenRepo
 import com.example.daracademyadmin.repo.dataStore.DataStoreRepo
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -38,6 +42,7 @@ class DaracademyAdminViewModel : ViewModel{
         private set
 
     val repo : DaracademyRepository
+    val screenRepo : ScreenRepo
 
     private val dataStoreRepo : DataStoreRepo
 
@@ -49,12 +54,13 @@ class DaracademyAdminViewModel : ViewModel{
 
 
 
-    constructor(context : Context){
+    constructor(context : Context , navController: NavHostController ){
         this.repo = DaracademyRepository  ( context = context )
         this.dataStoreRepo = DataStoreRepo( context = context )
         isSignIn {
             isSignIn = it
         }
+        this.screenRepo = ScreenRepo(navController)
     }
 
     fun isSignIn(onResult: (Boolean)->Unit = {} ){

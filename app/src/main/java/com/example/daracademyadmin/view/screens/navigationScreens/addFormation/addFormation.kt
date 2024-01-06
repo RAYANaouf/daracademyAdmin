@@ -1,5 +1,6 @@
 package com.example.daracademyadmin.view.screens.navigationScreens.addFormation
 
+import android.app.Activity
 import android.graphics.Color.parseColor
 import android.net.Uri
 import android.os.Build
@@ -33,6 +34,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,8 +45,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
@@ -53,6 +57,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.bigsam.grafic.material.loadingEffect.loadingLottieAnimation
 import com.example.bigsam.model.data.`object`.NormalTextStyles
@@ -67,6 +72,7 @@ import com.example.daracademyadmin.view.common.SchedulerBottomSheet
 import com.example.daracademyadmin.view.screens.navigationScreens.addFormation.dialog.PickDayDialog
 import com.example.daracademyadmin.model.dataClasses.Teacher
 import com.example.daracademyadmin.model.variables.josefinSansFamily
+import com.example.daracademyadmin.ui.theme.backgroundLight
 import com.example.daracademyadmin.viewModel.DaracademyAdminViewModel
 import com.example.daracademyadmin.ui.theme.color1
 import com.example.daracademyadmin.ui.theme.customBlack9
@@ -80,12 +86,20 @@ import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 @Composable
 fun AddFormationScreen(
     viewModel: DaracademyAdminViewModel,
-    onNavigation : (Screens)->Unit = {},
     modifier : Modifier = Modifier
 ) {
 
 
     var context = LocalContext.current
+
+
+    val window = LocalView.current.context as Activity
+
+    LaunchedEffect(key1 = window){
+        window.window.apply {
+            navigationBarColor = Color.White.toArgb()
+        }
+    }
 
 
     var teachers : List<Teacher>? by remember {
@@ -521,7 +535,7 @@ fun AddFormationScreen(
                             }
                         )
 
-                        onNavigation(Screens.HomeScreen())
+                        viewModel.screenRepo.navigate_to_screen(Screens.HomeScreen().root)
                     }
             ) {
                     Image(
@@ -548,12 +562,13 @@ fun AddFormationScreen(
 @Composable
 fun AddFormationScreen_preview() {
     val context = LocalContext.current
+    val navController = rememberNavController()
     AddFormationScreen(
         viewModel = viewModel(
             factory = object : ViewModelProvider.Factory{
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     return if (modelClass.isAssignableFrom(DaracademyAdminViewModel::class.java))
-                        DaracademyAdminViewModel( context ) as T
+                        DaracademyAdminViewModel( context , navController ) as T
                     else
                         throw IllegalArgumentException("cant create DaracademyAdminViewModel (addFormation Screen)")
                 }

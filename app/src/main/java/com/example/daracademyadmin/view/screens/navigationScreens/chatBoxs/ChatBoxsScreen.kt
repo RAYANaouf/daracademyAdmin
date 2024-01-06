@@ -1,5 +1,6 @@
 package com.example.daracademy.view.screens.chatScreen
 
+import android.app.Activity
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -27,8 +28,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -44,6 +47,7 @@ import com.example.daracademy.view.material.lottie.LottieAnimation_loading
 import com.example.daracademyadmin.R
 import com.example.daracademyadmin.model.variables.firaSansFamily
 import com.example.daracademyadmin.model.variables.josefinSansFamily
+import com.example.daracademyadmin.ui.theme.backgroundLight
 import com.example.daracademyadmin.ui.theme.color1
 import com.example.daracademyadmin.ui.theme.customBlack0
 import com.example.daracademyadmin.ui.theme.customWhite0
@@ -53,12 +57,20 @@ import com.example.daracademyadmin.viewModel.DaracademyAdminViewModel
 
 @Composable
 fun ChatBoxsScreen(
-    navController  : NavController,
     viewModel      : DaracademyAdminViewModel,
     modifier       : Modifier = Modifier
 ) {
 
     val context = LocalContext.current
+
+
+    val window = LocalView.current.context as Activity
+
+    LaunchedEffect(key1 = window){
+        window.window.apply {
+            navigationBarColor = backgroundLight.toArgb()
+        }
+    }
 
 
     Column(
@@ -82,7 +94,7 @@ fun ChatBoxsScreen(
                         messageBox = it,
                         modifier = Modifier
                             .clickable {
-                                navController.navigate("${Screens.ChatScreen().root}/${it.userId}/${it.productId}/${it.name}")
+                                viewModel.screenRepo.navigate_to_screen(Screens.HomeScreen().root , params =  arrayOf("${it.userId}" , "${it.productId}" , "${it.name}" ))
                             }
                             .padding(top = 8.dp, bottom = 8.dp)
 
@@ -129,7 +141,6 @@ fun Item(
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-//                .background(Color.Magenta)
                     .padding(top = 16.dp, bottom = 16.dp)
                     .size(45.dp)
                     .clip(CircleShape)
@@ -170,7 +181,6 @@ fun Item(
 @Composable
 fun ChatBoxsScreen_preview() {
     ChatBoxsScreen(
-        navController = rememberNavController(),
         viewModel = viewModel()
     )
 }

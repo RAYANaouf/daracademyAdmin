@@ -1,5 +1,6 @@
 package com.example.daracademyadmin.view.screens.navigationScreens.stageScreen
 
+import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -11,9 +12,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -23,17 +27,29 @@ import com.example.bigsam.model.data.`object`.NormalTextStyles
 import com.example.daracademy.model.data.sealedClasses.screens.Screens
 import com.example.daracademyadmin.model.sealedClasses.phaseDesEtudes.PhaseDesEtudes
 import com.example.daracademyadmin.model.variables.firaSansFamily
+import com.example.daracademyadmin.ui.theme.backgroundLight
 import com.example.daracademyadmin.ui.theme.color1
 import com.example.daracademyadmin.ui.theme.color2
 import com.example.daracademyadmin.ui.theme.color3
 import com.example.daracademyadmin.ui.theme.customWhite0
+import com.example.daracademyadmin.viewModel.DaracademyAdminViewModel
 
 @Composable
 fun StageScreen(
+    viewModel     : DaracademyAdminViewModel  = androidx.lifecycle.viewmodel.compose.viewModel(),
     kind          : String = "edit",
-    navController : NavController,
     modifier      : Modifier = Modifier
 ) {
+
+
+    val window = LocalView.current.context as Activity
+
+    LaunchedEffect(key1 = window){
+        window.window.apply {
+            navigationBarColor = backgroundLight.toArgb()
+        }
+    }
+
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -51,11 +67,7 @@ fun StageScreen(
                 .weight(1f)
                 .clip(RoundedCornerShape(16.dp))
                 .clickable {
-                    navController.navigate("${Screens.AnneesScreen().root}/${PhaseDesEtudes.Primaire().phase}/${kind}"){
-                        popUpTo(Screens.HomeScreen().root){
-                            inclusive = true
-                        }
-                    }
+                    viewModel.screenRepo.navigate_to_screen(Screens.AnneesScreen().root , PhaseDesEtudes.Primaire().phase , kind)
                 }
                 .background(color1)
         ) {
@@ -74,11 +86,9 @@ fun StageScreen(
                 .weight(1f)
                 .clip(RoundedCornerShape(16.dp))
                 .clickable {
-                    navController.navigate("${Screens.AnneesScreen().root}/${PhaseDesEtudes.CEM().phase}/${kind}"){
-                        popUpTo(Screens.HomeScreen().root){
-                            inclusive = true
-                        }
-                    }
+
+                    viewModel.screenRepo.navigate_to_screen(Screens.AnneesScreen().root , PhaseDesEtudes.CEM().phase , kind)
+
                 }
                 .background(color2)
         ) {
@@ -97,11 +107,9 @@ fun StageScreen(
                 .weight(1f)
                 .clip(RoundedCornerShape(16.dp))
                 .clickable {
-                    navController.navigate("${Screens.AnneesScreen().root}/${PhaseDesEtudes.Lycee().phase}/${kind}"){
-                        popUpTo(Screens.HomeScreen().root){
-                            inclusive = true
-                        }
-                    }
+
+                    viewModel.screenRepo.navigate_to_screen(Screens.AnneesScreen().root , PhaseDesEtudes.Lycee().phase , kind)
+
                 }
                 .background(color3)
         ) {
@@ -121,7 +129,5 @@ fun StageScreen(
 @Preview
 @Composable
 fun StageScreen_preview() {
-    StageScreen(
-        navController = rememberNavController()
-        )
+    StageScreen()
 }

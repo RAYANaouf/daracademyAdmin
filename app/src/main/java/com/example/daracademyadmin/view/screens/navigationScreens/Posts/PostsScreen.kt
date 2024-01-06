@@ -1,13 +1,17 @@
 package com.example.daracademyadmin.view.screens.navigationScreens.Posts
 
+import android.app.Activity
 import android.widget.Toast
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.daracademy.view.material.lottie.LottieAnimation_loading
+import com.example.daracademyadmin.ui.theme.backgroundLight
 import com.example.daracademyadmin.view.material.lottie.LottieAnimation_empty
 import com.example.daracademyadmin.viewModel.DaracademyAdminViewModel
 
@@ -16,6 +20,16 @@ fun PostsScreen(
     viewModel: DaracademyAdminViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
     modifier: Modifier = Modifier
 ) {
+
+
+    val window = LocalView.current.context as Activity
+
+    LaunchedEffect(key1 = window){
+        window.window.apply {
+            navigationBarColor = backgroundLight.toArgb()
+        }
+    }
+
 
     if (viewModel.getAllPosts() == null){
         LottieAnimation_loading()

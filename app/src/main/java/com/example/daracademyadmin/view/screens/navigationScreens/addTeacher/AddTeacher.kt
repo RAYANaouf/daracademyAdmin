@@ -1,5 +1,6 @@
 package com.example.daracademyadmin.view.screens.navigationScreens.addTeacher
 
+import android.app.Activity
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -32,6 +33,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,8 +43,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -59,16 +63,27 @@ import com.example.daracademyadmin.ui.theme.color1
 import com.example.daracademyadmin.ui.theme.color3
 import com.example.daracademyadmin.ui.theme.customWhite0
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.rememberNavController
 import com.example.alphaspace.screens.common.dropDownMenu.AlphaDropDownMenu
 import com.example.bigsam.grafic.material.loadingEffect.loadingLottieAnimation
 import com.example.daracademyadmin.model.variables.josefinSansFamily
+import com.example.daracademyadmin.ui.theme.backgroundLight
 
 @Composable
 fun AddTeacherScreen(
-    onNavigate : (Screens)->Unit = {},
     viewModel: DaracademyAdminViewModel,
     modifier: Modifier = Modifier
 ) {
+
+
+    val window = LocalView.current.context as Activity
+
+    LaunchedEffect(key1 = window){
+        window.window.apply {
+            navigationBarColor = backgroundLight.toArgb()
+        }
+    }
+
 
     var context = LocalContext.current
 
@@ -358,7 +373,7 @@ fun AddTeacherScreen(
                             }
                         )
 
-                        onNavigate(Screens.HomeScreen())
+                        viewModel.screenRepo.navigate_to_screen(Screens.HomeScreen().root)
 
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = color1),
@@ -388,13 +403,14 @@ fun AddTeacherScreen(
 fun AddTeacherScreen_preview() {
 
     val context = LocalContext.current
+    val navController = rememberNavController()
 
     AddTeacherScreen(
         viewModel = viewModel(
             factory = object : ViewModelProvider.Factory{
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     if (modelClass.isAssignableFrom(DaracademyAdminViewModel::class.java)){
-                        return DaracademyAdminViewModel(context) as T
+                        return DaracademyAdminViewModel(context , navController) as T
                     }
                     else
                         throw IllegalArgumentException("cant create DaracademyAdminViewModel (addTeacherScreen)")

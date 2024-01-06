@@ -1,5 +1,7 @@
 package com.example.daracademy.view.screens.annees_de_etude_Screen
 
+import android.app.Activity
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,12 +17,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,18 +42,31 @@ import com.example.daracademyadmin.R
 import com.example.daracademyadmin.model.dataClasses.Annees
 import com.example.daracademyadmin.model.sealedClasses.phaseDesEtudes.PhaseDesEtudes
 import com.example.daracademyadmin.model.variables.firaSansFamily
+import com.example.daracademyadmin.ui.theme.backgroundLight
 import com.example.daracademyadmin.ui.theme.color1
 import com.example.daracademyadmin.ui.theme.color2
 import com.example.daracademyadmin.ui.theme.color3
 import com.example.daracademyadmin.ui.theme.customWhite0
+import com.example.daracademyadmin.viewModel.DaracademyAdminViewModel
 
 @Composable
 fun AnneesDesEtudesScreen(
-    navController: NavController,
+    viewModel: DaracademyAdminViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
     kind         : String = "",
-    phase : String,
-    modifier: Modifier = Modifier
+    phase        : String,
+    modifier     : Modifier = Modifier
 ) {
+
+    val context = LocalContext.current
+
+
+    val window = LocalView.current.context as Activity
+
+    LaunchedEffect(key1 = window){
+        window.window.apply {
+            navigationBarColor = backgroundLight.toArgb()
+        }
+    }
 
     var color  = remember {
 
@@ -95,11 +114,8 @@ fun AnneesDesEtudesScreen(
                         .clip(RoundedCornerShape(16.dp))
                         .background(color = color)
                         .clickable {
-                            navController.navigate("${Screens.MatieresScreen().root}/$phase/${annee.id}/${kind}"){
-                                popUpTo(Screens.HomeScreen().root){
-                                    inclusive = true
-                                }
-                            }
+
+                            viewModel.screenRepo.navigate_to_screen(Screens.MatieresScreen().root , phase , annee.id ,  kind )
                         }
                         .padding(top = 4.dp, bottom = 4.dp, start = 10.dp, end = 10.dp)
                 ) {
@@ -122,11 +138,9 @@ fun AnneesDesEtudesScreen(
                         .clip(RoundedCornerShape(16.dp))
                         .background(color = color)
                         .clickable {
-                            navController.navigate("${Screens.MatieresScreen().root}/$phase/${annee.id}/${kind}"){
-                                popUpTo(Screens.HomeScreen().root){
-                                    inclusive = true
-                                }
-                            }
+
+                            viewModel.screenRepo.navigate_to_screen(Screens.MatieresScreen().root , phase , annee.id ,  kind )
+
                         }
                         .padding(top = 4.dp, bottom = 4.dp, start = 10.dp, end = 10.dp)
                 ) {
@@ -179,7 +193,6 @@ fun AnneesDesEtudesScreen(
 @Composable
 fun AnneesDesEtudesScreen_preview() {
     AnneesDesEtudesScreen(
-        navController = rememberNavController(),
         phase = PhaseDesEtudes.Primaire().phase
     )
 }

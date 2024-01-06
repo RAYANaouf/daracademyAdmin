@@ -2,29 +2,29 @@ package com.example.daracademy.model.data.objects.screen
 
 object screens {
 
-    val homeScreen                 = "homeScreen"
-    val signInScreen               = "signInScreen"
+    val homeScreen                 = "Home"
+    val signInScreen               = "Sign in"
 
-    val PostsScreen                = "PostsScreen"
-    val FormationsScreen           = "FormationsScreen"
-    val StudentsScreen             = "StudentsScreen"
-    val TeachersScreen             = "TeachersScreen"
-    val CoursesScreen              = "CoursesScreen"
-    val StatisticsScreen           = "StatisticsScreen"
+    val PostsScreen                = "Posts"
+    val FormationsScreen           = "Formations"
+    val StudentsScreen             = "Students"
+    val TeachersScreen             = "Teachers"
+    val CoursesScreen              = "Courses"
+    val StatisticsScreen           = "Statistics"
 
 
-    val addPostScreen              = "addPostScreen"
-    val addFormationScreen         = "addFormationScreen"
-    val addStudentScreen           = "addStudentScreen"
-    val addTeacherScreen           = "addTeacherScreen"
-    val addCoursScreen             = "addCoursScreen"
+    val addPostScreen              = "Add post"
+    val addFormationScreen         = "Add formation"
+    val addStudentScreen           = "Add student"
+    val addTeacherScreen           = "Add teacher"
+    val addCoursScreen             = "Add cours"
 
-    val chatBoxsScreen             = "chatBoxsScreen"
+    val chatBoxsScreen             = "Chat boxs"
 
-    val chatScreen                 = "chatScreen"
-    val stageScreen                = "stageScreen"
-    val anneesScreen               = "anneesScreen"
-    val matieresScreen             = "matieresScreen"
-    val uploadsScreen              = "uploadsScreen"
+    val chatScreen                 = "Chat"
+    val stageScreen                = "Stage"
+    val anneesScreen               = "Annees"
+    val matieresScreen             = "Matieres"
+    val uploadsScreen              = "Uploads"
 
 }

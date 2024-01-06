@@ -1,5 +1,6 @@
 package com.example.daracademyadmin.view.screens.navigationScreens.homeScreen
 
+import android.app.Activity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,10 +21,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -40,6 +44,7 @@ import com.example.daracademyadmin.R
 import com.example.daracademyadmin.model.dataClasses.Category
 import com.example.daracademyadmin.model.variables.categories
 import com.example.daracademyadmin.model.variables.firaSansFamily
+import com.example.daracademyadmin.ui.theme.backgroundLight
 import com.example.daracademyadmin.viewModel.DaracademyAdminViewModel
 import com.example.daracademyadmin.ui.theme.color1
 import com.example.daracademyadmin.ui.theme.color2
@@ -50,11 +55,19 @@ import com.example.daracademyadmin.ui.theme.customWhite3
 
 @Composable
 fun HomeScreen(
-    navController : NavController,
     viewModel : DaracademyAdminViewModel,
-    onNavigate : (Screens)->Unit = {},
     modifier: Modifier = Modifier
 ) {
+
+
+    val window = LocalView.current.context as Activity
+
+    LaunchedEffect(key1 = window){
+        window.window.apply {
+            navigationBarColor = backgroundLight.toArgb()
+        }
+    }
+
 
 
     Column(
@@ -79,26 +92,23 @@ fun HomeScreen(
                     .background(color)
                     .clickable {
 
-                        if (category.screen == Screens.HomeScreen().root) {
-                            navController.navigate(Screens.HomeScreen().root)
-                        }
-                        else if (category.screen == Screens.AddTeacherScreen().root) {
-                            navController.navigate(Screens.AddTeacherScreen().root)
+                        if (category.screen == Screens.AddTeacherScreen().root) {
+                            viewModel.screenRepo.navigate_to_screen(Screens.AddTeacherScreen().root)
                         }
                         else if (category.screen == Screens.AddPostScreen().root) {
-                            navController.navigate(Screens.AddPostScreen().root)
+                            viewModel.screenRepo.navigate_to_screen(Screens.AddPostScreen().root)
                         }
                         else if (category.screen == Screens.AddFormationScreen().root) {
-                            navController.navigate(Screens.AddFormationScreen().root)
+                            viewModel.screenRepo.navigate_to_screen(Screens.AddFormationScreen().root)
                         }
                         else if (category.screen == Screens.AddStudentScreen().root) {
-                            navController.navigate(Screens.AddStudentScreen().root)
+                            viewModel.screenRepo.navigate_to_screen(Screens.AddStudentScreen().root)
                         }
                         else if (category.screen == Screens.StageScreen().root) {
-                            navController.navigate("${Screens.StageScreen().root}/edit")
+                            viewModel.screenRepo.navigate_to_screen(Screens.StageScreen().root , params = arrayOf("edit"))
                         }
                         else {
-                            navController.navigate(Screens.HomeScreen().root)
+                            viewModel.screenRepo.navigate_to_screen(Screens.HomeScreen().root)
                         }
 
                     }
@@ -156,56 +166,6 @@ fun HomeScreen(
 }
 
 
-@Composable
-private fun HomeScreenGridItem(
-    modifier : Modifier = Modifier,
-    category: Category
-) {
-    Surface(
-        shadowElevation = 4.dp,
-        border = BorderStroke(
-            width = 2.dp,
-            color = customWhite3,
-        ),
-        shape = RoundedCornerShape(12.dp),
-        modifier = modifier
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 16.dp, start = 8.dp, end = 8.dp)
-//                .background(Color.Red)
-        ) {
-            Icon(
-                painter = painterResource(id = category.img),
-                contentDescription = null,
-                tint     = color1 ,
-                modifier = Modifier
-                    .size(40.dp)
-//                    .background(Color.Yellow)
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .height(35.dp)
-//                    .background(Color.Red)
-            ) {
-                Text(
-                    text = category.name,
-                    style = NormalTextStyles.TextStyleSZ8.copy(color = color1),
-                    maxLines = 1,
-                    textAlign = TextAlign.Center,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-        }
-    }
-}
 
 
 @Preview
@@ -213,14 +173,14 @@ private fun HomeScreenGridItem(
 fun HomeScreen_preview() {
 
     val context = LocalContext.current
+    val navController = rememberNavController()
 
     HomeScreen(
-        navController = rememberNavController(),
         viewModel = viewModel(
             factory = object  : ViewModelProvider.Factory{
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     if (modelClass.isAssignableFrom(DaracademyAdminViewModel::class.java))
-                        return DaracademyAdminViewModel(context) as T
+                        return DaracademyAdminViewModel(context , navController) as T
                     throw IllegalArgumentException("can't create DaracademyAdminViewModel (MainActivity)")
                 }
             }
@@ -228,37 +188,4 @@ fun HomeScreen_preview() {
     )
 }
 
-
-@Preview
-@Composable
-fun HomeScreenGridItem_preview() {
-    HomeScreenGridItem(
-        category = Category(img =  R.drawable.support , name = "Education" )
-    )
-}
-
-
-
-/*
-Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-            .padding(top = 26.dp)
-    ) {
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            verticalArrangement   = Arrangement.spacedBy(12.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            contentPadding = PaddingValues(top = 16.dp , bottom = 16.dp , start = 20.dp , end = 20.dp),
-            modifier = Modifier
-        ){
-
-            items(categories){
-                HomeScreenGridItem(category = it)
-            }
-
-        }
-    }
-
- */
 

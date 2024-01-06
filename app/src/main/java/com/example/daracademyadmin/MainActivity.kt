@@ -42,6 +42,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -126,11 +127,13 @@ class MainActivity : ComponentActivity() {
 
         setContent {
 
+        val navController = rememberNavController()
+
             val viewModel : DaracademyAdminViewModel = viewModel(
                 factory = object : ViewModelProvider.Factory{
                     override fun <T : ViewModel> create(modelClass: Class<T>): T {
                         if (modelClass.isAssignableFrom(DaracademyAdminViewModel::class.java))
-                            return DaracademyAdminViewModel(this@MainActivity) as T
+                            return DaracademyAdminViewModel(this@MainActivity , navController) as T
                         else
                             throw IllegalArgumentException("can't create DaracademyAdminViewModel (MainActivity)")
                     }
@@ -179,8 +182,6 @@ fun MainScreen(
 
     val context = LocalContext.current
 
-    val navController = rememberNavController()
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
 
@@ -243,11 +244,11 @@ fun MainScreen(
                             .clickable {
                                 coroutineScope.launch {
 
-                                    navController.navigate("${Screens.StageScreen().root}/view")
-
                                     drawerState.apply {
                                         close()
                                     }
+
+                                    viewModel.screenRepo.navigate_to_screen(screen = Screens.StageScreen().root , params = arrayOf("view"))
                                 }
                             }
                             .padding(top = 6.dp, bottom = 6.dp)
@@ -276,7 +277,9 @@ fun MainScreen(
                             .padding(start = 16.dp, end = 16.dp)
                             .clickable {
                                 coroutineScope.launch {
-                                    navController.navigate(Screens.FormationsScreen().root)
+
+                                    viewModel.screenRepo.navigate_to_screen(screen = Screens.FormationsScreen().root)
+
                                     drawerState.apply {
                                         close()
                                     }
@@ -308,7 +311,9 @@ fun MainScreen(
                             .padding(start = 16.dp, end = 16.dp)
                             .clickable {
                                 coroutineScope.launch {
-                                    navController.navigate(Screens.PostsScreen().root)
+
+                                    viewModel.screenRepo.navigate_to_screen(screen = Screens.PostsScreen().root)
+
                                     drawerState.apply {
                                         close()
                                     }
@@ -339,16 +344,15 @@ fun MainScreen(
                             .height(65.dp)
                             .padding(start = 16.dp, end = 16.dp)
                             .clickable {
-                                navController.navigate(Screens.StatisticsScreen().root) {
-                                    popUpTo(Screens.HomeScreen().root) {
-                                        inclusive = true
-                                    }
-                                }
+
                                 coroutineScope.launch {
                                     drawerState.apply {
                                         close()
                                     }
                                 }
+
+                                viewModel.screenRepo.navigate_to_screen(screen = Screens.StatisticsScreen().root)
+
                             }
                             .padding(top = 6.dp, bottom = 6.dp)
                             .fillMaxWidth()
@@ -383,8 +387,7 @@ fun MainScreen(
                             .height(65.dp)
                             .padding(start = 16.dp, end = 16.dp)
                             .clickable {
-//                                viewModel.setAppScreen(Screens.ChatBoxsScreen())
-                                navController.navigate(Screens.ChatBoxsScreen().root)
+                                viewModel.screenRepo.navigate_to_screen(Screens.ChatBoxsScreen().root)
                                 coroutineScope.launch {
                                     drawerState.apply {
                                         close()
@@ -425,7 +428,7 @@ fun MainScreen(
                             .padding(start = 16.dp, end = 16.dp)
                             .clickable {
 
-                                navController.navigate(Screens.UploadsScreen().root)
+                                viewModel.screenRepo.navigate_to_screen(screen = Screens.UploadsScreen().root)
 
                                 coroutineScope.launch {
                                     drawerState.apply {
@@ -535,7 +538,7 @@ fun MainScreen(
 
             Scaffold(
                 topBar = {
-                    if ( navBackStackEntry?.destination?.route == Screens.HomeScreen().root )
+                    if ( viewModel.screenRepo.app_screen == Screens.HomeScreen().root )
                     {
                         AlphaTopBar2(
                             img = painterResource(id = R.drawable.daracademy),
@@ -552,67 +555,36 @@ fun MainScreen(
                     }
                     else {
 
-                        val img = remember {
-                            if(navBackStackEntry?.destination?.route == Screens.AddPostScreen().root){
-                                R.drawable.post
-                            }
-                            else if(navBackStackEntry?.destination?.route == Screens.AddTeacherScreen().root){
-                                R.drawable.teacher
-                            }
-                            else if(navBackStackEntry?.destination?.route == Screens.AddStudentScreen().root){
-                                R.drawable.student_icon
-                            }
-                            else if(navBackStackEntry?.destination?.route == Screens.AddFormationScreen().root){
-                                R.drawable.formation
-                            }
-                            else{
-                                -1
+                        val img by remember(viewModel.screenRepo.app_screen) {
+                            derivedStateOf {
+                                when(viewModel.screenRepo.app_screen){
+                                    Screens.AddPostScreen().root-> R.drawable.post
+                                    Screens.AddTeacherScreen().root->R.drawable.teacher
+                                    Screens.AddStudentScreen().root->R.drawable.student_icon
+                                    Screens.AddFormationScreen().root->R.drawable.formation
+                                    else ->-1
+                                }
                             }
                         }
 
-                        val translate_img = remember {
-                            if(navBackStackEntry?.destination?.route == Screens.AddPostScreen().root){
-                                R.drawable.translation_inline
-                            }
-                            else if(navBackStackEntry?.destination?.route == Screens.AddFormationScreen().root){
-                                R.drawable.translation_inline
-                            }
-                            else{
-                                -1
+                        val translate_img by remember(viewModel.screenRepo.app_screen) {
+                            derivedStateOf {
+                                when(viewModel.screenRepo.app_screen){
+                                    Screens.AddPostScreen().root-> R.drawable.translation_inline
+                                    Screens.AddFormationScreen().root-> R.drawable.translation_inline
+                                    else -> -1
+                                }
                             }
                         }
 
-                        val title = remember {
-                            if(navBackStackEntry?.destination?.route == Screens.AddPostScreen().root){
-                                "Add post"
-                            }
-                            else if(navBackStackEntry?.destination?.route == Screens.AddTeacherScreen().root){
-                                "Add teacher"
-                            }
-                            else if(navBackStackEntry?.destination?.route == Screens.AddStudentScreen().root){
-                                "Add student"
-                            }
-                            else if(navBackStackEntry?.destination?.route == Screens.AddFormationScreen().root){
-                                "Add formation"
-                            }
-                            else if(navBackStackEntry?.destination?.route == Screens.StudentsScreen().root){
-                                "Student"
-                            }
-                            else{
-                                "${navBackStackEntry?.destination?.route}"
-                            }
-                        }
+                        val title = viewModel.screenRepo.app_screen
 
 
                         AlphaTopAppBar3(
-                            elevation = if (navBackStackEntry?.destination?.route == Screens.StudentsScreen().root) 0.dp else 8.dp,
+                            elevation = if (viewModel.screenRepo.app_screen == Screens.StudentsScreen().root) 0.dp else 8.dp,
                             onCloseClicked = {
-//                                viewModel.setAppScreen(Screens.HomeScreen())
-                                navController.navigate(Screens.HomeScreen().root){
-                                    popUpTo(Screens.HomeScreen().root){
-                                        inclusive = true
-                                    }
-                                }
+                                viewModel.screenRepo.navigate_to_screen(Screens.HomeScreen().root)
+
                             },
                             centralTitle = {
 
@@ -629,13 +601,7 @@ fun MainScreen(
                                             modifier = Modifier
                                                 .size(26.dp)
                                                 .clickable {
-                                                    Toast
-                                                        .makeText(
-                                                            context,
-                                                            "${navBackStackEntry?.destination?.route == Screens.AddPostScreen().root} ${Screens.AddPostScreen().root} ",
-                                                            Toast.LENGTH_LONG
-                                                        )
-                                                        .show()
+
                                                 }
                                         )
                                     }
@@ -694,19 +660,14 @@ fun MainScreen(
                     .windowInsetsPadding(WindowInsets.statusBars)
             ) {paddingValues ->
                 NavHost(
-                    navController = navController,
+                    navController = viewModel.screenRepo.navController,
                     startDestination = Screens.HomeScreen().root,
                     modifier = Modifier
                 ) {
 
                     composable(route = Screens.HomeScreen().root) {
                         HomeScreen(
-                            navController = navController,
                             viewModel = viewModel,
-                            onNavigate = {
-//                                viewModel.setAppScreen(it)
-                                navController.navigate(it.root)
-                            },
                             modifier = Modifier
                                 .background(backgroundLight)
                                 .padding(
@@ -717,12 +678,7 @@ fun MainScreen(
 
                     composable(route = Screens.PostsScreen().root) {
                         PostsScreen(
-//                            navController = navController,
                             viewModel = viewModel,
-//                            onNavigate = {
-//                                viewModel.setAppScreen(it)
-//                                navController.navigate(it.root)
-//                            },
                             modifier = Modifier
                                 .background(backgroundLight)
                                 .padding(
@@ -731,30 +687,10 @@ fun MainScreen(
                         )
                     }
 
-//                    composable(route = Screens.FormationsScreen().root) {
-//                        FormationsScreen(
-////                            navController = navController,
-//                            viewModel = viewModel,
-////                            onNavigate = {
-////                                viewModel.setAppScreen(it)
-////                                navController.navigate(it.root)
-////                            },
-//                            modifier = Modifier
-//                                .background(backgroundLight)
-//                                .padding(
-//                                    top = paddingValues.calculateTopPadding(),
-//                                )
-//                        )
-//                    }
 
                     composable(route = Screens.CoursesScreen().root) {
                         CoursesScreen(
-//                            navController = navController,
                             viewModel = viewModel,
-//                            onNavigate = {
-//                                viewModel.setAppScreen(it)
-//                                navController.navigate(it.root)
-//                            },
                             modifier = Modifier
                                 .background(backgroundLight)
                                 .padding(
@@ -769,12 +705,7 @@ fun MainScreen(
                         AddPostScreen(
                             viewModel = viewModel,
                             onNavigate = {
-                                navController.navigate(Screens.HomeScreen().root){
-                                    popUpTo(Screens.HomeScreen().root){
-                                        inclusive = true
-                                    }
-                                }
-//                                viewModel.setAppScreen(Screens.HomeScreen())
+                                viewModel.screenRepo.navigate_to_screen(Screens.HomeScreen().root)
                             },
                             modifier = Modifier
                                 .background(backgroundLight)
@@ -787,14 +718,6 @@ fun MainScreen(
                     composable(route = Screens.AddTeacherScreen().root){
                         AddTeacherScreen(
                             viewModel = viewModel,
-                            onNavigate = {
-                                navController.navigate(it.root){
-                                    popUpTo(Screens.HomeScreen().root){
-                                        inclusive = true
-                                    }
-                                }
-//                                viewModel.setAppScreen(it)
-                            },
                             modifier = Modifier
                                 .background(backgroundLight)
                                 .padding(top = paddingValues.calculateTopPadding())
@@ -804,14 +727,6 @@ fun MainScreen(
                     composable(route = Screens.AddFormationScreen().root){
                         AddFormationScreen(
                         viewModel = viewModel,
-                        onNavigation = {
-                            navController.navigate(it.root){
-                                popUpTo(Screens.HomeScreen().root){
-                                    inclusive = true
-                                }
-                            }
-//                            viewModel.setAppScreen(it)
-                        },
                             modifier = Modifier
                                 .background(backgroundLight)
                                 .padding(top = paddingValues.calculateTopPadding())
@@ -821,14 +736,6 @@ fun MainScreen(
                     composable(route = Screens.AddStudentScreen().root){
                         AddStudentScreen(
                             viewModel = viewModel,
-                            onNavigation = {
-                                navController.navigate(it.root){
-                                    popUpTo(Screens.HomeScreen().root){
-                                        inclusive = true
-                                    }
-                                }
-//                                viewModel.setAppScreen(it)
-                            },
                             modifier = Modifier
                                 .background(backgroundLight)
                                 .padding(top = paddingValues.calculateTopPadding())
@@ -837,7 +744,6 @@ fun MainScreen(
 
                     composable(route = Screens.ChatBoxsScreen().root){
                         ChatBoxsScreen(
-                            navController = navController,
                             viewModel = viewModel,
                             modifier = Modifier
                                 .background(backgroundLight)
@@ -883,8 +789,8 @@ fun MainScreen(
                         )
                     ){navBackStackEntry->
                         StageScreen(
-                            navController = navController,
-                            kind          = navBackStackEntry.arguments?.getString("kind") ?: "",
+                            viewModel = viewModel,
+                            kind      = navBackStackEntry.arguments?.getString("kind") ?: "",
                             modifier  = Modifier
                                 .background(backgroundLight)
                                 .padding(
@@ -906,11 +812,12 @@ fun MainScreen(
                     ){navBackStackEntry->
 
                         AnneesDesEtudesScreen(
-                            navController = navController,
-                            phase = navBackStackEntry.arguments?.getString("phase") ?: "",
-                            kind  = navBackStackEntry.arguments?.getString("kind") ?: "",
-                            modifier     = Modifier
+                            viewModel = viewModel,
+                            phase     = navBackStackEntry.arguments?.getString("phase") ?: "",
+                            kind      = navBackStackEntry.arguments?.getString("kind") ?: "",
+                            modifier  = Modifier
                                 .background(backgroundLight)
+                                .fillMaxSize()
                                 .padding(
                                     top = paddingValues.calculateTopPadding()
                                 )
@@ -932,7 +839,6 @@ fun MainScreen(
                         )
                     ){navBackStackEntry->
                         MatieresScreen(
-                            navController = navController,
                             viewModel = viewModel,
                             phase     = navBackStackEntry.arguments?.getString("phase") ?: "",
                             annee     = navBackStackEntry.arguments?.getString("annee") ?: "",
@@ -962,14 +868,6 @@ fun MainScreen(
                         )
                     ){navBackStackEntry->
                         AddCoursScreen(
-                            onNavigate = {
-                                navController.navigate(it.root){
-                                    popUpTo(Screens.HomeScreen().root){
-                                        inclusive = true
-                                    }
-                                }
-//                                viewModel.setAppScreen(it)
-                            },
                             phase      = navBackStackEntry.arguments?.getString("phase") ?: "",
                             annee      = navBackStackEntry.arguments?.getString("annee") ?: "",
                             matiere    = navBackStackEntry.arguments?.getString("matiere") ?: "",
@@ -989,16 +887,7 @@ fun MainScreen(
 
 
                         StatisticsScreen(
-                            navController = navController,
                             viewModel     = viewModel,
-                            onClick       = {
-                                navController.navigate(Screens.StudentsScreen
-                                    ().root){
-                                    popUpTo(Screens.HomeScreen().root){
-                                        inclusive = true
-                                    }
-                                }
-                            },
                             modifier      = Modifier
                                 .background(backgroundLight)
                                 .padding(top = paddingValues.calculateTopPadding())
@@ -1010,8 +899,6 @@ fun MainScreen(
                     composable(
                         route = "${Screens.StudentsScreen().root}"
                     ){navBackStackEntry->
-
-                        Toast.makeText(context , "${navBackStackEntry?.destination?.route}" , Toast.LENGTH_LONG).show()
 
                         StudentsScreen(
                             modifier = Modifier
@@ -1043,7 +930,6 @@ fun MainScreen(
                     ){navBackStackEntry->
                         com.example.daracademy.view.screens.formations.FormationsScreen(
                             viewModel = viewModel,
-                            navController = navController,
                             modifier = Modifier
                                 .background(Color(android.graphics.Color.parseColor("#f9f9f9")))
                                 .padding(top = paddingValues.calculateTopPadding())
@@ -1065,15 +951,6 @@ fun MainScreen(
 
 }
 
-
-private fun somme(l : List<Float>):Float{
-    var result = 0.0f
-    l.forEach {
-        result += it
-    }
-
-    return (result/l.size)
-}
 
 
 @RequiresApi(Build.VERSION_CODES.O)
