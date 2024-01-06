@@ -322,6 +322,7 @@ class DaracademyRepository {
                                 )
                                 .addOnSuccessListener {
                                     onSuccessCallBack()
+                                    analytics.logEvent("Add_Teacher" , null)
                                 }
                                 .addOnFailureListener{
                                     onFailureCallBack(it)
@@ -703,6 +704,8 @@ class DaracademyRepository {
                         doc.toObject(Message::class.java)
                     }
                     onSuccessCallBack(messages)
+
+                    analytics.logEvent("chats" , null)
                 }
             }
 

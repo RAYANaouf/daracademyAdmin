@@ -1,6 +1,8 @@
 package com.example.daracademyadmin.view.material.alphaTopBar
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -28,8 +30,8 @@ import com.example.daracademyadmin.ui.theme.customWhite0
 @Composable
 fun AlphaTopAppBar3(
     onCloseClicked : ()->Unit = {},
-    centralTitle : @Composable() (RowScope.()->Unit) = {},
-    trailingActions : @Composable() (RowScope.()->Unit) = {},
+    centralTitle : @Composable() (BoxScope.()->Unit) = {},
+    trailingActions : @Composable() (BoxScope.()->Unit) = {},
     elevation : Dp = 8.dp,
     modifier : Modifier = Modifier
 ) {
@@ -41,8 +43,7 @@ fun AlphaTopAppBar3(
             .height(55.dp)
             .fillMaxWidth()
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(start = 16.dp , end = 16.dp)
@@ -58,13 +59,11 @@ fun AlphaTopAppBar3(
                         onCloseClicked()
                     }
                     .padding(8.dp)
+                    .align(Alignment.CenterStart)
             )
 
-            Spacer(modifier = Modifier.weight(1f))
 
             centralTitle()
-
-            Spacer(modifier = Modifier.weight(1f))
 
             trailingActions()
         }

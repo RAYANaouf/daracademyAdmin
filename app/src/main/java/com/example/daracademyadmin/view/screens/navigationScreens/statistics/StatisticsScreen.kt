@@ -36,6 +36,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.example.daracademy.model.data.sealedClasses.screens.Screens
 import com.example.daracademyadmin.R
 import com.example.daracademyadmin.model.dataClasses.Student
 import com.example.daracademyadmin.ui.theme.customWhite0
@@ -44,8 +47,10 @@ import com.example.daracademyadmin.viewModel.DaracademyAdminViewModel
 
 @Composable
 fun StatisticsScreen(
-    viewModel : DaracademyAdminViewModel,
-    modifier  : Modifier = Modifier
+    viewModel       : DaracademyAdminViewModel,
+    navController   : NavController = rememberNavController(),
+    onClick         : ()->Unit ={},
+    modifier        : Modifier = Modifier
 ) {
 
     val context = LocalContext.current
@@ -88,6 +93,21 @@ fun StatisticsScreen(
         teachersAndStudents(
             teachers = teachers,
             students = students,
+            onTeacherClick = {
+//                navController.navigate(Screens.TeachersScreen().root){
+//                    popUpTo(Screens.HomeScreen().root){
+//                        inclusive = true
+//                    }
+//                }
+            },
+            onStudentClick = {
+//                navController.navigate(Screens.StudentsScreen().root){
+//                    popUpTo(Screens.HomeScreen().root){
+//                        inclusive = true
+//                    }
+//                }
+                onClick()
+            },
             modifier = Modifier
                 .fillMaxWidth(0.8f)
             )
@@ -119,6 +139,8 @@ fun StatisticsScreen(
 fun teachersAndStudents(
     teachers  : Int? ,
     students  : Int? ,
+    onTeacherClick : ()->Unit = {},
+    onStudentClick : ()->Unit = {},
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -139,7 +161,9 @@ fun teachersAndStudents(
                     shape = RoundedCornerShape(12.dp)
                 )
                 .background(customWhite0)
-                .clickable { }
+                .clickable {
+                    onTeacherClick()
+                }
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -185,7 +209,9 @@ fun teachersAndStudents(
                     shape = RoundedCornerShape(12.dp)
                 )
                 .background(customWhite0)
-                .clickable { }
+                .clickable {
+                    onStudentClick()
+                }
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,

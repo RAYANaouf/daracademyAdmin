@@ -56,7 +56,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
@@ -94,6 +97,8 @@ import com.example.daracademyadmin.viewModel.DaracademyAdminViewModel
 import com.example.daracademyadmin.ui.theme.DaracademyAdminTheme
 import com.example.daracademyadmin.ui.theme.backgroundLight
 import com.example.daracademyadmin.ui.theme.color1
+import com.example.daracademyadmin.ui.theme.color2
+import com.example.daracademyadmin.ui.theme.color3
 import com.example.daracademyadmin.ui.theme.customWhite0
 import com.example.daracademyadmin.ui.theme.customWhite7
 import com.example.daracademyadmin.view.screens.navigationScreens.Courses.CoursesScreen
@@ -102,6 +107,7 @@ import com.example.daracademyadmin.view.screens.navigationScreens.Posts.PostsScr
 import com.example.daracademyadmin.view.screens.navigationScreens.addCours.AddCoursScreen
 import com.example.daracademyadmin.view.screens.navigationScreens.stageScreen.StageScreen
 import com.example.daracademyadmin.view.screens.navigationScreens.statistics.StatisticsScreen
+import com.example.daracademyadmin.view.screens.navigationScreens.students.StudentsScreen
 import com.example.daracademyadmin.view.screens.navigationScreens.uploadScreen.UploadScreen
 import kotlinx.coroutines.launch
 
@@ -589,13 +595,17 @@ fun MainScreen(
                             else if(navBackStackEntry?.destination?.route == Screens.AddFormationScreen().root){
                                 "Add formation"
                             }
+                            else if(navBackStackEntry?.destination?.route == Screens.StudentsScreen().root){
+                                "Student"
+                            }
                             else{
-                                ""
+                                "${navBackStackEntry?.destination?.route}"
                             }
                         }
 
 
                         AlphaTopAppBar3(
+                            elevation = if (navBackStackEntry?.destination?.route == Screens.StudentsScreen().root) 0.dp else 8.dp,
                             onCloseClicked = {
 //                                viewModel.setAppScreen(Screens.HomeScreen())
                                 navController.navigate(Screens.HomeScreen().root){
@@ -605,35 +615,59 @@ fun MainScreen(
                                 }
                             },
                             centralTitle = {
-                                if(navBackStackEntry?.destination?.route != Screens.AddPostScreen().root){
 
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier
+                                        .align(Alignment.Center)
+                                ) {
+                                    if (img >0){
+                                        Image(
+                                            painter = painterResource(id = img),
+                                            contentDescription = null,
+                                            contentScale = ContentScale.Inside,
+                                            modifier = Modifier
+                                                .size(26.dp)
+                                                .clickable {
+                                                    Toast
+                                                        .makeText(
+                                                            context,
+                                                            "${navBackStackEntry?.destination?.route == Screens.AddPostScreen().root} ${Screens.AddPostScreen().root} ",
+                                                            Toast.LENGTH_LONG
+                                                        )
+                                                        .show()
+                                                }
+                                        )
+                                    }
+
+                                    Spacer(modifier = Modifier.width(10.dp))
+
+                                    if (title != ""){
+                                        Text(
+                                            text  = buildAnnotatedString {
+                                                withStyle(
+                                                    style = SpanStyle(fontSize = NormalTextStyles.TextStyleSZ3.fontSize , color = color1)
+                                                ){
+                                                    append(title[0])
+                                                }
+                                                withStyle(
+                                                    style = SpanStyle(fontSize = NormalTextStyles.TextStyleSZ5.fontSize , color = color3)
+                                                ){
+                                                    append(title[1])
+                                                }
+                                                withStyle(
+                                                    style = SpanStyle(fontSize = NormalTextStyles.TextStyleSZ5.fontSize , color = color2)
+                                                ){
+                                                    for (i in 2..<title.length){
+                                                        append(title[i])
+                                                    }
+                                                }
+                                            } ,
+                                            style = NormalTextStyles.TextStyleSZ5.copy(fontFamily = firaSansFamily , fontWeight = FontWeight.SemiBold , color = color1),
+                                        )
+                                    }
                                 }
 
-                                if (img >0){
-                                    Image(
-                                        painter = painterResource(id = img),
-                                        contentDescription = null,
-                                        contentScale = ContentScale.Inside,
-                                        modifier = Modifier
-                                            .size(26.dp)
-                                            .clickable {
-                                                Toast
-                                                    .makeText(
-                                                        context,
-                                                        "${navBackStackEntry?.destination?.route == Screens.AddPostScreen().root} ${Screens.AddPostScreen().root} ",
-                                                        Toast.LENGTH_LONG
-                                                    )
-                                                    .show()
-                                            }
-                                    )
-                                }
-
-                                Spacer(modifier = Modifier.width(10.dp))
-
-                                Text(
-                                    text = title ,
-                                    style = NormalTextStyles.TextStyleSZ5.copy(fontFamily = firaSansFamily , fontWeight = FontWeight.SemiBold , color = color1),
-                                )
 
                             },
                             trailingActions = {
@@ -647,6 +681,7 @@ fun MainScreen(
                                             .clickable {
 
                                             }
+                                            .align(Alignment.CenterEnd)
                                     )
                                 }
 
@@ -762,7 +797,7 @@ fun MainScreen(
                             },
                             modifier = Modifier
                                 .background(backgroundLight)
-                                .padding(top = paddingValues.calculateTopPadding()  )
+                                .padding(top = paddingValues.calculateTopPadding())
                         )
                     }
 
@@ -779,7 +814,7 @@ fun MainScreen(
                         },
                             modifier = Modifier
                                 .background(backgroundLight)
-                                .padding(top = paddingValues.calculateTopPadding() )
+                                .padding(top = paddingValues.calculateTopPadding())
                         )
                     }
 
@@ -953,15 +988,41 @@ fun MainScreen(
                     ){navBackStackEntry->
 
 
-
                         StatisticsScreen(
-                            viewModel = viewModel,
-                            modifier = Modifier
+                            navController = navController,
+                            viewModel     = viewModel,
+                            onClick       = {
+                                navController.navigate(Screens.StudentsScreen
+                                    ().root){
+                                    popUpTo(Screens.HomeScreen().root){
+                                        inclusive = true
+                                    }
+                                }
+                            },
+                            modifier      = Modifier
                                 .background(backgroundLight)
-                                .padding( top = paddingValues.calculateTopPadding())
+                                .padding(top = paddingValues.calculateTopPadding())
+                        )
+
+
+                    }
+
+                    composable(
+                        route = "${Screens.StudentsScreen().root}"
+                    ){navBackStackEntry->
+
+                        Toast.makeText(context , "${navBackStackEntry?.destination?.route}" , Toast.LENGTH_LONG).show()
+
+                        StudentsScreen(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(backgroundLight)
+                                .padding(top = paddingValues.calculateTopPadding())
                         )
 
                     }
+
+
 
 
                     composable(
@@ -972,7 +1033,7 @@ fun MainScreen(
                             progresses = viewModel.getProgress(),
                             modifier = Modifier
                                 .background(backgroundLight)
-                                .padding( top = paddingValues.calculateTopPadding())
+                                .padding(top = paddingValues.calculateTopPadding())
                         )
 
                     }
