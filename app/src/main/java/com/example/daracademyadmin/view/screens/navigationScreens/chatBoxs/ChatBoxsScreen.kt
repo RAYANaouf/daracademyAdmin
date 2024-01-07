@@ -94,7 +94,7 @@ fun ChatBoxsScreen(
                         messageBox = it,
                         modifier = Modifier
                             .clickable {
-                                viewModel.screenRepo.navigate_to_screen(Screens.HomeScreen().root , params =  arrayOf("${it.userId}" , "${it.productId}" , "${it.name}" ))
+                                viewModel.screenRepo.navigate_to_screen(Screens.ChatScreen().root , params =  arrayOf("${it.userId}" , "${it.productId}" , "${it.name}" ))
                             }
                             .padding(top = 8.dp, bottom = 8.dp)
 
