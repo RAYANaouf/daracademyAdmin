@@ -4,6 +4,7 @@ data class Student(
     val name  : String = "",
     val email : String = "",
     val phone : Phone   = Phone(),
-    val photo : String = ""
+    val photo : String = "",
+    val paid  : Boolean = true
 )
 
