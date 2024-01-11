@@ -360,6 +360,7 @@ class DaracademyRepository {
     fun addTeacher( name : String , email: String , number : String , type : String , photo : Uri? ,  formation : List<String> , support : List<String> ,  onSuccessCallBack: () -> Unit = {} , onFailureCallBack: (exp : Exception) -> Unit = {}){
 
 
+
         val teachersRef = storageRef.child("teachers")
         val id          = System.currentTimeMillis()
 
@@ -380,54 +381,62 @@ class DaracademyRepository {
 
             imgProg.add(0f)
 
-            photoRef.putFile(photo)
-                .addOnProgressListener {
+            Firebase.auth.createUserWithEmailAndPassword(
+                "rayan_aouf",
+                "123456789"
+            )
+                .addOnSuccessListener {
+                    photoRef.putFile(photo)
+                        .addOnProgressListener {
 
-                    imgProg[0] = 100f * it.bytesTransferred / it.totalByteCount
-                    var item = progresses[progressPostIndex]
-                    progresses.removeAt(progressPostIndex)
+                            imgProg[0] = 100f * it.bytesTransferred / it.totalByteCount
+                            var item = progresses[progressPostIndex]
+                            progresses.removeAt(progressPostIndex)
 
-                    //do
-                    item = item.copy(progress = imgProg )
+                            //do
+                            item = item.copy(progress = imgProg )
 
-                    progresses.add(progressPostIndex , item)
+                            progresses.add(progressPostIndex , item)
 
-                }
-                .addOnSuccessListener { _->
-                    //get the uri
-                    photoRef.downloadUrl
-                        .addOnSuccessListener { downloadUri->
-                            firebaseFirestore.collection("teachers")
-                                .document("$id")
-                                .set(
-                                    hashMapOf(
-                                        "id"         to id.toString(),
-                                        "name"       to name,
-                                        "email"      to email,
-                                        "phone"      to hashMapOf("type" to type , "number" to number),
-                                        "formations" to formation,
-                                        "supports"   to support,
-                                        "photo"      to downloadUri.toString()
-                                    )
-                                )
-                                .addOnSuccessListener { onSuccessCallBack() }
+                        }
+                        .addOnSuccessListener { _->
+                            //get the uri
+                            photoRef.downloadUrl
+                                .addOnSuccessListener { downloadUri->
+                                    firebaseFirestore.collection("teachers")
+                                        .document("$id")
+                                        .set(
+                                            hashMapOf(
+                                                "id"         to id.toString(),
+                                                "name"       to name,
+                                                "email"      to email,
+                                                "phone"      to hashMapOf("type" to type , "number" to number),
+                                                "formations" to formation,
+                                                "supports"   to support,
+                                                "photo"      to downloadUri.toString()
+                                            )
+                                        )
+                                        .addOnSuccessListener { onSuccessCallBack() }
+                                        .addOnFailureListener { onFailureCallBack(it) }
+                                }
                                 .addOnFailureListener { onFailureCallBack(it) }
                         }
-                        .addOnFailureListener { onFailureCallBack(it) }
+                        .addOnFailureListener{
+
+                            var item = progresses[progressPostIndex]
+                            progresses.removeAt(progressPostIndex)
+
+                            //do
+                            item = item.copy(failed = true )
+
+                            progresses.add(progressPostIndex , item)
+
+                            onFailureCallBack(it)
+                        }
                 }
                 .addOnFailureListener{
-
-                    var item = progresses[progressPostIndex]
-                    progresses.removeAt(progressPostIndex)
-
-                    //do
-                    item = item.copy(failed = true )
-
-                    progresses.add(progressPostIndex , item)
-
                     onFailureCallBack(it)
                 }
-
         }
         else{
             imgProg.add(100f)
@@ -440,20 +449,29 @@ class DaracademyRepository {
 
             progresses.add(progressPostIndex , item)
 
-            firebaseFirestore.collection("teachers")
-                .document("$id")
-                .set(
-                    hashMapOf(
-                        "name"       to name,
-                        "email"      to email,
-                        "phone"      to hashMapOf("type" to type , "number" to number),
-                        "formations" to formation,
-                        "supports"   to support,
-                        "photo"      to ""
-                    )
-                )
-                .addOnSuccessListener { onSuccessCallBack() }
-                .addOnFailureListener { onFailureCallBack(it) }
+            auth.createUserWithEmailAndPassword(
+                email,
+                "123456789"
+            )
+                .addOnSuccessListener {
+                    firebaseFirestore.collection("teachers")
+                        .document("$id")
+                        .set(
+                            hashMapOf(
+                                "name"       to name,
+                                "email"      to email,
+                                "phone"      to hashMapOf("type" to type , "number" to number),
+                                "formations" to formation,
+                                "supports"   to support,
+                                "photo"      to ""
+                            )
+                        )
+                        .addOnSuccessListener { onSuccessCallBack() }
+                        .addOnFailureListener { onFailureCallBack(it) }
+                }
+                .addOnFailureListener {
+                    onFailureCallBack(it)
+                }
         }
 
 
