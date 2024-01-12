@@ -381,62 +381,55 @@ class DaracademyRepository {
 
             imgProg.add(0f)
 
-            Firebase.auth.createUserWithEmailAndPassword(
-                "rayan_aouf",
-                "123456789"
-            )
-                .addOnSuccessListener {
-                    photoRef.putFile(photo)
-                        .addOnProgressListener {
+            photoRef.putFile(photo)
+                .addOnProgressListener {
 
-                            imgProg[0] = 100f * it.bytesTransferred / it.totalByteCount
-                            var item = progresses[progressPostIndex]
-                            progresses.removeAt(progressPostIndex)
+                    imgProg[0] = 100f * it.bytesTransferred / it.totalByteCount
+                    var item = progresses[progressPostIndex]
+                    progresses.removeAt(progressPostIndex)
 
-                            //do
-                            item = item.copy(progress = imgProg )
+                    //do
+                    item = item.copy(progress = imgProg )
 
-                            progresses.add(progressPostIndex , item)
+                    progresses.add(progressPostIndex , item)
 
-                        }
-                        .addOnSuccessListener { _->
-                            //get the uri
-                            photoRef.downloadUrl
-                                .addOnSuccessListener { downloadUri->
-                                    firebaseFirestore.collection("teachers")
-                                        .document("$id")
-                                        .set(
-                                            hashMapOf(
-                                                "id"         to id.toString(),
-                                                "name"       to name,
-                                                "email"      to email,
-                                                "phone"      to hashMapOf("type" to type , "number" to number),
-                                                "formations" to formation,
-                                                "supports"   to support,
-                                                "photo"      to downloadUri.toString()
-                                            )
-                                        )
-                                        .addOnSuccessListener { onSuccessCallBack() }
-                                        .addOnFailureListener { onFailureCallBack(it) }
-                                }
+                }
+                .addOnSuccessListener { _->
+                    //get the uri
+                    photoRef.downloadUrl
+                        .addOnSuccessListener { downloadUri->
+                            firebaseFirestore.collection("teachers")
+                                .document("$id")
+                                .set(
+                                    hashMapOf(
+                                        "id"         to id.toString(),
+                                        "name"       to name,
+                                        "email"      to email,
+                                        "phone"      to hashMapOf("type" to type , "number" to number),
+                                        "formations" to formation,
+                                        "supports"   to support,
+                                        "photo"      to downloadUri.toString()
+                                    )
+                                )
+                                .addOnSuccessListener { onSuccessCallBack() }
                                 .addOnFailureListener { onFailureCallBack(it) }
                         }
-                        .addOnFailureListener{
-
-                            var item = progresses[progressPostIndex]
-                            progresses.removeAt(progressPostIndex)
-
-                            //do
-                            item = item.copy(failed = true )
-
-                            progresses.add(progressPostIndex , item)
-
-                            onFailureCallBack(it)
-                        }
+                        .addOnFailureListener { onFailureCallBack(it) }
                 }
                 .addOnFailureListener{
+
+                    var item = progresses[progressPostIndex]
+                    progresses.removeAt(progressPostIndex)
+
+                    //do
+                    item = item.copy(failed = true )
+
+                    progresses.add(progressPostIndex , item)
+
                     onFailureCallBack(it)
                 }
+
+
         }
         else{
             imgProg.add(100f)
