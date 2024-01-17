@@ -87,10 +87,6 @@ fun AddTeacherScreen(
 
     var context = LocalContext.current
 
-    var loading by rememberSaveable {
-        mutableStateOf(false)
-    }
-
     var name by rememberSaveable {
         mutableStateOf("")
     }
@@ -134,44 +130,7 @@ fun AddTeacherScreen(
                 .verticalScroll(rememberScrollState())
                 .fillMaxSize()
         ) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(190.dp)
-            ){
-                Image(
-                    painter = rememberAsyncImagePainter(model = if (photo_uri == null) R.drawable.teacher else photo_uri),
-                    contentDescription = null,
-                    contentScale = if (photo_uri==null) ContentScale.Inside else ContentScale.Crop,
-                    modifier = Modifier
-                        .size(100.dp)
-                        .clickable {
-                            launcher_img.launch(
-                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                            )
-                        }
-                        .clip(if (photo_uri == null) RoundedCornerShape(0.dp) else CircleShape)
-                        .border(
-                            width = 1.5.dp,
-                            color = if (photo_uri == null) Color.Transparent else color1,
-                            shape = CircleShape
-                        )
-                )
-                Box(
-                    modifier = Modifier
-                        .size(90.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.camera_icon ),
-                        contentDescription = null,
-                        tint = color1,
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .size(20.dp)
-                    )
-                }
-            }
+
 
 
             Row(
