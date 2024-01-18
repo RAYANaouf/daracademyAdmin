@@ -5,6 +5,7 @@ data class Teacher(
     val name      : String = "",
     val email     : String = "",
     val photo     : String = "",
+    val password  : String = "",
     val phone     : Phone = Phone(),
     val formation : List<String> = listOf(),
     val supports  : List<String> = listOf()

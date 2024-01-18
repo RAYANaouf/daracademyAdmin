@@ -68,6 +68,8 @@ import com.example.alphaspace.screens.common.dropDownMenu.AlphaDropDownMenu
 import com.example.bigsam.grafic.material.loadingEffect.loadingLottieAnimation
 import com.example.daracademyadmin.model.variables.josefinSansFamily
 import com.example.daracademyadmin.ui.theme.backgroundLight
+import com.example.daracademyadmin.view.screens.navigationScreens.addTeacher.components.header.Header
+import com.example.daracademyadmin.view.screens.navigationScreens.addTeacher.components.informationFields.informationFields
 
 @Composable
 fun AddTeacherScreen(
@@ -94,14 +96,14 @@ fun AddTeacherScreen(
     var email by rememberSaveable {
         mutableStateOf("")
     }
+    var password by rememberSaveable {
+        mutableStateOf("")
+    }
 
     var number by rememberSaveable {
         mutableStateOf("")
     }
 
-    var expanded by remember{
-        mutableStateOf(false)
-    }
 
     var numberType by remember {
         mutableStateOf("07")
@@ -112,11 +114,7 @@ fun AddTeacherScreen(
     }
 
 
-    var launcher_img = rememberLauncherForActivityResult(contract = ActivityResultContracts.PickVisualMedia()){uri->
-        if (uri != null){
-            photo_uri = uri
-        }
-    }
+
 
     Box(
         modifier = modifier
@@ -131,174 +129,44 @@ fun AddTeacherScreen(
                 .fillMaxSize()
         ) {
 
+            Header(
+                photo_uri = photo_uri,
+                onImageChange = {uri ->
+                    photo_uri = uri
+                }
+            )
 
+            informationFields(
+                name       = name,
+                email      = email,
+                numberType = numberType,
+                number     = number,
+                password   = password,
+                onChange   = {type, txt ->
+                    when(type){
+                        "name"->{
+                            name = txt
+                        }
+                        "email"->{
+                            email = txt
+                        }
+                        "numberType"->{
+                            numberType = txt
+                        }
+                        "number"->{
+                            if (txt.length <= 8){
+                                number = txt.filter { it.isDigit() }
+                            }
+                        }
+                        "password"->{
+                            password = txt
+                        }
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-                    .padding(start = 16.dp, end = 16.dp)
-            ) {
-                AlphaTextField(
-                    text = name,
-                    textFieldStyle = NormalTextStyles.TextStyleSZ7,
-                    onValueChange = {
-                        name = it
-                    },
-                    hint = "Teacher name",
-                    hintStyle = NormalTextStyles.TextStyleSZ7,
-                    cursorColor = color1,
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .weight(1f)
-                )
-            }
-
-            Spacer(
-                modifier = Modifier
-                    .height(24.dp)
+                    }
+                }
             )
 
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-                    .padding(start = 16.dp, end = 16.dp)
-            ) {
-                AlphaTextField(
-                    text = email,
-                    textFieldStyle = NormalTextStyles.TextStyleSZ7,
-                    onValueChange = {
-                        email = it
-                    },
-                    hint = "Teacher email",
-                    hintStyle = NormalTextStyles.TextStyleSZ7,
-                    cursorColor = color1,
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .weight(1f)
-                )
-            }
-
-            Spacer(
-                modifier = Modifier
-                    .height(24.dp)
-            )
-
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-                    .padding(start = 16.dp, end = 16.dp)
-            ) {
-
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .aspectRatio(1f)
-                        .clip(RoundedCornerShape(12.dp))
-                        .border(
-                            width = 1.dp,
-                            color = color1,
-                            shape = RoundedCornerShape(12.dp)
-                        )
-                        .clickable {
-                            expanded = true
-                        }
-                ) {
-
-                    AlphaDropDownMenu(
-                        expanded = expanded,
-                        items = listOf("05","06","07"),
-                        onClick = {type-> numberType = type},
-                        onDismissRequest = { expanded = false })
-
-                    Text(
-                        text = numberType,
-                        style = NormalTextStyles.TextStyleSZ6.copy(color = color1 , fontFamily = josefinSansFamily),
-                        modifier = Modifier
-                            .offset(x = 0.dp , y = (-3).dp)
-                    )
-                }
-                
-                Spacer(modifier = Modifier.width(12.dp))
-
-                AlphaTextField(
-                    text = number,
-                    textFieldStyle = NormalTextStyles.TextStyleSZ7,
-                    onValueChange = {txt->
-
-                        if (txt.length <= 8){
-                            number = txt.filter { it.isDigit() }
-                        }
-
-//                        var format = "**_**_**_**"
-//
-//                        if (txt.length <= format.length){
-//
-//                            val newNumber = buildString {
-//
-//                                var inputIndex  = 0
-//
-//
-//                                while (inputIndex < txt.length){
-//
-//                                    if(format[inputIndex] == '_' && txt[inputIndex] != '_'){
-//                                        append("_${txt[inputIndex]}")
-//
-//                                    }
-//                                    else{
-//                                        append(txt[inputIndex])
-//                                    }
-//
-//
-//
-//                                    inputIndex++
-//                                }
-//
-//                            }
-//
-//                            number = newNumber
-//                        }
-
-
-
-
-                    },
-                    hint = "Phone number",
-                    hintStyle = NormalTextStyles.TextStyleSZ7,
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        keyboardType = KeyboardType.Phone
-                    ),
-                    cursorColor = color1,
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .weight(1f)
-                )
-
-                Spacer(modifier = Modifier.width(12.dp))
-
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .aspectRatio(1f)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(color3)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.phone_fulfilled_icon),
-                        contentDescription = null,
-                        tint = color1,
-                        modifier = Modifier
-                            .fillMaxSize(0.55f)
-                    )
-                }
-
-            }
 
 
         }
@@ -319,6 +187,7 @@ fun AddTeacherScreen(
                         viewModel.addTeacher(
                             name = name,
                             email = email,
+                            password = password,
                             number     = number,
                             type       = numberType,
                             photo      = photo_uri ,

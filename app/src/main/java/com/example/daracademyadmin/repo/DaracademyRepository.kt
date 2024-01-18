@@ -357,7 +357,7 @@ class DaracademyRepository {
 
     }
 
-    fun addTeacher( name : String , email: String , number : String , type : String , photo : Uri? ,  formation : List<String> , support : List<String> ,  onSuccessCallBack: () -> Unit = {} , onFailureCallBack: (exp : Exception) -> Unit = {}){
+    fun addTeacher( name : String , email: String , password : String , number : String , type : String , photo : Uri? ,  formation : List<String> , support : List<String> ,  onSuccessCallBack: () -> Unit = {} , onFailureCallBack: (exp : Exception) -> Unit = {}){
 
 
 
@@ -408,6 +408,7 @@ class DaracademyRepository {
                                         "phone"      to hashMapOf("type" to type , "number" to number),
                                         "formations" to formation,
                                         "supports"   to support,
+                                        "password"   to password,
                                         "photo"      to downloadUri.toString()
                                     )
                                 )

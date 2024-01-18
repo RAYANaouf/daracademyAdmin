@@ -96,10 +96,10 @@ class DaracademyAdminViewModel : ViewModel{
 
     }
 
-    fun addTeacher( name : String , email: String , number : String , type : String , photo : Uri? ,  formation : List<String> , support : List<String> ,  onSuccessCallBack: () -> Unit = {} , onFailureCallBack: (exp : Exception) -> Unit = {}){
+    fun addTeacher( name : String , email: String , password : String ,  number : String , type : String , photo : Uri? ,  formation : List<String> , support : List<String> ,  onSuccessCallBack: () -> Unit = {} , onFailureCallBack: (exp : Exception) -> Unit = {}){
 
 
-        this.repo.addTeacher(name, email, number, type, photo, formation, support, onSuccessCallBack, onFailureCallBack)
+        this.repo.addTeacher(name = name, email = email, password =  password , number = number, type =  type, photo = photo, formation  =formation, support = support,  onSuccessCallBack, onFailureCallBack)
 
 
     }
