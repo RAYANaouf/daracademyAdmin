@@ -156,8 +156,8 @@ class DaracademyAdminViewModel : ViewModel{
         )
     }
 
-    fun addCourses(phase : String, annee : String, matiere : String, course : Course, onSuccessCallBack: () -> Unit, onFailureCallBack: (ex: Exception) -> Unit) {
-        this.repo.addCourses(phase,annee, matiere, course, onSuccessCallBack, onFailureCallBack)
+    fun addCourses(  course : Course, onSuccessCallBack: () -> Unit, onFailureCallBack: (ex: Exception) -> Unit) {
+        this.repo.addCourses( course, onSuccessCallBack, onFailureCallBack)
     }
 
     fun getProgress(): List<ProgressUpload>{

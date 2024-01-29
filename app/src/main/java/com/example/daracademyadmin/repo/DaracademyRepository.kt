@@ -80,31 +80,24 @@ class DaracademyRepository {
 
     /***************************************************************************************/
 
-    var matieres : HashMap<String , HashMap< String , List<Matiere>? > > =
+    var matieres : HashMap<String , List<Matiere>? > =
         hashMapOf(
-            PhaseDesEtudes.Primaire().phase to hashMapOf(
-                annees_de_primaire[0].id     to null,
-                annees_de_primaire[1].id     to null,
-                annees_de_primaire[2].id     to null,
-                annees_de_primaire[3].id     to null,
-                annees_de_primaire[4].id     to null,
-                annees_de_primaire[5].id     to null,
-                annees_de_primaire[6].id     to null,
-            ),
-            PhaseDesEtudes.CEM().phase      to hashMapOf(
-                annees_de_C_E_M[0].id        to null,
-                annees_de_C_E_M[1].id        to null,
-                annees_de_C_E_M[2].id        to null,
-                annees_de_C_E_M[3].id        to null,
-                annees_de_C_E_M[4].id        to null,
-            ),
-            PhaseDesEtudes.Lycee().phase    to hashMapOf(
-                annees_de_lycee[0].id        to null,
-                annees_de_lycee[1].id        to null,
-                annees_de_lycee[2].id        to null,
-                annees_de_lycee[3].id        to null,
-            )
+            PhaseDesEtudes.Primaire().phase+"_"+annees_de_primaire[0].id to null,
+            PhaseDesEtudes.Primaire().phase+"_"+annees_de_primaire[1].id to null,
+            PhaseDesEtudes.Primaire().phase+"_"+annees_de_primaire[2].id to null,
+            PhaseDesEtudes.Primaire().phase+"_"+annees_de_primaire[3].id to null,
+            PhaseDesEtudes.Primaire().phase+"_"+annees_de_primaire[4].id to null,
 
+            PhaseDesEtudes.CEM().phase+"_"+annees_de_C_E_M[0].id to null,
+            PhaseDesEtudes.CEM().phase+"_"+annees_de_C_E_M[1].id to null,
+            PhaseDesEtudes.CEM().phase+"_"+annees_de_C_E_M[2].id to null,
+            PhaseDesEtudes.CEM().phase+"_"+annees_de_C_E_M[3].id to null,
+            PhaseDesEtudes.CEM().phase+"_"+annees_de_C_E_M[4].id to null,
+
+            PhaseDesEtudes.Lycee().phase+"_"+annees_de_lycee[0].id to null,
+            PhaseDesEtudes.Lycee().phase+"_"+annees_de_lycee[1].id to null,
+            PhaseDesEtudes.Lycee().phase+"_"+annees_de_lycee[2].id to null,
+            PhaseDesEtudes.Lycee().phase+"_"+annees_de_lycee[3].id to null,
         )
 
 
@@ -820,23 +813,21 @@ class DaracademyRepository {
                     imgRef.downloadUrl
                         .addOnSuccessListener {storageUri->
 
-                        firebaseFirestore.collection("phases")
-                            .document(phase)
-                            .collection("annees")
-                            .document(annee)
-                            .collection("matieres")
-                            .document(matiere.name)
+                        firebaseFirestore.collection("matieres")
+                            .document(id)
                             .set(
-                                hashMapOf(
-                                    "name"   to matiere.name,
-                                    "img"    to matiere.img,
-                                    "imgUrl" to storageUri
+                                Matiere(
+                                    id = id,
+                                    name = matiere.name,
+                                    imgUrl = storageUri.toString(),
+                                    phase = phase,
+                                    annee = annee
                                 )
                             )
                             .addOnSuccessListener {
-                                var list = matieres.get(phase)?.get(annee)?.toMutableList()
-                                list?.add(matiere)
-                                matieres.get(phase)?.set(annee , list ?: emptyList())
+                                var list = matieres[phase+"_"+annee]?.toMutableList()
+                                list?.add(matiere.copy(id = id))
+                                matieres[phase+"_"+annee] = list ?: emptyList()
 
                                 onSuccessCallBack(
                                     list ?: emptyList()
@@ -852,22 +843,22 @@ class DaracademyRepository {
                 .addOnFailureListener(onFailureCallBack)
         }
         else{
-            firebaseFirestore.collection("phases")
-                .document(phase)
-                .collection("annees")
-                .document(annee)
-                .collection("matieres")
-                .document(matiere.name)
+
+            firebaseFirestore.collection("matieres")
+                .document(id)
                 .set(
-                    hashMapOf(
-                        "name"   to matiere.name,
-                        "img"    to matiere.img,
+                    Matiere(
+                        id   = id,
+                        name = matiere.name,
+                        img  = matiere.img,
+                        phase = phase,
+                        annee = annee,
                     )
                 )
                 .addOnSuccessListener {
-                    var list = matieres.get(phase)?.get(annee)?.toMutableList()
-                    list?.add(matiere)
-                    matieres.get(phase)?.set(annee , list ?: emptyList())
+                    var list = matieres[phase+"_"+annee]?.toMutableList()
+                    list?.add(matiere.copy(id = id))
+                    matieres[phase+"_"+annee] = list ?: emptyList()
 
                     onSuccessCallBack(
                         list ?: emptyList()
@@ -890,15 +881,13 @@ class DaracademyRepository {
     fun getAllMatieres(phase : String , annee : String , onSuccessCallBack: (List<Matiere>) -> Unit , onFailureCallBack: (ex: Exception) -> Unit) {
 
 
-        if (matieres.get(phase)?.get(annee) != null){
-            onSuccessCallBack(matieres.get(phase)?.get(annee)!!)
+        if (matieres[phase+"_"+annee] != null){
+            onSuccessCallBack(matieres[phase+"_"+annee]!!)
         }
         else{
-            firebaseFirestore.collection("phases")
-                .document(phase)
-                .collection("annees")
-                .document(annee)
-                .collection("matieres")
+            firebaseFirestore.collection("matieres")
+                .whereEqualTo("phase" , phase)
+                .whereEqualTo("annee" , annee)
                 .get()
                 .addOnSuccessListener { docs->
                     var new_matieres = ArrayList<Matiere>()
@@ -906,7 +895,7 @@ class DaracademyRepository {
                         new_matieres.add(doc.toObject(Matiere::class.java))
                     }
 
-                    matieres.get(phase)?.set(annee , new_matieres)
+                    matieres[phase+"_"+annee] = new_matieres
 
                     onSuccessCallBack(new_matieres)
                 }
@@ -919,20 +908,14 @@ class DaracademyRepository {
     }
 
 
-    fun addCourses( phase : String , annee : String , matiere : String , course : Course , onSuccessCallBack: () -> Unit , onFailureCallBack: (ex: Exception) -> Unit){
+    fun addCourses(  course : Course , onSuccessCallBack: () -> Unit , onFailureCallBack: (ex: Exception) -> Unit){
 
         val courseId  = System.currentTimeMillis().toString()
 
 
-        firebaseFirestore.collection("phases")
-            .document(phase)
-            .collection("annees")
-            .document(annee)
-            .collection("matieres")
-            .document(matiere)
-            .collection("courses")
+        firebaseFirestore.collection("courses")
             .document(courseId)
-            .set(course.copy(courseId = courseId))
+            .set(course.copy(courseId = courseId ))
             .addOnSuccessListener {
                 onSuccessCallBack()
             }

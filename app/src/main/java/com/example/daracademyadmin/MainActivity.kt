@@ -114,9 +114,6 @@ import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
-    private val Context.dataStore  : DataStore<Preferences> by preferencesDataStore(name = "dataStore")
-
-
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -854,23 +851,15 @@ fun MainScreen(
 
 
                     composable(
-                        route = "${Screens.AddCoursScreen().root}/{phase}/{annee}/{matiere}",
+                        route = "${Screens.AddCoursScreen().root}/{matiereId}",
                         arguments = listOf(
-                            navArgument("phase"){
-                                type = NavType.StringType
-                            },
-                            navArgument("annee"){
-                                type = NavType.StringType
-                            },
-                            navArgument("matiere"){
+                            navArgument("matiereId"){
                                 type = NavType.StringType
                             }
                         )
                     ){navBackStackEntry->
                         AddCoursScreen(
-                            phase      = navBackStackEntry.arguments?.getString("phase") ?: "",
-                            annee      = navBackStackEntry.arguments?.getString("annee") ?: "",
-                            matiere    = navBackStackEntry.arguments?.getString("matiere") ?: "",
+                            matiereId  = navBackStackEntry.arguments?.getString("matiereId") ?: "",
                             viewModel  = viewModel,
                             modifier   = Modifier
                                 .background(backgroundLight)

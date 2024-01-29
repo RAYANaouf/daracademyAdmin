@@ -67,7 +67,7 @@ fun MatieresScreen(
     modifier     : Modifier = Modifier
 ) {
 
-//    val context = LocalContext.current
+
 
     val window = LocalView.current.context as Activity
 
@@ -116,13 +116,10 @@ fun MatieresScreen(
                         .clip(RoundedCornerShape(16.dp))
                         .clickable {
                             if (kind == "view"){
-
                                 viewModel.screenRepo.navigate_to_screen(Screens.CoursesScreen().root )
-
-
                             }
                             else if(kind == "edit"){
-                                viewModel.screenRepo.navigate_to_screen(Screens.AddCoursScreen().root , phase , annee , it.name )
+                                viewModel.screenRepo.navigate_to_screen(Screens.AddCoursScreen().root ,it.id )
 
                             }
 
@@ -130,8 +127,7 @@ fun MatieresScreen(
                 )
             }
 
-            item(){
-                val context = LocalContext.current
+            item{
                 AddMatieresItem(
                     onClick = {
                         state_addMatiereDialog.show()
@@ -139,6 +135,7 @@ fun MatieresScreen(
                     background = customWhite0
                 )
             }
+
         }
     }
     

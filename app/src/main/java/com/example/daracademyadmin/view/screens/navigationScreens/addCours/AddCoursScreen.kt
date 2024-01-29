@@ -79,9 +79,7 @@ import com.example.daracademyadmin.viewModel.DaracademyAdminViewModel
 @Composable
 fun AddCoursScreen(
     viewModel  : DaracademyAdminViewModel ,
-    phase      : String,
-    annee      : String,
-    matiere    : String,
+    matiereId    : String,
     modifier   : Modifier = Modifier
 ) {
 
@@ -303,10 +301,7 @@ fun AddCoursScreen(
                     .clickable {
                         loading = true
                         viewModel.addCourses(
-                            phase ,
-                            annee ,
-                            matiere ,
-                            course = Course(courseId = "" , teacherId = selectedTeacher.get(0).id , lessons =  lessons ) ,
+                            course = Course(courseId = "" , teacherId = selectedTeacher.get(0).id , matiereId = matiereId ,  lessons =  lessons ) ,
                             onSuccessCallBack = {
                                 loading = false
                                 viewModel.screenRepo.navigate_to_screen(Screens.HomeScreen().root)
@@ -520,8 +515,6 @@ fun AddCoursScreen_preview() {
                 }
             }
         ),
-        phase = "",
-        annee = "",
-        matiere = ""
+        matiereId = ""
     )
 }
